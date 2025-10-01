@@ -6,8 +6,8 @@ from datetime import datetime
 
 class PlatformBase(BaseModel):
     date: Optional[datetime] = None
-    serial_num: str
-    current_status: str
+    serial_num: Optional[str] = None
+    current_status: Optional[str] = None
 
 class PlatformCreate(PlatformBase):
     pass

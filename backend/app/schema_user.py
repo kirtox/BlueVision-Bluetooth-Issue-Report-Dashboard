@@ -2,11 +2,11 @@ from pydantic import BaseModel
 from typing import Optional
 
 class UserBase(BaseModel):
-    username: str
+    username: Optional[str] = None
     hashed_password: Optional[str] = None
 
 class UserCreate(UserBase):
-    password: str
+    password: Optional[str] = None
 
 class UserUpdate(UserBase):
     password: Optional[str] = None

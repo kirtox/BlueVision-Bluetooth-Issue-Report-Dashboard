@@ -56,7 +56,7 @@ def create_report(report: ReportCreate, db: Session = Depends(get_db)):
     return crud.create_report(db, report)
 
 # Update a report
-@app.put("/reports/{report_id}", response_model=ReportInDB)
+@app.patch("/reports/{report_id}", response_model=ReportInDB)
 def update_report(report_id: int, report: ReportUpdate, db: Session = Depends(get_db)):
     return crud.update_report(db, report_id, report)
 

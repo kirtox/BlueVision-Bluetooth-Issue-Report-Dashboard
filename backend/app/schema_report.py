@@ -3,27 +3,27 @@ from typing import Optional
 from datetime import datetime
 
 class ReportBase(BaseModel):
-    op_name: str
+    op_name: Optional[str] = None
     date: Optional[datetime] = None
-    serial_num: str
+    serial_num: Optional[str] = None
 
-    os_version: str
-    platform_brand: str
-    platform: str
-    platform_phase: str
-    platform_bios: str
-    cpu: str
-    wlan: str
-    wlan_phase: str
-    bt_driver: str
-    bt_interface: str
-    wifi_driver: str
-    audio_driver: str
-    wrt_version: str
-    wrt_preset: str
+    os_version: Optional[str] = None
+    platform_brand: Optional[str] = None
+    platform: Optional[str] = None
+    platform_phase: Optional[str] = None
+    platform_bios: Optional[str] = None
+    cpu: Optional[str] = None
+    wlan: Optional[str] = None
+    wlan_phase: Optional[str] = None
+    bt_driver: Optional[str] = None
+    bt_interface: Optional[str] = None
+    wifi_driver: Optional[str] = None
+    audio_driver: Optional[str] = None
+    wrt_version: Optional[str] = None
+    wrt_preset: Optional[str] = None
     msft_teams_version: Optional[str] = None
 
-    scenario: str
+    scenario: Optional[str] = None
 
     mouse_bt: Optional[str] = None
     mouse_brand: Optional[str] = None
@@ -49,31 +49,31 @@ class ReportBase(BaseModel):
     device1_brand: Optional[str] = None
     device1: Optional[str] = None
 
-    modern_standby: str
+    modern_standby: Optional[str] = None
     ms_period: Optional[str] = None
     ms_os_waiting_time: Optional[str] = None
 
-    s4: str
+    s4: Optional[str] = None
     s4_period: Optional[str] = None
     s4_os_waiting_time: Optional[str] = None
 
-    warm_boot: str
+    warm_boot: Optional[str] = None
     wb_period: Optional[str] = None
     wb_os_waiting_time: Optional[str] = None
 
-    cold_boot: str
+    cold_boot: Optional[str] = None
     cb_period: Optional[str] = None
     cb_os_waiting_time: Optional[str] = None
 
-    microsoft_teams: str
+    microsoft_teams: Optional[str] = None
 
-    apm: str
+    apm: Optional[str] = None
     apm_period: Optional[str] = None
     
-    opp: str
-    swift_pair: str
+    opp: Optional[str] = None
+    swift_pair: Optional[str] = None
 
-    power_type: str
+    power_type: Optional[str] = None
     urgent_level: Optional[str] = None
     fix_work_week: Optional[str] = None
     fix_bt_driver: Optional[str] = None
