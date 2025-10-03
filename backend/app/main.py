@@ -13,6 +13,7 @@ from app import models, crud, auth, export
 from app.schema_report import ReportCreate, ReportUpdate, ReportInDB
 from app.schema_platform import PlatformCreate, PlatformUpdate, PlatformInDB
 from app.schema_platform_latest_report import PlatformWithLatestReportInDB
+from app.middleware import APIAccessLogMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 # Solve CORS（Cross-Origin Resource Sharing） issue
@@ -23,6 +24,9 @@ import logging
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# Add API Access Log Middleware
+app.add_middleware(APIAccessLogMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
