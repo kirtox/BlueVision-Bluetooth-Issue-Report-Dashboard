@@ -13,6 +13,7 @@ from app import models, crud, auth, export
 from app.schema_report import ReportCreate, ReportUpdate, ReportInDB
 from app.schema_platform import PlatformCreate, PlatformUpdate, PlatformInDB
 from app.schema_platform_latest_report import PlatformWithLatestReportInDB
+from app.schema_api_log import APIAccessLogInDB
 from app.middleware import APIAccessLogMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -107,6 +108,11 @@ def update_platform(platform_id: int, platform: PlatformUpdate, db: Session = De
 @app.delete("/platforms/{platform_id}")
 def delete_platform(platform_id: int, db: Session = Depends(get_db)):
     return crud.delete_platform(db, platform_id)
+
+# API Access Logs
+@app.get("/api-logs", response_model=list[APIAccessLogInDB])
+def get_api_logs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    return crud.get_api_access_logs(db, skip=skip, limit=limit)
 
 # Summary each serial_num's latest report
 # @app.get("/platforms/latest_reports", response_model=list[PlatformWithLatestReportInDB])

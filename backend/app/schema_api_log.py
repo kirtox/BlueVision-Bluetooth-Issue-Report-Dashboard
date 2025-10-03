@@ -2,12 +2,12 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional
 
-class ApiAccessLogInDB(BaseModel):
+class APIAccessLogInDB(BaseModel):
     id: int
     timestamp: datetime
     method: str
     endpoint: str
-    client_ip: Optional[str] = None
+    client_ip: str
     user_agent: Optional[str] = None
     request_body: Optional[str] = None
     response_status: Optional[int] = None

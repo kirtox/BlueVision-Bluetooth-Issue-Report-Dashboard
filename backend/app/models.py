@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Text
 from sqlalchemy.ext.declarative import declarative_base
 import datetime
 
@@ -106,3 +106,17 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+
+class APIAccessLog(Base):
+    __tablename__ = "api_access_log"
+    id = Column(Integer, primary_key=True, index=True)
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    method = Column(String, nullable=False)
+    endpoint = Column(String, nullable=False)
+    client_ip = Column(String, nullable=False)
+    user_agent = Column(String)
+    request_body = Column(Text)  # 使用 Text 類型來存儲較長的 JSON 內容
+    response_status = Column(Integer)
+    response_time_ms = Column(Integer)
+    host = Column(String)
+    referer = Column(String)

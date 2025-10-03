@@ -232,3 +232,16 @@ def update_user(db: Session, user_id: int, user: UserUpdate):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+# API Access Log CRUD
+def create_api_access_log(db: Session, log_data: dict):
+    """創建 API 訪問日誌記錄"""
+    db_log = models.APIAccessLog(**log_data)
+    db.add(db_log)
+    db.commit()
+    db.refresh(db_log)
+    return db_log
+
+def get_api_access_logs(db: Session, skip: int = 0, limit: int = 100):
+    """獲取 API 訪問日誌列表"""
+    return db.query(models.APIAccessLog).order_by(models.APIAccessLog.timestamp.desc()).offset(skip).limit(limit).all()

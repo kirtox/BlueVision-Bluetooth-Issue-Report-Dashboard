@@ -77,34 +77,29 @@ class APIAccessLogMiddleware(BaseHTTPMiddleware):
         if self.config.get("debug_print_request", False):
             self.print_response_summary(method, endpoint, response.status_code, process_time)
         
-        # Record to database (暫時禁用，因為缺少 create_api_access_log 函數)
-        # try:
-        #     db = SessionLocal()
-        #     
-        #     # 取得額外的平台資訊
-        #     server_info = self.get_server_info()
-        #     client_hostname = self.get_client_hostname(client_ip)
-        #     
-        #     log_data = {
-        #         "method": method,
-        #         "endpoint": endpoint,
-        #         "client_ip": client_ip,
-        #         "user_agent": user_agent,
-        #         "request_body": request_body,
-        #         "response_status": response.status_code,
-        #         "response_time_ms": process_time,
-        #         "host": host,
-        #         "referer": referer,
-        #         "server_hostname": server_info.get("hostname"),
-        #         "server_ip": server_info.get("ip"),
-        #         "client_hostname": client_hostname,
-        #         "platform_info": f"{server_info.get('platform')} {server_info.get('architecture')}",
-        #         "timestamp": datetime.now().isoformat()
-        #     }
-        #     crud.create_api_access_log(db, log_data)
-        #     db.close()
-        # except Exception as e:
-        #     logger.error(f"Failed to log API access: {e}")
+        # Record to database
+        try:
+            db = SessionLocal()
+            
+            from datetime import timezone, timedelta
+            taipei_tz = timezone(timedelta(hours=8))
+            
+            log_data = {
+                "method": method,
+                "endpoint": endpoint,
+                "client_ip": client_ip,
+                "user_agent": user_agent,
+                "request_body": request_body,  # 加入 request body
+                "response_status": response.status_code,
+                "response_time_ms": process_time,
+                "host": host,
+                "referer": referer,
+                "timestamp": datetime.now(taipei_tz).replace(tzinfo=None)  # 轉換為台灣時間但移除時區資訊
+            }
+            crud.create_api_access_log(db, log_data)
+            db.close()
+        except Exception as e:
+            logger.error(f"Failed to log API access: {e}")
         
         return response
     
