@@ -210,12 +210,29 @@ def get_user(db: Session, username: str):
 def create_user(db: Session, user: UserCreate):
     db_user = models.User(
         username=user.username,
-        hashed_password=get_password_hash(user.password)
+        hashed_password=get_password_hash(user.password),
+        role=user.role
     )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
+
+def get_users(db: Session):
+    """獲取所有用戶列表"""
+    return db.query(models.User).all()
+
+def authenticate_user(db: Session, username: str, password: str):
+    """驗證用戶登入"""
+    from .utils import verify_password
+    user = get_user(db, username)
+    if not user:
+        return False
+    if user.is_active != "Y":
+        return False
+    if not verify_password(password, user.hashed_password):
+        return False
+    return user
 
 def update_user(db: Session, user_id: int, user: UserUpdate):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()

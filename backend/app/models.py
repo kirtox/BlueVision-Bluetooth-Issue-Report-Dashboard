@@ -104,8 +104,11 @@ class Platform(Base):
 class User(Base):
     __tablename__ = "user"
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
+    username = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    role = Column(String, default="User", nullable=False)  # "Administrator" 或 "User"
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    is_active = Column(String, default="Y", nullable=False)  # "Y" 或 "N"
 
 class APIAccessLog(Base):
     __tablename__ = "api_access_log"
