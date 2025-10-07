@@ -5,6 +5,7 @@ import Sidebar from "components/navbars/sidebar/Sidebar";
 import Header from "components/navbars/topbar/Header";
 // import { Image } from "react-bootstrap";
 import { useState, useEffect } from "react";
+import { ProtectedRoute } from "../components/ProtectedRoute";
 
 // import ScrollButton from "sub-components/dashboard/ScrollButton";
 
@@ -47,18 +48,19 @@ const RootLayout = () => {
   }, []);
 
   return (
-    <section className="bg-light">
-      <div id="db-wrapper" className={`${showMenu ? "" : "toggled"}`}>
-        <div className="navbar-vertical navbar">
-          <Sidebar showMenu={showMenu} toggleMenu={ToggleMenu} />
-        </div>
-        <div id="page-content">
-          <div className="header">
-            <Header toggleMenu={ToggleMenu} />
+    <ProtectedRoute>
+      <section className="bg-light">
+        <div id="db-wrapper" className={`${showMenu ? "" : "toggled"}`}>
+          <div className="navbar-vertical navbar">
+            <Sidebar showMenu={showMenu} toggleMenu={ToggleMenu} />
           </div>
-          <Outlet />
+          <div id="page-content">
+            <div className="header">
+              <Header toggleMenu={ToggleMenu} />
+            </div>
+            <Outlet />
+          </div>
         </div>
-      </div>
 
       {/* <div style={{ position: 'fixed', bottom: '30px', left: '30px', display: 'flex', gap: '12px', zIndex: 1000 }}>
         <ScrollButton direction="down" />
@@ -156,7 +158,8 @@ const RootLayout = () => {
           <path d="M6 9l6 6 6-6"/>
         </svg>
       </button>
-    </section>
+      </section>
+    </ProtectedRoute>
   );
 };
 

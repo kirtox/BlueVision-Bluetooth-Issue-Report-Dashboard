@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import { Nav, Navbar} from "react-bootstrap";
 
 // import sub components
-// import Notifications from "./Notifications";
+import Notifications from "./Notifications";
+import { UserMenu } from "./UserMenu";
 
 interface HeaderProps {
   toggleMenu: () => void;
@@ -32,7 +33,8 @@ const Header: React.FC<HeaderProps> = ({ toggleMenu }) => {
         </div>
         {/* Quick Menu */}
         <Nav className="navbar-right-wrap ms-2 d-flex nav-top-wrap">
-          {/* <Notifications /> */}
+          <Notifications />
+          <UserMenu />
         </Nav>
       </div>
     </Navbar>
