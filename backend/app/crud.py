@@ -225,13 +225,28 @@ def get_users(db: Session):
 def authenticate_user(db: Session, username: str, password: str):
     """驗證用戶登入"""
     from .utils import verify_password
+    
+    print(f"Authenticating user: {username}")
+    
     user = get_user(db, username)
     if not user:
+        print(f"User not found: {username}")
         return False
+    
+    print(f"User found: {user.username}, active: {user.is_active}")
+    
     if user.is_active != "Y":
+        print(f"User not active: {user.is_active}")
         return False
-    if not verify_password(password, user.hashed_password):
+    
+    password_valid = verify_password(password, user.hashed_password)
+    print(f"Password verification result: {password_valid}")
+    
+    if not password_valid:
+        print("Password verification failed")
         return False
+    
+    print("Authentication successful")
     return user
 
 def update_user(db: Session, user_id: int, user: UserUpdate):

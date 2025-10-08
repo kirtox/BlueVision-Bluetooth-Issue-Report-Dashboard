@@ -1,18 +1,22 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { authService } from '../services/authService';
 
 interface User {
-  id: string;
+  id: number;
   username: string;
-  email: string;
+  role: string;
   avatar?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (username: string, password: string) => Promise<boolean>;
+  register: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
   isAuthenticated: boolean;
+  useMockAuth: boolean;
+  setUseMockAuth: (value: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,6 +36,9 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [useMockAuth, setUseMockAuth] = useState(() => {
+    return localStorage.getItem('useMockAuth') !== 'false';
+  });
 
   useEffect(() => {
     // 檢查本地存儲中的用戶信息
@@ -39,11 +46,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         const token = localStorage.getItem('authToken');
         if (token) {
-          // 這裡可以調用 API 驗證 token
-          // 暫時使用模擬數據
-          const userData = localStorage.getItem('userData');
-          if (userData) {
-            setUser(JSON.parse(userData));
+          // 驗證 token 是否有效
+          try {
+            if (!useMockAuth) {
+              await authService.verifyToken(token);
+            }
+            const userData = localStorage.getItem('userData');
+            if (userData) {
+              setUser(JSON.parse(userData));
+            }
+          } catch (error) {
+            // Token 無效，清除本地存儲
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userData');
           }
         }
       } catch (error) {
@@ -58,27 +73,71 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuthStatus();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (username: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      // 這裡應該調用實際的登入 API
-      // 暫時使用模擬登入
-      if (email && password) {
-        const mockUser: User = {
-          id: '1',
-          username: email.split('@')[0],
-          email: email,
+      if (useMockAuth) {
+        // 模擬登入模式
+        if (username && password) {
+          const mockUser: User = {
+            id: 1,
+            username: username,
+            role: 'User',
+            avatar: '/images/avatar/avatar-1.jpg'
+          };
+
+          setUser(mockUser);
+          localStorage.setItem('authToken', 'mock-token-' + Date.now());
+          localStorage.setItem('userData', JSON.stringify(mockUser));
+          return true;
+        }
+        return false;
+      } else {
+        // 真實 API 模式
+        const response = await authService.login({ username, password });
+
+        // 除錯：檢查回應格式
+        console.log('Login response:', response);
+
+        if (!response.user) {
+          console.error('Response missing user object:', response);
+          throw new Error('Invalid response format: missing user data');
+        }
+
+        const user: User = {
+          id: response.user.id,
+          username: response.user.username,
+          role: response.user.role,
           avatar: '/images/avatar/avatar-1.jpg'
         };
-        
-        setUser(mockUser);
-        localStorage.setItem('authToken', 'mock-token-' + Date.now());
-        localStorage.setItem('userData', JSON.stringify(mockUser));
+
+        setUser(user);
+        localStorage.setItem('authToken', response.access_token);
+        localStorage.setItem('userData', JSON.stringify(user));
         return true;
       }
-      return false;
     } catch (error) {
       console.error('Login failed:', error);
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const register = async (username: string, password: string): Promise<boolean> => {
+    setIsLoading(true);
+    try {
+      if (useMockAuth) {
+        // 模擬註冊模式，直接登入
+        return await login(username, password);
+      } else {
+        // 真實 API 模式
+        await authService.register({ username, password });
+        // 註冊成功後自動登入
+        return await login(username, password);
+      }
+    } catch (error) {
+      console.error('Registration failed:', error);
       return false;
     } finally {
       setIsLoading(false);
@@ -91,12 +150,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('userData');
   };
 
+  const handleMockAuthChange = (value: boolean) => {
+    setUseMockAuth(value);
+    localStorage.setItem('useMockAuth', value.toString());
+  };
+
   const value: AuthContextType = {
     user,
     login,
+    register,
     logout,
     isLoading,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
+    useMockAuth,
+    setUseMockAuth: handleMockAuthChange
   };
 
   return (

@@ -63,7 +63,7 @@ export const UserMenu: React.FC = () => {
           <div className="lh-1">
             <h5 className="mb-1">{user?.username}</h5>
             <Link to="#" className="text-inherit fs-6">
-              {user?.email}
+              {user?.username}
             </Link>
           </div>
           <div className="dropdown-divider mt-3 mb-2"></div>

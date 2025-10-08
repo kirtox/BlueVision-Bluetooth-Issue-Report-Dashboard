@@ -6,10 +6,11 @@ import { useState, useEffect } from "react";
 //import custom hook
 import { useMounted } from "hooks/useMounted";
 import { useAuth } from "../../contexts/AuthContext";
+import { AuthModeToggle } from "../../components/AuthModeToggle";
 
 const SignIn = () => {
   const hasMounted = useMounted();
-  const { login, isAuthenticated, isLoading } = useAuth();
+  const { login, isAuthenticated, isLoading, setUseMockAuth } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
@@ -65,6 +66,7 @@ const SignIn = () => {
   return (
     <Row className="align-items-center justify-content-center g-0 min-vh-100">
       <Col xxl={4} lg={6} md={8} xs={12} className="py-8 py-xl-0">
+        <AuthModeToggle onModeChange={setUseMockAuth} />
         <Card className="smooth-shadow-md">
           <Card.Body className="p-6">
             <div className="mb-4">

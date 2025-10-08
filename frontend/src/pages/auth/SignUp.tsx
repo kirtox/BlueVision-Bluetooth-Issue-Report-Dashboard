@@ -6,10 +6,11 @@ import { useState, useEffect } from "react";
 //import custom hook
 import { useMounted } from "hooks/useMounted";
 import { useAuth } from "../../contexts/AuthContext";
+import { AuthModeToggle } from "../../components/AuthModeToggle";
 
 const SignUp = () => {
   const hasMounted = useMounted();
-  const { login, isAuthenticated } = useAuth();
+  const { register, isAuthenticated, setUseMockAuth } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
@@ -56,9 +57,7 @@ const SignUp = () => {
     setIsSubmitting(true);
 
     try {
-      // The registration API should be called here
-      // Log in directly temporarily
-      const success = await login(formData.username, formData.password);
+      const success = await register(formData.username, formData.password);
       if (success) {
         navigate('/');
       } else {
@@ -74,6 +73,7 @@ const SignUp = () => {
   return (
     <Row className="align-items-center justify-content-center g-0 min-vh-100">
       <Col xxl={4} lg={6} md={8} xs={12} className="py-8 py-xl-0">
+        <AuthModeToggle onModeChange={setUseMockAuth} />
         <Card className="smooth-shadow-md">
           <Card.Body className="p-6">
             <div className="mb-4">

@@ -14,7 +14,6 @@ from app.schema_report import ReportCreate, ReportUpdate, ReportInDB
 from app.schema_platform import PlatformCreate, PlatformUpdate, PlatformInDB
 from app.schema_platform_latest_report import PlatformWithLatestReportInDB
 from app.schema_api_log import APIAccessLogInDB
-from app.schema_user import UserCreate, UserLogin, UserResponse
 from app.middleware import APIAccessLogMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -115,37 +114,7 @@ def delete_platform(platform_id: int, db: Session = Depends(get_db)):
 def get_api_logs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return crud.get_api_access_logs(db, skip=skip, limit=limit)
 
-# User Management
-@app.post("/users", response_model=UserResponse)
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    # 檢查用戶名是否已存在
-    db_user = crud.get_user(db, username=user.username)
-    if db_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
-    return crud.create_user(db, user=user)
 
-@app.get("/users", response_model=list[UserResponse])
-def get_users(db: Session = Depends(get_db)):
-    return crud.get_users(db)
-
-@app.post("/login")
-def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
-    user = crud.authenticate_user(db, user_credentials.username, user_credentials.password)
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid username or password")
-    
-    from app.utils import create_token
-    token = create_token(user.username)
-    
-    return {
-        "access_token": token,
-        "token_type": "bearer",
-        "user": {
-            "id": user.id,
-            "username": user.username,
-            "role": user.role
-        }
-    }
 
 # Summary each serial_num's latest report
 # @app.get("/platforms/latest_reports", response_model=list[PlatformWithLatestReportInDB])
