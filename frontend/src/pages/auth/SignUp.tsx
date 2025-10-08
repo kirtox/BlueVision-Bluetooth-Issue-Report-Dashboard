@@ -39,33 +39,33 @@ const SignUp = () => {
     setError('');
 
     if (!agreed) {
-      setError('請同意服務條款和隱私政策');
+      setError('Please agree to the Terms of Service and Privacy Policy');
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setError('密碼確認不符');
+      setError('Password confirmation does not match');
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('密碼長度至少需要 6 個字符');
+      setError('Password must be at least 6 characters long');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // 這裡應該調用註冊 API
-      // 暫時直接登入
-      const success = await login(formData.email, formData.password);
+      // The registration API should be called here
+      // Log in directly temporarily
+      const success = await login(formData.username, formData.password);
       if (success) {
         navigate('/');
       } else {
-        setError('註冊失敗，請稍後再試');
+        setError('Registration failed, please try again later');
       }
     } catch (err) {
-      setError('註冊時發生錯誤，請稍後再試');
+      setError('An error occurred while registering, please try again later');
     } finally {
       setIsSubmitting(false);
     }
@@ -84,7 +84,7 @@ const SignUp = () => {
                   alt=""
                 />
               </Link>
-              <p className="mb-6">請填寫您的註冊資訊</p>
+              <p className="mb-6">Please fill in your registration information</p>
             </div>
 
             {error && (
@@ -96,11 +96,11 @@ const SignUp = () => {
             {hasMounted && (
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="username">
-                  <Form.Label>用戶名</Form.Label>
+                  <Form.Label>username</Form.Label>
                   <Form.Control
                     type="text"
                     name="username"
-                    placeholder="請輸入用戶名"
+                    placeholder="Please enter username"
                     value={formData.username}
                     onChange={handleChange}
                     required
@@ -108,11 +108,11 @@ const SignUp = () => {
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="email">
-                  <Form.Label>電子郵件</Form.Label>
+                  <Form.Label>E-mail</Form.Label>
                   <Form.Control
                     type="email"
                     name="email"
-                    placeholder="請輸入電子郵件"
+                    placeholder="Please enter email"
                     value={formData.email}
                     onChange={handleChange}
                     required
@@ -120,11 +120,11 @@ const SignUp = () => {
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="password">
-                  <Form.Label>密碼</Form.Label>
+                  <Form.Label>Password</Form.Label>
                   <Form.Control
                     type="password"
                     name="password"
-                    placeholder="請輸入密碼（至少6個字符）"
+                    placeholder="Please enter a password (at least 6 characters)"
                     value={formData.password}
                     onChange={handleChange}
                     required
@@ -132,11 +132,11 @@ const SignUp = () => {
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="confirmPassword">
-                  <Form.Label>確認密碼</Form.Label>
+                  <Form.Label>Confirm Password</Form.Label>
                   <Form.Control
                     type="password"
                     name="confirmPassword"
-                    placeholder="請再次輸入密碼"
+                    placeholder="Please enter password again"
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
@@ -151,8 +151,8 @@ const SignUp = () => {
                       onChange={(e) => setAgreed(e.target.checked)}
                     />
                     <Form.Check.Label>
-                      我同意 <Link to="#"> 服務條款 </Link> 和{" "}
-                      <Link to="#"> 隱私政策</Link>
+                      I agree to the <Link to="#"> Terms of Service </Link> and{" "}
+                      <Link to="#"> Privacy Policy</Link>.
                     </Form.Check.Label>
                   </Form.Check>
                 </div>
@@ -164,13 +164,13 @@ const SignUp = () => {
                       type="submit"
                       disabled={isSubmitting || !agreed}
                     >
-                      {isSubmitting ? '註冊中...' : '建立免費帳戶'}
+                      {isSubmitting ? 'Registering...' : 'Create an account'}
                     </Button>
                   </div>
                   <div className="d-md-flex justify-content-between mt-4">
                     <div className="mb-2 mb-md-0">
                       <Link to="/signin" className="fs-5">
-                        已有帳戶？立即登入
+                        Already membe? Login
                       </Link>
                     </div>
                     <div>
@@ -178,7 +178,7 @@ const SignUp = () => {
                         to="/forget-password"
                         className="text-inherit fs-5"
                       >
-                        忘記密碼？
+                        Forgot your password?
                       </Link>
                     </div>
                   </div>

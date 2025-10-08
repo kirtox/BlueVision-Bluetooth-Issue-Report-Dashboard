@@ -12,7 +12,7 @@ const SignIn = () => {
   const { login, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: ''
   });
   const [error, setError] = useState('');
@@ -37,7 +37,7 @@ const SignIn = () => {
     setIsSubmitting(true);
 
     try {
-      const success = await login(formData.email, formData.password);
+      const success = await login(formData.username, formData.password);
       if (success) {
         navigate('/');
       } else {
@@ -86,13 +86,13 @@ const SignIn = () => {
 
             {hasMounted && (
               <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3" controlId="email">
+                <Form.Group className="mb-3" controlId="username">
                   <Form.Label>Username</Form.Label>
                   <Form.Control
                     type="text"
                     name="username"
                     placeholder="Enter username here"
-                    value={formData.email}
+                    value={formData.username}
                     onChange={handleChange}
                     required
                   />
