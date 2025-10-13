@@ -9,11 +9,12 @@ class UserCreate(UserBase):
     username: str
     password: str
     role: Optional[str] = "User"  # 預設為 User
+    is_active: Optional[bool] = True  # 預設為 True
 
 class UserUpdate(UserBase):
     password: Optional[str] = None
     role: Optional[str] = None
-    is_active: Optional[str] = None
+    is_active: Optional[bool] = None
 
 class UserLogin(BaseModel):
     username: str
@@ -24,7 +25,7 @@ class UserInDB(UserBase):
     username: str
     role: str
     created_at: datetime
-    is_active: str
+    is_active: bool
 
     model_config = {
         "from_attributes": True
@@ -35,7 +36,7 @@ class UserResponse(BaseModel):
     username: str
     role: str
     created_at: datetime
-    is_active: str
+    is_active: bool
 
     model_config = {
         "from_attributes": True
