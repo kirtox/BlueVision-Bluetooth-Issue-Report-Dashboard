@@ -9,20 +9,22 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
-    network_mode: "host"
+    # network_mode: "host"
     depends_on:
       - backend
     # restart: always
-    environment:
-      - NGINX_PORT=5174
+    networks:
+      - app-network
+    ports:
+      - "5174:80"
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile.prod
-    network_mode: "host"
+    # network_mode: "host"
     environment:
-      - DATABASE_URL=postgresql://admin:password@127.0.0.1:5433/btird
+      - DATABASE_URL=postgresql://admin:password@db:5432/btird
       - EXPECTED_CLIENT_IP=192.168.0.126
       - TZ=Asia/Taipei
     depends_on:
@@ -34,6 +36,10 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+    networks:
+      - app-network
+    ports:
+      - "8001:8000"
 
   db:
     image: postgres:15
