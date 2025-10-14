@@ -22,14 +22,14 @@ export const AuthModeToggle: React.FC<AuthModeToggleProps> = ({ onModeChange }) 
                 <Form.Check
                     type="switch"
                     id="auth-mode-switch"
-                    label={useMockAuth ? "模擬登入模式 (任何帳密都可登入)" : "真實 API 模式 (需要有效帳戶)"}
+                    label={useMockAuth ? "Fake log-in mode (Any account)" : "Real log-in mode (A valid account is required)"}
                     checked={useMockAuth}
                     onChange={(e) => handleToggle(e.target.checked)}
                 />
                 <small className="text-muted">
                     {useMockAuth
-                        ? "目前使用模擬登入，任何電子郵件和密碼都可以登入"
-                        : "目前連接到後端 API，需要真實的用戶帳戶"
+                        ? "Connected by a fake account"
+                        : "Connected by a valid account"
                     }
                 </small>
             </Card.Body>

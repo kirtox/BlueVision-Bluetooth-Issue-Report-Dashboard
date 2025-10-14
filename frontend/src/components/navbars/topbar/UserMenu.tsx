@@ -24,14 +24,14 @@ export const UserMenu: React.FC = () => {
           className="me-2"
           onClick={handleLogin}
         >
-          登入
+          Log in
         </Button>
         <Button 
           variant="primary" 
           size="sm"
           onClick={() => navigate('/signup')}
         >
-          註冊
+          Sign Up
         </Button>
       </div>
     );
@@ -69,16 +69,16 @@ export const UserMenu: React.FC = () => {
           <div className="dropdown-divider mt-3 mb-2"></div>
         </Dropdown.Item>
         <Dropdown.Item as={Link} to="/profile">
-          <i className="fe fe-user me-2"></i> 編輯個人資料
+          <i className="fe fe-user me-2"></i> Profile
         </Dropdown.Item>
         <Dropdown.Item as={Link} to="/activity">
-          <i className="fe fe-activity me-2"></i> 活動記錄
+          <i className="fe fe-activity me-2"></i> Activity
         </Dropdown.Item>
         <Dropdown.Item as={Link} to="/settings">
-          <i className="fe fe-settings me-2"></i> 帳戶設定
+          <i className="fe fe-settings me-2"></i> Settings
         </Dropdown.Item>
         <Dropdown.Item onClick={handleLogout}>
-          <i className="fe fe-power me-2"></i> 登出
+          <i className="fe fe-power me-2"></i> Log out
         </Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
