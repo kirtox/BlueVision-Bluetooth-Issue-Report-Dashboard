@@ -152,19 +152,19 @@ if __name__ == "__main__":
     print("post_dell_data.py running...")
 
     # Import Dell report data
-    # print("create_report_data_single() running...")
-    # create_report_data_single()
-    # print("create_report_data_single() end")
+    print("create_report_data_single() running...")
+    create_report_data_single()
+    print("create_report_data_single() end")
 
     # Import Dell platform data
-    # print("create_platform_data_single() running...")
-    # create_platform_data_single()
-    # print("create_platform_data_single() end")
+    print("create_platform_data_single() running...")
+    create_platform_data_single()
+    print("create_platform_data_single() end")
 
     # Simulate few platforms simultaneously, and change each platform status
-    simulate_multiple_platforms([
-        "5RYD064",
-        "WWF342X",
-        "BITS007",
-        "QWER001"
-    ])
+    # simulate_multiple_platforms([
+    #     "5RYD064",
+    #     "WWF342X",
+    #     "BITS007",
+    #     "QWER001"
+    # ])

@@ -25,7 +25,6 @@ services:
     # network_mode: "host"
     environment:
       - DATABASE_URL=postgresql://admin:password@db:5432/btird
-      - EXPECTED_CLIENT_IP=192.168.0.126
       - TZ=Asia/Taipei
     depends_on:
       db:

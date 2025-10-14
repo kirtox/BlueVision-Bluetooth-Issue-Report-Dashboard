@@ -83,9 +83,13 @@ Allow inbound traffic on ports **8001** and **5174**.
 Run the following commands in an **PowerShell / CMD**:
 
 ```bash
-# Establish NAT
+# Add NAT
 netsh interface portproxy add v4tov4 listenaddress=myIP listenport=5174 connectaddress=127.0.0.1 connectport=5174
 netsh interface portproxy add v4tov4 listenaddress=myIP listenport=8001 connectaddress=127.0.0.1 connectport=8001
+
+# Remove NAT
+netsh interface portproxy delete v4tov4 listenaddress=myIP listenport=5174
+netsh interface portproxy delete v4tov4 listenaddress=myIP listenport=8001
 
 # Check NAT table
 netsh interface portproxy show all

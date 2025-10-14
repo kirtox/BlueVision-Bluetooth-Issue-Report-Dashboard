@@ -16,13 +16,38 @@ from app.schema_platform_latest_report import PlatformWithLatestReportInDB
 from app.schema_api_log import APIAccessLogInDB
 from app.middleware import APIAccessLogMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, inspect, text
 # Solve CORS（Cross-Origin Resource Sharing） issue
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 import logging
 
-models.Base.metadata.create_all(bind=engine)
+# Safe table creation - create tables if they don't exist
+def create_tables_if_not_exist():
+    """Safely create tables only if they don't exist"""
+    try:
+        with engine.connect() as conn:
+            # Use PostgreSQL advisory lock to avoid concurrent table creation
+            conn.execute(text("SELECT pg_advisory_lock(123456)"))
+            
+            try:
+                # Create tables with built-in check mechanism
+                models.Base.metadata.create_all(bind=engine, checkfirst=True)
+                logging.info("✅ Database tables ready")
+            finally:
+                # Always release the lock, even if table creation fails
+                conn.execute(text("SELECT pg_advisory_unlock(123456)"))
+                
+        # Test database connection
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        logging.info("✅ Database connection successful")
+        
+    except Exception as e:
+        logging.error(f"❌ Database setup failed: {e}")
+        # Don't fail startup, but log the error
+
+create_tables_if_not_exist()
 
 app = FastAPI()
 
