@@ -12,7 +12,9 @@ export interface LoginResponse {
   user: {
     id: number;
     username: string;
+    email?: string;
     role: string;
+    avatar?: string;
   };
 }
 
@@ -96,6 +98,27 @@ export const authService = {
 
     if (!response.ok) {
       throw new Error('Token verification failed');
+    }
+
+    return response.json();
+  },
+
+  // 上傳頭像
+  async uploadAvatar(file: File, token: string): Promise<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const response = await fetch(`${API_BASE_URL}/upload-avatar`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Avatar upload failed');
     }
 
     return response.json();

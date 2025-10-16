@@ -24,7 +24,8 @@ API_LOG_CONFIG = {
         "/assets/",
         "/css/",
         "/js/",
-        "/img/"
+        "/img/",
+        "/uploads/"  # 排除頭像等上傳檔案
     ],
     
     # Path patterns to exclude from tracing (inclusive matching)

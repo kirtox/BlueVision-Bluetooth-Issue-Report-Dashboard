@@ -5,9 +5,28 @@ from .db import get_db
 from .crud import get_user, create_user, get_users, authenticate_user
 from .utils import verify_password, create_token, verify_token
 from .schema_user import UserCreate, UserLogin, UserResponse
+from . import models
 
 router = APIRouter()
 security = HTTPBearer()
+
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)) -> models.User:
+    """獲取當前認證用戶"""
+    token = credentials.credentials
+    username = verify_token(token)
+    
+    if not username:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    user = get_user(db, username)
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    if user.is_active != "Y":
+        raise HTTPException(status_code=401, detail="User account is inactive")
+    
+    return user
 
 
 @router.post("/login")
@@ -32,7 +51,9 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
         "user": {
             "id": user.id,
             "username": user.username,
-            "role": user.role
+            "email": user.email,
+            "role": user.role,
+            "avatar": user.avatar
         }
     }
     
@@ -83,7 +104,9 @@ def verify_token_endpoint(credentials: HTTPAuthorizationCredentials = Depends(se
         "user": {
             "id": user.id,
             "username": user.username,
-            "role": user.role
+            "email": user.email,
+            "role": user.role,
+            "avatar": user.avatar
         }
     }
 

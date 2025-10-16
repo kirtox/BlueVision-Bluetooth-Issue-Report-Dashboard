@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text
 from sqlalchemy.ext.declarative import declarative_base
 import datetime
+from datetime import timezone, timedelta
 
 # from backend.app.generate_test_data import current_status
 
@@ -10,7 +11,7 @@ class Report(Base):
     __tablename__ = "report"
     id = Column(Integer, primary_key=True, index=True)
     op_name = Column(String, nullable=False)
-    date = Column(DateTime, default=datetime.datetime.utcnow)
+    date = Column(DateTime, default=lambda: datetime.datetime.now(timezone(timedelta(hours=8))).replace(tzinfo=None))
     serial_num = Column(String, nullable=False)
 
     os_version = Column(String, nullable=False)
@@ -97,7 +98,7 @@ class Report(Base):
 class Platform(Base):
     __tablename__ = "platform"
     id = Column(Integer, primary_key=True, index=True)
-    date = Column(DateTime, default=datetime.datetime.utcnow)
+    date = Column(DateTime, default=lambda: datetime.datetime.now(timezone(timedelta(hours=8))).replace(tzinfo=None))
     serial_num = Column(String, unique=True, nullable=False)
     current_status = Column(String, nullable=False)
 
@@ -105,15 +106,17 @@ class User(Base):
     __tablename__ = "user"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=True)  # 電子郵件地址
     hashed_password = Column(String, nullable=False)
     role = Column(String, default="User", nullable=False)  # "Administrator" 或 "User"
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    avatar = Column(String, nullable=True)  # 頭像檔案路徑
+    created_at = Column(DateTime, default=lambda: datetime.datetime.now(timezone(timedelta(hours=8))).replace(tzinfo=None))
     is_active = Column(String, default="Y", nullable=False)  # "Y" 或 "N"
 
 class APIAccessLog(Base):
     __tablename__ = "api_access_log"
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    timestamp = Column(DateTime, default=lambda: datetime.datetime.now(timezone(timedelta(hours=8))).replace(tzinfo=None))
     method = Column(String, nullable=False)
     endpoint = Column(String, nullable=False)
     client_ip = Column(String, nullable=False)

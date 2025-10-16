@@ -210,8 +210,10 @@ def get_user(db: Session, username: str):
 def create_user(db: Session, user: UserCreate):
     db_user = models.User(
         username=user.username,
+        email=user.email,
         hashed_password=get_password_hash(user.password),
-        role=user.role
+        role=user.role,
+        avatar=user.avatar
     )
     db.add(db_user)
     db.commit()
@@ -249,12 +251,17 @@ def authenticate_user(db: Session, username: str, password: str):
     print("Authentication successful")
     return user
 
-def update_user(db: Session, user_id: int, user: UserUpdate):
+def update_user(db: Session, user_id: int, user):
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     if not db_user:
         return None
 
-    update_data = user.dict(exclude_unset=True)
+    # Handle both UserUpdate objects and dictionaries
+    if hasattr(user, 'dict'):
+        update_data = user.dict(exclude_unset=True)
+    else:
+        update_data = user
+
     if "password" in update_data:
         update_data["hashed_password"] = get_password_hash(update_data.pop("password"))
 

@@ -30,6 +30,8 @@ services:
       db:
         condition: service_healthy
     # restart: always
+    volumes:
+      - avatar_uploads:/app/uploads
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8001/health || exit 1"]
       interval: 10s
@@ -61,3 +63,4 @@ services:
 
 volumes:
   pgdata_prod:
+  avatar_uploads:

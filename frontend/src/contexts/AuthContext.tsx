@@ -4,6 +4,7 @@ import { authService } from '../services/authService';
 interface User {
   id: number;
   username: string;
+  email?: string;
   role: string;
   avatar?: string;
 }
@@ -13,6 +14,7 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<boolean>;
   register: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
+  updateAvatar: (file: File) => Promise<boolean>;
   isLoading: boolean;
   isAuthenticated: boolean;
   useMockAuth: boolean;
@@ -83,7 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             id: 1,
             username: username,
             role: 'User',
-            avatar: '/images/avatar/avatar-1.jpg'
+            avatar: '/images/avatar/avatar-default.jpg'
           };
 
           setUser(mockUser);
@@ -107,8 +109,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const user: User = {
           id: response.user.id,
           username: response.user.username,
+          email: response.user.email,
           role: response.user.role,
-          avatar: '/images/avatar/avatar-1.jpg'
+          avatar: response.user.avatar || '/images/avatar/avatar-default.jpg'
         };
 
         setUser(user);
@@ -150,6 +153,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('userData');
   };
 
+  const updateAvatar = async (file: File): Promise<boolean> => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('No authentication token');
+      }
+
+      if (useMockAuth) {
+        // 模擬模式：創建本地 URL
+        const mockAvatarUrl = URL.createObjectURL(file);
+        const updatedUser = { ...user!, avatar: mockAvatarUrl };
+        setUser(updatedUser);
+        localStorage.setItem('userData', JSON.stringify(updatedUser));
+        return true;
+      } else {
+        // 真實 API 模式
+        const response = await authService.uploadAvatar(file, token);
+        const updatedUser = { ...user!, avatar: response.avatar };
+        setUser(updatedUser);
+        localStorage.setItem('userData', JSON.stringify(updatedUser));
+        return true;
+      }
+    } catch (error) {
+      console.error('Avatar update failed:', error);
+      return false;
+    }
+  };
+
   const handleMockAuthChange = (value: boolean) => {
     setUseMockAuth(value);
     localStorage.setItem('useMockAuth', value.toString());
@@ -160,6 +191,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     register,
     logout,
+    updateAvatar,
     isLoading,
     isAuthenticated: !!user,
     useMockAuth,
