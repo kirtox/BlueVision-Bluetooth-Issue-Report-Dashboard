@@ -18,7 +18,7 @@ def create_default_admin():
         return
     
     # Create default admin account
-    password = "admin123"  # Please change this password in production environment
+    password = "intel123"  # Please change this password in production environment
     
     # Ensure password doesn't exceed 72 bytes (bcrypt limitation)
     if len(password.encode('utf-8')) > 72:
@@ -28,7 +28,8 @@ def create_default_admin():
     admin_data = UserCreate(
         username="admin",
         password=password,
-        role="Administrator"
+        role="Administrator",
+        email="intel123@intel.com"
     )
     
     try:

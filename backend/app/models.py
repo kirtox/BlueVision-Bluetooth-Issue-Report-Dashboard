@@ -106,7 +106,7 @@ class User(Base):
     __tablename__ = "user"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True, nullable=False)
-    email = Column(String, unique=True, index=True, nullable=True)  # 電子郵件地址
+    email = Column(String, unique=True, index=True, nullable=True)  # email address
     hashed_password = Column(String, nullable=False)
     role = Column(String, default="User", nullable=False)  # "Administrator" 或 "User"
     avatar = Column(String, nullable=True)  # 頭像檔案路徑
