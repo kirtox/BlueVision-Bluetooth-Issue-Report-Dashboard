@@ -105,28 +105,6 @@ export interface FeaturesDataProps {
   description: string;
 }
 
-export interface ChildrenItemProps {
-  id: string;
-  title?: string;
-  name?: string;
-  link: string;
-  children?: ChildrenItemProps[];
-  icon?: string;
-  badge?: string;
-  badgecolor?: string;
-}
-
-export interface DashboardMenuProps {
-  id: string;
-  title: string;
-  link?: string;
-  grouptitle?: boolean;
-  children?: ChildrenItemProps[];
-  icon?: string;
-  badge?: string;
-  badgecolor?: string;
-}
-
 export interface ReportTableProps {
   reports: Report[];
   onReload: () => void;
@@ -211,4 +189,24 @@ export interface ReportMultipleGaugeChartProps {
   max?: number;
   thresholds?: Threshold[];
   title?: string;
+}
+
+export interface APIAccessLog {
+  id: number;
+  timestamp: string;
+  method: string;
+  endpoint: string;
+  client_ip: string;
+  user_agent?: string;
+  request_body?: string;
+  response_status?: number;
+  response_time_ms?: number;
+  host?: string;
+  referer?: string;
+  [key: string]: any;
+}
+
+export interface APIAccessLogTableProps {
+  logs: APIAccessLog[];
+  onReload: () => void;
 }

@@ -18,6 +18,7 @@ import Documentation from "pages/dashboard/Documentation";
 import ChangeLog from "pages/dashboard/Changelog";
 import ApiDemo from "./pages/dashboard/pages/ApiDemo";
 import AuthTest from "./pages/dashboard/AuthTest";
+import APIAccessLogs from "./pages/logs/APIAccessLogs";
 
 // import bootstrap components
 import Accordion from "bootstrap-components/Accordions";
@@ -114,6 +115,16 @@ const App = () => {
           id: "layout-vertical",
           path: "/layout-vertical",
           Component: LayoutVertical,
+        },
+        {
+          id: "logs",
+          path: "/logs",
+          children: [
+            {
+              path: "api-access",
+              Component: APIAccessLogs,
+            },
+          ],
         },
         {
           id: "components",
