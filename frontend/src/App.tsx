@@ -53,7 +53,7 @@ const App = () => {
       Component: SignIn,
     },
     {
-      path: "/signup", 
+      path: "/signup",
       Component: SignUp,
     },
     {
@@ -159,7 +159,7 @@ const App = () => {
       ],
     },
   ]);
-  
+
   return (
     <AuthProvider>
       <RouterProvider router={router} />

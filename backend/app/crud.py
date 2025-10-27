@@ -284,3 +284,5 @@ def create_api_access_log(db: Session, log_data: dict):
 def get_api_access_logs(db: Session, skip: int = 0, limit: int = 100):
     """獲取 API 訪問日誌列表"""
     return db.query(models.APIAccessLog).order_by(models.APIAccessLog.timestamp.desc()).offset(skip).limit(limit).all()
+
+
