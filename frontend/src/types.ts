@@ -118,6 +118,8 @@ export interface Report {
   platform: string;
   cpu: string;
   wlan: string;
+  wifi_name?: string;
+  wifi_band?: string;
   scenario: string;
   bt_driver: string;
   wifi_driver: string;

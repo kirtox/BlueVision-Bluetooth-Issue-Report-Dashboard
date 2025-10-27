@@ -22,6 +22,8 @@ class Report(Base):
     cpu = Column(String, nullable=False)
     wlan = Column(String, nullable=False)
     wlan_phase = Column(String, nullable=False)
+    wifi_name = Column(String, nullable=True)
+    wifi_band = Column(String, nullable=True)
     bt_driver = Column(String, nullable=False)
     bt_interface = Column(String, nullable=False)
     wifi_driver = Column(String, nullable=False)

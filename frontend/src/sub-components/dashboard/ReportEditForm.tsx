@@ -133,6 +133,8 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
           <Row>
             {renderField("WLAN", "wlan")}
             {renderField("WLAN Phase", "wlan_phase")}
+            {renderField("WiFi Name", "wifi_name")}
+            {renderField("WiFi Band", "wifi_band")}
             {renderField("Bluetooth Interface", "bt_interface")}
           </Row>
           <hr></hr>

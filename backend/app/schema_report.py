@@ -15,6 +15,8 @@ class ReportBase(BaseModel):
     cpu: Optional[str] = None
     wlan: Optional[str] = None
     wlan_phase: Optional[str] = None
+    wifi_name: Optional[str] = None
+    wifi_band: Optional[str] = None
     bt_driver: Optional[str] = None
     bt_interface: Optional[str] = None
     wifi_driver: Optional[str] = None
