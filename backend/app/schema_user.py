@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional
 from datetime import datetime
 
@@ -14,6 +14,18 @@ class UserCreate(UserBase):
     avatar: Optional[str] = None  # 註冊時可選擇上傳頭像
     is_active: Optional[bool] = True  # 預設為 True
 
+    @field_validator('username')
+    @classmethod
+    def username_to_lowercase(cls, v):
+        return v.lower() if v else v
+
+    @field_validator('email')
+    @classmethod
+    def email_to_lowercase(cls, v):
+        if v is not None:
+            return v.lower()
+        return v
+
 class UserUpdate(UserBase):
     password: Optional[str] = None
     email: Optional[str] = None
@@ -21,14 +33,31 @@ class UserUpdate(UserBase):
     avatar: Optional[str] = None
     is_active: Optional[bool] = None
 
+    @field_validator('email')
+    @classmethod
+    def email_to_lowercase(cls, v):
+        if v is not None:
+            return v.lower()
+        return v
+
 class UserLogin(BaseModel):
     username: str
     password: str
+
+    @field_validator('username')
+    @classmethod
+    def username_to_lowercase(cls, v):
+        return v.lower() if v else v
 
 class ChangePassword(BaseModel):
     email: str
     current_password: str
     new_password: str
+
+    @field_validator('email')
+    @classmethod
+    def email_to_lowercase(cls, v):
+        return v.lower() if v else v
 
 class UserInDB(UserBase):
     id: int

@@ -2,6 +2,7 @@
 import { Col, Row, Container, Card, Image, Badge, Button, Modal, Form, Alert } from "react-bootstrap";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useRef, useState } from "react";
+import { formatUsernameForDisplay } from "../../../utils/formatUtils";
 
 const Profile = () => {
   const { user, updateAvatar } = useAuth();
@@ -276,7 +277,7 @@ const Profile = () => {
                   <div className="border-bottom pb-2 mb-2">
                     <small className="text-muted text-uppercase fw-bold">Username</small>
                   </div>
-                  <p className="mb-0">{user.username}</p>
+                  <p className="mb-0">{formatUsernameForDisplay(user.username)}</p>
                 </Col>
 
                 <Col md={6} className="mb-3">

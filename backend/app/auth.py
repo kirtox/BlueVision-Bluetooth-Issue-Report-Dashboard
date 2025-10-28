@@ -141,6 +141,18 @@ def change_password(
     return {"message": "Password changed successfully"}
 
 
+@router.get("/check-username/{username}")
+def check_username_availability(username: str, db: Session = Depends(get_db)):
+    """檢查用戶名是否可用"""
+    # 將username轉為小寫進行檢查
+    username_lower = username.lower()
+    existing_user = get_user(db, username_lower)
+    return {
+        "available": existing_user is None,
+        "username": username_lower
+    }
+
+
 @router.get("/debug/users")
 def debug_users(db: Session = Depends(get_db)):
     """除錯用：檢查資料庫中的使用者"""

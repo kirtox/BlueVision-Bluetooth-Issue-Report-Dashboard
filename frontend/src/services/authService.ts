@@ -20,6 +20,7 @@ export interface LoginResponse {
 
 export interface RegisterRequest {
   username: string;
+  email?: string;
   password: string;
   role?: string;
 }
@@ -71,7 +72,7 @@ export const authService = {
 
   // 註冊
   async register(userData: RegisterRequest): Promise<any> {
-    const response = await fetch(`${API_BASE_URL}/users`, {
+    const response = await fetch(`${API_BASE_URL}/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -98,6 +99,19 @@ export const authService = {
 
     if (!response.ok) {
       throw new Error('Token verification failed');
+    }
+
+    return response.json();
+  },
+
+  // 檢查用戶名是否可用
+  async checkUsernameAvailability(username: string): Promise<{ available: boolean; username: string }> {
+    const response = await fetch(`${API_BASE_URL}/check-username/${encodeURIComponent(username)}`, {
+      method: 'GET',
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to check username availability');
     }
 
     return response.json();

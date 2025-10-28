@@ -2,6 +2,7 @@ import { Dropdown, Image, Button } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useRef, useState } from "react";
+import { formatUsernameForDisplay } from "../../../utils/formatUtils";
 
 export const UserMenu: React.FC = () => {
   const { user, logout, isAuthenticated, updateAvatar } = useAuth();
@@ -124,9 +125,9 @@ export const UserMenu: React.FC = () => {
         >
           <Dropdown.Item as="div" className="px-4 pb-0 pt-2" bsPrefix=" ">
             <div className="lh-1">
-              <h5 className="mb-1">{user?.username}</h5>
+              <h5 className="mb-1">{formatUsernameForDisplay(user?.username || '')}</h5>
               <Link to="#" className="text-inherit fs-6">
-                {user?.username}
+                {formatUsernameForDisplay(user?.username || '')}
               </Link>
             </div>
             <div className="dropdown-divider mt-3 mb-2"></div>

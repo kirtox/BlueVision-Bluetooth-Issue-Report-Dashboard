@@ -2,7 +2,7 @@ import { Card, Container, Row, Col, Button, Badge } from "react-bootstrap";
 import { useAuth } from "../../contexts/AuthContext";
 
 const AuthTest = () => {
-  const { user, logout, useMockAuth } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <Container fluid className="p-6">
@@ -51,8 +51,8 @@ const AuthTest = () => {
                 <Badge bg="success" className="ms-2">已登入</Badge>
               </p>
               <p><strong>認證模式:</strong> 
-                <Badge bg={useMockAuth ? "warning" : "info"} className="ms-2">
-                  {useMockAuth ? "模擬模式" : "API 模式"}
+                <Badge bg="info" className="ms-2">
+                  API 模式
                 </Badge>
               </p>
               <p><strong>本地存儲:</strong></p>
