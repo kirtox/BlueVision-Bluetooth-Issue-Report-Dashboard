@@ -134,7 +134,7 @@ export const UserMenu: React.FC = () => {
           <Dropdown.Item onClick={handleAvatarClick} disabled={isUploading}>
             <i className="fe fe-camera me-2"></i> Change avatar
           </Dropdown.Item>
-          <Dropdown.Item as={Link} to="/profile">
+          <Dropdown.Item as={Link} to="/pages/profile">
             <i className="fe fe-user me-2"></i> Profile
           </Dropdown.Item>
           {/* <Dropdown.Item as={Link} to="/activity">
