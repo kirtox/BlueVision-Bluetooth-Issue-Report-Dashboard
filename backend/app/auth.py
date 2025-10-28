@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from .db import get_db
-from .crud import get_user, create_user, get_users, authenticate_user
+from .crud import get_user, create_user, get_users, authenticate_user, change_user_password
 from .utils import verify_password, create_token, verify_token
-from .schema_user import UserCreate, UserLogin, UserResponse
+from .schema_user import UserCreate, UserLogin, UserResponse, ChangePassword
 from . import models
 
 router = APIRouter()
@@ -109,6 +109,36 @@ def verify_token_endpoint(credentials: HTTPAuthorizationCredentials = Depends(se
             "avatar": user.avatar
         }
     }
+
+
+@router.post("/change-password")
+def change_password(
+    password_data: ChangePassword, 
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """變更用戶密碼"""
+    # 驗證郵箱是否匹配
+    if current_user.email != password_data.email:
+        raise HTTPException(
+            status_code=400, 
+            detail="Email address does not match your registered email"
+        )
+    
+    # 嘗試變更密碼
+    result = change_user_password(
+        db, 
+        current_user.id, 
+        password_data.current_password, 
+        password_data.new_password
+    )
+    
+    if result is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    elif result is False:
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    return {"message": "Password changed successfully"}
 
 
 @router.get("/debug/users")

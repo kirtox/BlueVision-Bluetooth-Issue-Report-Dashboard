@@ -4,7 +4,7 @@ from .schema_platform import PlatformCreate, PlatformUpdate
 from .schema_platform_latest_report import PlatformWithLatestReportInDB
 from .schema_user import UserCreate, UserUpdate
 from sqlalchemy.orm import Session, aliased
-from .utils import get_password_hash
+from .utils import get_password_hash, verify_password
 from sqlalchemy import func, or_, String
 from datetime import datetime
 from datetime import datetime, timezone, timedelta
@@ -268,6 +268,22 @@ def update_user(db: Session, user_id: int, user):
     for key, value in update_data.items():
         setattr(db_user, key, value)
 
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+def change_user_password(db: Session, user_id: int, current_password: str, new_password: str):
+    """變更用戶密碼"""
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user:
+        return None
+    
+    # 驗證當前密碼
+    if not verify_password(current_password, db_user.hashed_password):
+        return False
+    
+    # 更新為新密碼
+    db_user.hashed_password = get_password_hash(new_password)
     db.commit()
     db.refresh(db_user)
     return db_user

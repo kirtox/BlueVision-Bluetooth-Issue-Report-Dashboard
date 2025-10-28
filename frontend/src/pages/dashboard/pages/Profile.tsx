@@ -1,5 +1,5 @@
 // import node module libraries
-import { Col, Row, Container, Card, Image, Badge } from "react-bootstrap";
+import { Col, Row, Container, Card, Image, Badge, Button, Modal, Form, Alert } from "react-bootstrap";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useRef, useState } from "react";
 
@@ -7,6 +7,18 @@ const Profile = () => {
   const { user, updateAvatar } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Change Password Modal states
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    email: '',
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click();
@@ -56,6 +68,117 @@ const Profile = () => {
         return 'primary';
       default:
         return 'secondary';
+    }
+  };
+
+  const handlePasswordModalOpen = () => {
+    setPasswordForm({
+      email: '',
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    setPasswordError('');
+    setPasswordSuccess('');
+    setShowPasswordModal(true);
+  };
+
+  const handlePasswordModalClose = () => {
+    setShowPasswordModal(false);
+    setPasswordForm({
+      email: '',
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    setPasswordError('');
+    setPasswordSuccess('');
+  };
+
+  const handlePasswordFormChange = (field: string, value: string) => {
+    setPasswordForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    // Clear errors when user starts typing
+    if (passwordError) setPasswordError('');
+  };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    // Validation
+    if (!passwordForm.email) {
+      setPasswordError('Please enter your email address');
+      return;
+    }
+
+    if (!passwordForm.currentPassword) {
+      setPasswordError('Please enter your current password');
+      return;
+    }
+
+    if (!passwordForm.newPassword) {
+      setPasswordError('Please enter a new password');
+      return;
+    }
+
+    if (passwordForm.newPassword.length < 6) {
+      setPasswordError('New password must be at least 6 characters long');
+      return;
+    }
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+
+    if (passwordForm.currentPassword === passwordForm.newPassword) {
+      setPasswordError('New password must be different from current password');
+      return;
+    }
+
+    // Check if email matches user's registered email
+    if (user?.email && passwordForm.email !== user.email) {
+      setPasswordError('Email address does not match your registered email');
+      return;
+    }
+
+    setIsChangingPassword(true);
+
+    try {
+      // TODO: Implement password change API call
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_BASE_URL}/change-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+        },
+        body: JSON.stringify({
+          email: passwordForm.email,
+          current_password: passwordForm.currentPassword,
+          new_password: passwordForm.newPassword
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Password change failed');
+      }
+
+      setPasswordSuccess('Password changed successfully!');
+      setTimeout(() => {
+        handlePasswordModalClose();
+      }, 2000);
+
+    } catch (error) {
+      console.error('Password change error:', error);
+      setPasswordError(error instanceof Error ? error.message : 'Password change failed. Please try again.');
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
@@ -201,12 +324,130 @@ const Profile = () => {
                   </p>
                 </Col>
               </Row>
+
+              <hr className="my-4" />
+
+              <Row>
+                <Col md={12} className="text-center">
+                  <Button
+                    variant="outline-primary"
+                    onClick={handlePasswordModalOpen}
+                    className="me-2"
+                  >
+                    <i className="fe fe-lock me-2"></i>
+                    Change Password
+                  </Button>
+                </Col>
+              </Row>
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
+      {/* Change Password Modal */}
+      <Modal show={showPasswordModal} onHide={handlePasswordModalClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Change Password</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handlePasswordSubmit}>
+          <Modal.Body>
+            {passwordError && (
+              <Alert variant="danger" className="mb-3">
+                <i className="fe fe-alert-circle me-2"></i>
+                {passwordError}
+              </Alert>
+            )}
 
+            {passwordSuccess && (
+              <Alert variant="success" className="mb-3">
+                <i className="fe fe-check-circle me-2"></i>
+                {passwordSuccess}
+              </Alert>
+            )}
+
+            <div className="mb-3">
+              <Form.Label>Email Address <span className="text-danger">*</span></Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="Enter your registered email address"
+                value={passwordForm.email}
+                onChange={(e) => handlePasswordFormChange('email', e.target.value)}
+                required
+                disabled={isChangingPassword}
+              />
+              <Form.Text className="text-muted">
+                Please enter the email address you used when registering your account.
+              </Form.Text>
+            </div>
+
+            <div className="mb-3">
+              <Form.Label>Current Password <span className="text-danger">*</span></Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Enter your current password"
+                value={passwordForm.currentPassword}
+                onChange={(e) => handlePasswordFormChange('currentPassword', e.target.value)}
+                required
+                disabled={isChangingPassword}
+              />
+            </div>
+
+            <div className="mb-3">
+              <Form.Label>New Password <span className="text-danger">*</span></Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Enter your new password"
+                value={passwordForm.newPassword}
+                onChange={(e) => handlePasswordFormChange('newPassword', e.target.value)}
+                required
+                disabled={isChangingPassword}
+                minLength={6}
+              />
+              <Form.Text className="text-muted">
+                Password must be at least 6 characters long.
+              </Form.Text>
+            </div>
+
+            <div className="mb-3">
+              <Form.Label>Confirm New Password <span className="text-danger">*</span></Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Confirm your new password"
+                value={passwordForm.confirmPassword}
+                onChange={(e) => handlePasswordFormChange('confirmPassword', e.target.value)}
+                required
+                disabled={isChangingPassword}
+              />
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={handlePasswordModalClose}
+              disabled={isChangingPassword}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              type="submit"
+              disabled={isChangingPassword}
+            >
+              {isChangingPassword ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Changing...
+                </>
+              ) : (
+                <>
+                  <i className="fe fe-save me-2"></i>
+                  Change Password
+                </>
+              )}
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
     </Container>
   );
 };
