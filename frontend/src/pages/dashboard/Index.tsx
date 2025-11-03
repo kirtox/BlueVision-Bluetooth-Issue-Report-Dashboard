@@ -20,6 +20,9 @@ import { useState, useEffect } from "react";
 
 import ReportFilters from "sub-components/filters/ReportFilters";
 import { Report } from "types";
+import { usePermissions } from "../../contexts/PermissionContext";
+import { Button, Modal } from "react-bootstrap";
+import ReportEditForm from "sub-components/dashboard/ReportEditForm";
 
 // import ReportPieChart from "sub-components/dashboard/ReportPieChart";
 // import ReportDoughnutChart from "sub-components/dashboard/ReportDoughnutChart";
@@ -37,6 +40,7 @@ import ReportMultipleGaugeChart from "sub-components/dashboard/ReportMultipleGau
 
 const Dashboard = () => {
   const { stats, loading } = useCPUStats();
+  const permissions = usePermissions();
 
   // reports data and filter condition
   const [reports, setReports] = useState<Report[]>([]);
@@ -48,6 +52,10 @@ const Dashboard = () => {
   const [selectedScenarios, setSelectedScenarios] = useState<string[]>([]);
   const [selectedBTDrivers, setSelectedBTDrivers] = useState<string[]>([]);
   const [selectedResults, setSelectedResults] = useState<string[]>([]);
+
+  // 創建報告相關狀態
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newReport, setNewReport] = useState<Report | null>(null);
   const [dateRange, setDateRange] = useState<{ startDate: Date | null; endDate: Date | null }>({ startDate: null, endDate: null });
 
   // useEffect(() => {
@@ -60,14 +68,140 @@ const Dashboard = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const fetchReports = () => {
-    fetch(`${API_BASE_URL}/reports`)
-      .then(res => res.json())
-      .then(data => setReports(data));
+    const token = localStorage.getItem('authToken');
+    fetch(`${API_BASE_URL}/reports`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch reports');
+        }
+        return res.json();
+      })
+      .then(data => setReports(data))
+      .catch(error => {
+        console.error('Error fetching reports:', error);
+        // 可以在這裡添加錯誤處理，比如顯示錯誤訊息
+      });
   };
   
   useEffect(() => {
     fetchReports();
   }, []);
+
+  // 創建報告相關函數
+  const handleCreateReport = () => {
+    // 創建一個新的空報告對象
+    const emptyReport: Report = {
+      id: 0, // 新報告ID為0
+      op_name: '', // 這會在後端自動設置
+      date: new Date().toISOString(),
+      serial_num: '',
+      os_version: '',
+      platform_brand: '',
+      platform: '',
+      platform_phase: '',
+      platform_bios: '',
+      cpu: '',
+      wlan: '',
+      wlan_phase: '',
+      wifi_name: '',
+      wifi_band: '',
+      bt_driver: '',
+      bt_interface: '',
+      wifi_driver: '',
+      audio_driver: '',
+      wrt_version: '',
+      wrt_preset: '',
+      msft_teams_version: '',
+      scenario: '',
+      mouse_bt: '',
+      mouse_brand: '',
+      mouse: '',
+      mouse_click_period: '',
+      keyboard_bt: '',
+      keyboard_brand: '',
+      keyboard: '',
+      keyboard_click_period: '',
+      headset_bt: '',
+      headset_brand: '',
+      headset: '',
+      speaker_bt: '',
+      speaker_brand: '',
+      speaker: '',
+      phone_brand: '',
+      phone: '',
+      device1_brand: '',
+      device1: '',
+      modern_standby: '',
+      ms_period: '',
+      ms_os_waiting_time: '',
+      s4: '',
+      s4_period: '',
+      s4_os_waiting_time: '',
+      warm_boot: '',
+      wb_period: '',
+      wb_os_waiting_time: '',
+      cold_boot: '',
+      cb_period: '',
+      cb_os_waiting_time: '',
+      microsoft_teams: '',
+      apm: '',
+      apm_period: '',
+      opp: '',
+      swift_pair: '',
+      power_type: '',
+      urgent_level: '',
+      fix_work_week: '',
+      fix_bt_driver: '',
+      jira_id: '',
+      ips_id: '',
+      hsd_id: '',
+      result: '',
+      fail_rate: '',
+      fail_cycles: '',
+      cycles: '',
+      duration: '',
+      log_path: ''
+    };
+    
+    setNewReport(emptyReport);
+    setShowCreateModal(true);
+  };
+
+  const handleSaveNewReport = async () => {
+    if (!newReport) return;
+
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${API_BASE_URL}/reports`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(newReport),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create report');
+      }
+
+      setShowCreateModal(false);
+      setNewReport(null);
+      fetchReports(); // 重新載入報告列表
+    } catch (error) {
+      console.error('Error creating report:', error);
+      alert('Failed to create report');
+    }
+  };
+
+  const handleCloseCreateModal = () => {
+    setShowCreateModal(false);
+    setNewReport(null);
+  };
 
   const filteredReports = reports.filter((item) => {
     const matchesSearch =
@@ -127,6 +261,18 @@ const Dashboard = () => {
               <div className="d-flex justify-content-between align-items-center">
                 <div className="mb-2 mb-lg-0">
                   <h1 className="mb-0  text-white">Intel Bluetooth Issue Report Dashboard</h1>
+                </div>
+                <div>
+                  {permissions.canCreateReport() && (
+                    <Button 
+                      variant="light" 
+                      onClick={handleCreateReport}
+                      className="me-2"
+                    >
+                      <i className="fe fe-plus me-1"></i>
+                      Create Report
+                    </Button>
+                  )}
                 </div>
                 {/* <div>
                   <Link to="#" className="btn btn-white">
@@ -466,6 +612,29 @@ const Dashboard = () => {
           </Col>
         </Row> */}
       </Container>
+
+      {/* 創建報告 Modal */}
+      <Modal show={showCreateModal} onHide={handleCloseCreateModal} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Create New Report</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {newReport && (
+            <ReportEditForm
+              report={newReport}
+              onChange={setNewReport}
+            />
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseCreateModal}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleSaveNewReport}>
+            Create Report
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Fragment>
   );
 };

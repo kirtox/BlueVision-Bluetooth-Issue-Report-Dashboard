@@ -15,6 +15,9 @@ tz_taipei = timezone(timedelta(hours=8))
 def get_reports(db: Session):
     return db.query(models.Report).all()
 
+def get_report_by_id(db: Session, report_id: int):
+    return db.query(models.Report).filter(models.Report.id == report_id).first()
+
 def parse_date(date_str: str) -> datetime:
     """
     Parse the ISO8601 date string passed by the front end (which may be Z, UTC, or +08:00)

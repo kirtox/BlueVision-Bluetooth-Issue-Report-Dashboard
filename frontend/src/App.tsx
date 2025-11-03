@@ -3,6 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 //import routes files
 import { AuthProvider } from "./contexts/AuthContext";
+import { PermissionProvider } from "./contexts/PermissionContext";
 import RootLayout from "layouts/RootLayout";
 import SignIn from "./pages/auth/SignIn";
 import ForgetPassword from "pages/auth/ForgetPassword";
@@ -18,6 +19,7 @@ import Documentation from "pages/dashboard/Documentation";
 import ChangeLog from "pages/dashboard/Changelog";
 import ApiDemo from "./pages/dashboard/pages/ApiDemo";
 import AuthTest from "./pages/dashboard/AuthTest";
+import PermissionTest from "./pages/dashboard/PermissionTest";
 import APIAccessLogs from "./pages/logs/APIAccessLogs";
 
 // import bootstrap components
@@ -99,6 +101,10 @@ const App = () => {
               path: "auth-test",
               Component: AuthTest,
             },
+            {
+              path: "permission-test",
+              Component: PermissionTest,
+            },
           ],
         },
         {
@@ -162,7 +168,9 @@ const App = () => {
 
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
+      <PermissionProvider>
+        <RouterProvider router={router} />
+      </PermissionProvider>
     </AuthProvider>
   );
 };

@@ -39,6 +39,15 @@ export const DashboardMenu: DashboardMenuProps[] = [
       { id: uuid(), link: "/logs/api-access", name: "API Access Logs" },
     ],
   },
+  {
+    id: uuid(),
+    title: "Development",
+    icon: "settings",
+    children: [
+      { id: uuid(), link: "/pages/auth-test", name: "Auth Test" },
+      { id: uuid(), link: "/pages/permission-test", name: "Permission Test" },
+    ],
+  },
   // {
   //   id: uuid(),
   //   title: "LAYOUTS & PAGES",

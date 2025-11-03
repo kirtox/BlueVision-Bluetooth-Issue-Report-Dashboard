@@ -11,6 +11,7 @@ from fastapi import FastAPI, Depends, Body, HTTPException, UploadFile, File
 from fastapi.staticfiles import StaticFiles
 from app.db import get_db, engine
 from app import models, crud, auth, export
+from app.auth import get_current_user
 from app.schema_report import ReportCreate, ReportUpdate, ReportInDB
 from app.schema_platform import PlatformCreate, PlatformUpdate, PlatformInDB
 from app.schema_platform_latest_report import PlatformWithLatestReportInDB
@@ -90,22 +91,72 @@ def health():
 
 # Read all reports
 @app.get("/reports", response_model=list[ReportInDB])
-def read_reports(db: Session = Depends(get_db)):
+def read_reports(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    from .permissions import PermissionChecker
+    
+    # 檢查是否有查看報告的權限
+    if not PermissionChecker.can_view_reports(current_user):
+        raise HTTPException(status_code=403, detail="Permission denied: Cannot view reports")
+    
     return crud.get_reports(db)
 
 # Add a report
 @app.post("/reports", response_model=ReportInDB)
-def create_report(report: ReportCreate, db: Session = Depends(get_db)):
+def create_report(
+    report: ReportCreate, 
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    from .permissions import PermissionChecker
+    
+    # 檢查是否有創建報告的權限
+    if not PermissionChecker.can_create_report(current_user):
+        raise HTTPException(status_code=403, detail="Permission denied: Cannot create reports")
+    
+    # 如果是User角色，自動設置op_name為當前用戶名
+    if current_user.role == "User":
+        report.op_name = current_user.username
+    
     return crud.create_report(db, report)
 
 # Update a report
 @app.patch("/reports/{report_id}", response_model=ReportInDB)
-def update_report(report_id: int, report: ReportUpdate, db: Session = Depends(get_db)):
+def update_report(
+    report_id: int, 
+    report: ReportUpdate, 
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    from .permissions import check_report_ownership
+    
+    # 檢查報告擁有權
+    if not check_report_ownership(current_user, report_id, db):
+        raise HTTPException(
+            status_code=403, 
+            detail="Permission denied: You can only edit your own reports"
+        )
+    
     return crud.update_report(db, report_id, report)
 
 # Delete a report
 @app.delete("/reports/{report_id}")
-def delete_report(report_id: int, db: Session = Depends(get_db)):
+def delete_report(
+    report_id: int, 
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    from .permissions import check_report_ownership
+    
+    # 檢查報告擁有權
+    if not check_report_ownership(current_user, report_id, db):
+        raise HTTPException(
+            status_code=403, 
+            detail="Permission denied: You can only delete your own reports"
+        )
+    
     return crud.delete_report(db, report_id)
 
 # Summary each cpu numbers

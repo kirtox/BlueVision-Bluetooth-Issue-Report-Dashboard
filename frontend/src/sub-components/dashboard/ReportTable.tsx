@@ -1,11 +1,10 @@
 // import node module libraries
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { Card, Table, Dropdown, Spinner, Modal, Button } from "react-bootstrap";
-import { MoreVertical } from "react-feather";
+import { useState } from "react";
+import { Card, Table, Spinner, Modal, Button } from "react-bootstrap";
 
 import { ReportTableProps, Report } from "types";
 import ReportEditForm from "./ReportEditForm";
+import { ReportActions } from "../../components/permissions/ReportActions";
 
 function ReportTable({ reports, onReload }: ReportTableProps) {
   const [sortField, setSortField] = useState<string>('date');
@@ -63,10 +62,12 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
   const handleSave = async () => {
     if (!editForm) return;
     try {
+      const token = localStorage.getItem('authToken');
       const response = await fetch(`${API_BASE_URL}/reports/${editForm.id}`, {
-        method: "PUT", // OR "PATCH"
+        method: "PATCH", // 使用PATCH方法
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
         },
         body: JSON.stringify(editForm),
       });
@@ -81,33 +82,9 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
     }
   };
 
-  const ActionMenu = ({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => void }) => (
-    <Dropdown>
-      <Dropdown.Toggle as={CustomToggle}>
-        <MoreVertical size="15px" className="text-muted" />
-      </Dropdown.Toggle>
-      <Dropdown.Menu align={"end"}>
-        <Dropdown.Item eventKey="1" onClick={onEdit}>Edit</Dropdown.Item>
-        <Dropdown.Item eventKey="2" onClick={onDelete}>Delete</Dropdown.Item>
-      </Dropdown.Menu>
-    </Dropdown>
-  );
 
-  const CustomToggle = React.forwardRef<HTMLAnchorElement, { children: React.ReactNode; onClick: (e: React.MouseEvent<HTMLAnchorElement>) => void }>(
-    ({ children, onClick }, ref) => (
-      <Link
-        to=""
-        ref={ref}
-        onClick={(e) => {
-          e.preventDefault();
-          onClick(e);
-        }}
-        className="text-muted text-primary-hover"
-      >
-        {children}
-      </Link>
-    )
-  );
+
+
 
   const handleSort = (field: string) => {
     if (field === sortField) {
@@ -163,8 +140,12 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
   const handleConfirmDelete = async () => {
     if (!deletingReport) return;
     try {
+      const token = localStorage.getItem('authToken');
       const response = await fetch(`${API_BASE_URL}/reports/${deletingReport.id}`, {
         method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+        },
       });
       if (!response.ok) throw new Error("Delete failed");
       setShowDeleteModal(false);
@@ -310,7 +291,11 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
               </td>
               <td className="align-middle">
                 {/* <ActionMenu /> */}
-                <ActionMenu onEdit={() => handleEdit(item)} onDelete={() => handleDeleteClick(item)} />
+                <ReportActions
+                  report={item}
+                  onEdit={() => handleEdit(item)}
+                  onDelete={() => handleDeleteClick(item)}
+                />
               </td>
             </tr>
           );
