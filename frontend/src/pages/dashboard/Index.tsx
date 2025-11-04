@@ -23,6 +23,8 @@ import { Report } from "types";
 import { usePermissions } from "../../contexts/PermissionContext";
 import { Button, Modal } from "react-bootstrap";
 import ReportEditForm from "sub-components/dashboard/ReportEditForm";
+import { useAuth } from "../../contexts/AuthContext";
+import { useCallback } from "react";
 
 // import ReportPieChart from "sub-components/dashboard/ReportPieChart";
 // import ReportDoughnutChart from "sub-components/dashboard/ReportDoughnutChart";
@@ -41,6 +43,7 @@ import ReportMultipleGaugeChart from "sub-components/dashboard/ReportMultipleGau
 const Dashboard = () => {
   const { stats, loading } = useCPUStats();
   const permissions = usePermissions();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
 
   // reports data and filter condition
   const [reports, setReports] = useState<Report[]>([]);
@@ -67,29 +70,74 @@ const Dashboard = () => {
   // Define API_BASE_URL
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  const fetchReports = () => {
+  const fetchReports = useCallback(async () => {
     const token = localStorage.getItem('authToken');
-    fetch(`${API_BASE_URL}/reports`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    })
-      .then(res => {
-        if (!res.ok) {
-          throw new Error('Failed to fetch reports');
-        }
-        return res.json();
-      })
-      .then(data => setReports(data))
-      .catch(error => {
-        console.error('Error fetching reports:', error);
-        // 可以在這裡添加錯誤處理，比如顯示錯誤訊息
+    const callStack = new Error().stack;
+    
+    console.log('🚀 fetchReports called from:', callStack?.split('\n')[2]?.trim());
+    console.log('fetchReports called, token exists:', !!token, 'user:', user?.username, 'role:', user?.role, 'isAuthenticated:', isAuthenticated);
+    
+    if (!token) {
+      console.warn('❌ No auth token found, skipping reports fetch');
+      return;
+    }
+    
+    if (!user) {
+      console.warn('❌ No user data found, skipping reports fetch');
+      return;
+    }
+    
+    if (!isAuthenticated) {
+      console.warn('❌ User not authenticated, skipping reports fetch');
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/reports`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
-  };
+      
+      if (!response.ok) {
+        if (response.status === 403) {
+          console.error('Access denied - insufficient permissions. User role:', user?.role);
+          // 如果是403錯誤，可能是權限問題，等待一下再重試
+          setTimeout(() => {
+            console.log('Retrying fetchReports after 403 error...');
+            fetchReports();
+          }, 1000);
+          return;
+        } else if (response.status === 401) {
+          console.error('Authentication failed - token may be invalid');
+          // 401錯誤可能需要重新登入
+          return;
+        }
+        throw new Error(`Failed to fetch reports: ${response.status} ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('Reports fetched successfully:', data.length, 'reports');
+      setReports(data);
+    } catch (error) {
+      console.error('Error fetching reports:', error);
+    }
+  }, [user, isAuthenticated, API_BASE_URL]);
   
   useEffect(() => {
-    fetchReports();
-  }, []);
+    console.log('Dashboard useEffect triggered:', { 
+      isAuthenticated, 
+      authLoading, 
+      hasUser: !!user,
+      userRole: user?.role 
+    });
+    
+    // 只在用戶已認證、不在載入狀態且有用戶數據時才調用API
+    if (isAuthenticated && !authLoading && user) {
+      console.log('Calling fetchReports from Dashboard useEffect');
+      fetchReports();
+    }
+  }, [isAuthenticated, authLoading, user]);
 
   // 創建報告相關函數
   const handleCreateReport = () => {

@@ -20,6 +20,7 @@ import ChangeLog from "pages/dashboard/Changelog";
 import ApiDemo from "./pages/dashboard/pages/ApiDemo";
 import AuthTest from "./pages/dashboard/AuthTest";
 import PermissionTest from "./pages/dashboard/PermissionTest";
+import UserManagement from "./pages/dashboard/UserManagement";
 import APIAccessLogs from "./pages/logs/APIAccessLogs";
 
 // import bootstrap components
@@ -121,6 +122,11 @@ const App = () => {
           id: "layout-vertical",
           path: "/layout-vertical",
           Component: LayoutVertical,
+        },
+        {
+          id: "users",
+          path: "/users",
+          Component: UserManagement,
         },
         {
           id: "logs",

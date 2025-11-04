@@ -12,8 +12,9 @@ import { CustomToggleLevelTwo } from "./CustomToggleLevelTwo";
 import SimpleBar from "simplebar-react";
 
 // import routes file
-import { DashboardMenu } from "routes/DashboardRoutes";
+import { getDashboardMenuByRole } from "routes/DashboardRoutes";
 import { DashboardMenuProps } from "types";
+import { useAuth } from "../../../contexts/AuthContext";
 
 interface SidebarProps {
   showMenu: boolean;
@@ -22,6 +23,14 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ showMenu, toggleMenu }) => {
   const location = useLocation();
+  const { user } = useAuth();
+  
+  // 根據用戶角色獲取菜單
+  const menuItems = getDashboardMenuByRole(user?.role);
+  
+  console.log('Sidebar - User role:', user?.role);
+  console.log('Sidebar - Menu items:', menuItems.length, 'items');
+  console.log('Sidebar - Menu items:', menuItems.map(item => ({ title: item.title, children: item.children?.length })));
   const generateLink = (item: any) => {
     const location = useLocation();
 
@@ -58,7 +67,7 @@ const Sidebar: React.FC<SidebarProps> = ({ showMenu, toggleMenu }) => {
           as="ul"
           className="navbar-nav flex-column"
         >
-          {DashboardMenu.map(function (
+          {menuItems.map(function (
             menu: DashboardMenuProps,
             index: number
           ) {

@@ -10,8 +10,25 @@ export function useCPUStats() {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/reports/cpu_stats`)
-      .then((res) => res.json())
+    const token = localStorage.getItem('authToken');
+    
+    if (!token) {
+      console.warn('No auth token found, skipping CPU stats fetch');
+      setLoading(false);
+      return;
+    }
+    
+    fetch(`${API_BASE_URL}/reports/cpu_stats`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then((data) => {
         console.log('✅ CPU stats fetch success, data:', data);
         console.log(`${API_BASE_URL}/reports/cpu_stats`);

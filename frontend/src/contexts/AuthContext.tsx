@@ -42,26 +42,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const checkAuthStatus = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        if (token) {
-          // 驗證 token 是否有效
+        const userData = localStorage.getItem('userData');
+
+        console.log('AuthContext: Checking auth status', { hasToken: !!token, hasUserData: !!userData });
+
+        if (token && userData) {
+          // 先設置用戶數據，讓UI可以立即響應
+          const parsedUserData = JSON.parse(userData);
+          setUser(parsedUserData);
+          console.log('AuthContext: User data loaded from localStorage', parsedUserData);
+
+          // 然後在背景驗證 token
           try {
             await authService.verifyToken(token);
-            const userData = localStorage.getItem('userData');
-            if (userData) {
-              setUser(JSON.parse(userData));
-            }
+            console.log('AuthContext: Token verification successful');
           } catch (error) {
+            console.error('AuthContext: Token verification failed', error);
             // Token 無效，清除本地存儲
             localStorage.removeItem('authToken');
             localStorage.removeItem('userData');
+            setUser(null);
           }
+        } else {
+          console.log('AuthContext: No token or user data found');
         }
       } catch (error) {
         console.error('Auth check failed:', error);
         localStorage.removeItem('authToken');
         localStorage.removeItem('userData');
+        setUser(null);
       } finally {
         setIsLoading(false);
+        console.log('AuthContext: Auth check completed');
       }
     };
 

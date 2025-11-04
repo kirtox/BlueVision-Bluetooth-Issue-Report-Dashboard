@@ -11,7 +11,7 @@ from fastapi import FastAPI, Depends, Body, HTTPException, UploadFile, File
 from fastapi.staticfiles import StaticFiles
 from app.db import get_db, engine
 from app import models, crud, auth, export
-from app.auth import get_current_user
+from app.auth import get_current_user, get_current_user_optional
 from app.schema_report import ReportCreate, ReportUpdate, ReportInDB
 from app.schema_platform import PlatformCreate, PlatformUpdate, PlatformInDB
 from app.schema_platform_latest_report import PlatformWithLatestReportInDB
@@ -93,13 +93,25 @@ def health():
 @app.get("/reports", response_model=list[ReportInDB])
 def read_reports(
     db: Session = Depends(get_db),
-    current_user: models.User = Depends(get_current_user)
+    current_user: models.User = Depends(get_current_user_optional)
 ):
     from .permissions import PermissionChecker
     
+    # 如果沒有認證用戶，返回401
+    if not current_user:
+        print("Reports API: No authenticated user found")
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
+    # 添加詳細的日誌來診斷權限問題
+    print(f"Reports API called by user: {current_user.username}, role: {current_user.role}")
+    
     # 檢查是否有查看報告的權限
-    if not PermissionChecker.can_view_reports(current_user):
-        raise HTTPException(status_code=403, detail="Permission denied: Cannot view reports")
+    can_view = PermissionChecker.can_view_reports(current_user)
+    print(f"User {current_user.username} can view reports: {can_view}")
+    
+    if not can_view:
+        print(f"Access denied for user {current_user.username} with role {current_user.role}")
+        raise HTTPException(status_code=403, detail=f"Permission denied: Role '{current_user.role}' cannot view reports")
     
     return crud.get_reports(db)
 
@@ -161,12 +173,23 @@ def delete_report(
 
 # Summary each cpu numbers
 @app.get("/reports/cpu_stats")
-def get_cpu_stats(db: Session = Depends(get_db)):
+def get_cpu_stats(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    from .permissions import PermissionChecker
+    
+    # 檢查是否有查看報告的權限
+    if not PermissionChecker.can_view_reports(current_user):
+        raise HTTPException(status_code=403, detail="Permission denied: Cannot view reports")
+    
     return crud.get_cpu_stats(db)
 
 # Read all platforms
 @app.get("/platforms", response_model=list[PlatformInDB])
 def read_platforms(db: Session = Depends(get_db)):
+    # 平台狀態查看暫時不需要認證
+    # TODO: 之後可以根據需求決定是否需要認證
     return crud.get_platforms(db)
 
 # /platforms/latest_reports must place before /platform/{serial_num}
@@ -174,10 +197,20 @@ def read_platforms(db: Session = Depends(get_db)):
 # /platform/{serial_num} add prefix word "search_by_sn", so the issue should be solved.
 @app.get("/platforms/latest_reports", response_model=list[PlatformWithLatestReportInDB])
 def get_platform_latest_reports(db: Session = Depends(get_db)):
+    # 平台狀態查看暫時不需要認證，因為這是Dashboard的核心功能
+    # TODO: 之後可以根據需求決定是否需要認證
     return crud.get_platform_latest_reports(db)
 
 @app.get("/platforms/search_by_sn/{serial_num}", response_model=PlatformInDB)
-def get_platform_by_serial_num(serial_num: str, db: Session = Depends(get_db)):
+def get_platform_by_serial_num(
+    serial_num: str, 
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    # 所有登入用戶都可以查看平台狀態
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    
     result = crud.get_platform_by_serial_num(db, serial_num)
     if not result:
         raise HTTPException(status_code=404, detail="Platform not found")
@@ -185,22 +218,64 @@ def get_platform_by_serial_num(serial_num: str, db: Session = Depends(get_db)):
 
 # Add a platform
 @app.post("/platforms", response_model=PlatformInDB)
-def create_platform(platform: PlatformCreate, db: Session = Depends(get_db)):
+def create_platform(
+    platform: PlatformCreate, 
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    from .permissions import PermissionChecker
+    
+    # 檢查是否有平台管理權限
+    if not PermissionChecker.can_manage_platforms(current_user):
+        raise HTTPException(status_code=403, detail="Permission denied: Cannot manage platforms")
+    
     return crud.create_platform(db, platform)
 
 # Update a platform
 @app.put("/platforms/{platform_id}", response_model=PlatformInDB)
-def update_platform(platform_id: int, platform: PlatformUpdate, db: Session = Depends(get_db)):
+def update_platform(
+    platform_id: int, 
+    platform: PlatformUpdate, 
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    from .permissions import PermissionChecker
+    
+    # 檢查是否有平台管理權限
+    if not PermissionChecker.can_manage_platforms(current_user):
+        raise HTTPException(status_code=403, detail="Permission denied: Cannot manage platforms")
+    
     return crud.update_platform(db, platform_id, platform)
 
 # Delete a platform
 @app.delete("/platforms/{platform_id}")
-def delete_platform(platform_id: int, db: Session = Depends(get_db)):
+def delete_platform(
+    platform_id: int, 
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    from .permissions import PermissionChecker
+    
+    # 檢查是否有平台管理權限
+    if not PermissionChecker.can_manage_platforms(current_user):
+        raise HTTPException(status_code=403, detail="Permission denied: Cannot manage platforms")
+    
     return crud.delete_platform(db, platform_id)
 
 # API Access Logs
 @app.get("/api-logs", response_model=list[APIAccessLogInDB])
-def get_api_logs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def get_api_logs(
+    skip: int = 0, 
+    limit: int = 100, 
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    from .permissions import PermissionChecker
+    
+    # 檢查是否有查看日誌的權限
+    if not PermissionChecker.can_view_logs(current_user):
+        raise HTTPException(status_code=403, detail="Permission denied: Cannot view API logs")
+    
     return crud.get_api_access_logs(db, skip=skip, limit=limit)
 
 # Avatar upload endpoint

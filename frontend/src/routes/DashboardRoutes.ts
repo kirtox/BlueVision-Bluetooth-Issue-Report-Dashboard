@@ -178,3 +178,69 @@ export const DashboardMenu: DashboardMenuProps[] = [
   //   link: "https://dashui.codescandy.com/free-reactjs-admin-dashboard-template.html",
   // },
 ];
+
+// 使用固定ID來避免Accordion展開問題
+const MENU_IDS = {
+  DASHBOARD: 'dashboard-menu',
+  USER_MANAGEMENT: 'user-management-menu',
+  LOGS: 'logs-menu',
+  DEVELOPMENT: 'development-menu',
+  API_ACCESS_LOGS: 'api-access-logs',
+  AUTH_TEST: 'auth-test',
+  PERMISSION_TEST: 'permission-test'
+};
+
+// 根據用戶角色生成菜單
+export const getDashboardMenuByRole = (userRole?: string): DashboardMenuProps[] => {
+  // 基礎菜單項（所有用戶都可見）
+  const baseMenuItems: DashboardMenuProps[] = [
+    {
+      id: MENU_IDS.DASHBOARD,
+      title: "Dashboard",
+      icon: "home",
+      link: "/",
+    },
+  ];
+
+  // 管理員專用菜單項
+  const adminMenuItems: DashboardMenuProps[] = [
+    {
+      id: MENU_IDS.USER_MANAGEMENT,
+      title: "User Management",
+      icon: "users",
+      link: "/users",
+    },
+    {
+      id: MENU_IDS.LOGS,
+      title: "Logs",
+      icon: "file-text",
+      children: [
+        { id: MENU_IDS.API_ACCESS_LOGS, link: "/logs/api-access", name: "API Access Logs" },
+      ],
+    },
+  ];
+
+  // 開發測試菜單項
+  const developmentMenuItems: DashboardMenuProps[] = [
+    {
+      id: MENU_IDS.DEVELOPMENT,
+      title: "Development",
+      icon: "settings",
+      children: [
+        { id: MENU_IDS.AUTH_TEST, link: "/pages/auth-test", name: "Auth Test" },
+        { id: MENU_IDS.PERMISSION_TEST, link: "/pages/permission-test", name: "Permission Test" },
+      ],
+    },
+  ];
+
+  let menuItems = [...baseMenuItems];
+
+  if (userRole === 'Administrator') {
+    menuItems = [...menuItems, ...adminMenuItems, ...developmentMenuItems];
+  } else if (userRole === 'User') {
+    menuItems = [...menuItems, ...developmentMenuItems];
+  }
+  // Guest 用戶只能看到基礎菜單
+
+  return menuItems;
+};
