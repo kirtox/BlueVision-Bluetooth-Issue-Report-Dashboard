@@ -64,7 +64,7 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
     try {
       const token = localStorage.getItem('authToken');
       const response = await fetch(`${API_BASE_URL}/reports/${editForm.id}`, {
-        method: "PATCH", // 使用PATCH方法
+        method: "PATCH", // Use PATCH method
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`,

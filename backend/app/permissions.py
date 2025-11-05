@@ -8,12 +8,12 @@ from typing import List, Optional
 
 def require_role(allowed_roles: List[str]):
     """
-    裝飾器：檢查用戶是否具有指定角色之一
+    Decorator: Check if user has one of the specified roles
     """
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # 從kwargs中獲取current_user
+            # Get current_user from kwargs
             current_user = kwargs.get('current_user')
             if not current_user:
                 raise HTTPException(status_code=401, detail="Authentication required")
@@ -30,7 +30,7 @@ def require_role(allowed_roles: List[str]):
 
 def admin_only(func):
     """
-    裝飾器：僅管理員可訪問
+    Decorator: Admin access only
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -46,7 +46,7 @@ def admin_only(func):
 
 def authenticated_only(func):
     """
-    裝飾器：需要登入但不限制角色
+    Decorator: Requires login but no role restriction
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -59,10 +59,10 @@ def authenticated_only(func):
 
 def check_report_ownership(user: models.User, report_id: int, db: Session) -> bool:
     """
-    檢查用戶是否可以修改指定報告
-    - Administrator: 可以修改任何報告
-    - User: 只能修改自己的報告 (op_name == username)
-    - Guest: 不能修改任何報告
+    Check if user can modify specified report
+    - Administrator: Can modify any report
+    - User: Can only modify their own reports (op_name == username)
+    - Guest: Cannot modify any reports
     """
     if user.role == "Administrator":
         return True
@@ -81,8 +81,8 @@ def check_report_ownership(user: models.User, report_id: int, db: Session) -> bo
 
 def require_report_ownership(func):
     """
-    裝飾器：檢查報告擁有權
-    需要在路由參數中有report_id
+    Decorator: Check report ownership
+    Requires report_id in route parameters
     """
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -107,40 +107,40 @@ def require_report_ownership(func):
 
 class PermissionChecker:
     """
-    權限檢查工具類
+    Permission checking utility class
     """
     
     @staticmethod
     def can_manage_users(user: models.User) -> bool:
-        """檢查是否可以管理用戶"""
+        """Check if user can manage users"""
         return user.role == "Administrator"
     
     @staticmethod
     def can_view_logs(user: models.User) -> bool:
-        """檢查是否可以查看API日誌"""
+        """Check if user can view API logs"""
         return user.role == "Administrator"
     
     @staticmethod
     def can_manage_platforms(user: models.User) -> bool:
-        """檢查是否可以管理平台"""
+        """Check if user can manage platforms"""
         return user.role == "Administrator"
     
     @staticmethod
     def can_create_report(user: models.User) -> bool:
-        """檢查是否可以創建報告"""
+        """Check if user can create reports"""
         return user.role in ["Administrator", "User"]
     
     @staticmethod
     def can_view_reports(user: models.User) -> bool:
-        """檢查是否可以查看報告"""
+        """Check if user can view reports"""
         return user.role in ["Administrator", "User", "Guest"]
     
     @staticmethod
     def can_export_reports(user: models.User) -> bool:
-        """檢查是否可以匯出報告"""
+        """Check if user can export reports"""
         return user.role in ["Administrator", "User"]
     
     @staticmethod
     def can_edit_profile(user: models.User) -> bool:
-        """檢查是否可以編輯個人資料"""
+        """Check if user can edit profile"""
         return user.role in ["Administrator", "User"]

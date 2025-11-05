@@ -1,117 +1,117 @@
-# 登入系統使用說明
+# Login System User Guide
 
-## 概述
+## Overview
 
-基於 Header.tsx 中的 Notifications 組件設計，我們建立了一個完整的用戶認證系統。
+Based on the Notifications component design in Header.tsx, we have built a complete user authentication system.
 
-## 主要功能
+## Main Features
 
-### 1. 用戶認證 Context (`AuthContext.tsx`)
-- 提供全局的用戶狀態管理
-- 支持登入、登出功能
-- 自動檢查本地存儲的認證狀態
-- 提供 loading 狀態管理
+### 1. User Authentication Context (`AuthContext.tsx`)
+- Provides global user state management
+- Supports login and logout functionality
+- Automatically checks authentication status in local storage
+- Provides loading state management
 
-### 2. 用戶菜單組件 (`UserMenu.tsx`)
-- 基於原有 Notifications 組件的設計風格
-- 未登入時顯示登入/註冊按鈕
-- 已登入時顯示用戶頭像和下拉菜單
-- 包含用戶資訊、設定選項和登出功能
+### 2. User Menu Component (`UserMenu.tsx`)
+- Based on the design style of the original Notifications component
+- Shows login/register buttons when not logged in
+- Shows user avatar and dropdown menu when logged in
+- Contains user information, settings options, and logout functionality
 
-### 3. 登入頁面 (`SignIn.tsx`)
-- 中文化的登入表單
-- 表單驗證和錯誤處理
-- 自動重定向到主頁面
-- Loading 狀態顯示
+### 3. Login Page (`SignIn.tsx`)
+- Localized login form
+- Form validation and error handling
+- Auto-redirect to main page
+- Loading state display
 
-### 4. 註冊頁面 (`SignUp.tsx`)
-- 中文化的註冊表單
-- 密碼確認驗證
-- 服務條款同意檢查
-- 自動登入功能
+### 4. Registration Page (`SignUp.tsx`)
+- Localized registration form
+- Password confirmation validation
+- Terms of service agreement check
+- Auto-login functionality
 
-### 5. 路由保護 (`ProtectedRoute.tsx`)
-- 保護需要認證的頁面
-- 自動重定向未登入用戶到登入頁面
-- Loading 狀態處理
+### 5. Route Protection (`ProtectedRoute.tsx`)
+- Protects pages that require authentication
+- Auto-redirects unauthenticated users to login page
+- Loading state handling
 
-## 使用方式
+## Usage
 
-### 1. 訪問登入頁面
-- 直接訪問 `/signin` 進入登入頁面
-- 或點擊 Header 中的「登入」按鈕
+### 1. Access Login Page
+- Directly visit `/signin` to enter login page
+- Or click the "Login" button in the Header
 
-### 2. 註冊新帳戶
-- 訪問 `/signup` 進入註冊頁面
-- 或從登入頁面點擊「建立新帳戶」
+### 2. Register New Account
+- Visit `/signup` to enter registration page
+- Or click "Create New Account" from the login page
 
-### 3. 測試認證系統
-- 登入後訪問 `/pages/auth-test` 查看認證狀態
-- 可以查看當前用戶資訊和系統狀態
+### 3. Test Authentication System
+- After login, visit `/pages/auth-test` to view authentication status
+- Can view current user information and system status
 
-### 4. 登出
-- 點擊用戶頭像下拉菜單中的「登出」選項
+### 4. Logout
+- Click the "Logout" option in the user avatar dropdown menu
 
-## 技術特點
+## Technical Features
 
-1. **基於現有設計**: 完全基於 Header.tsx 中 Notifications 組件的設計風格
-2. **響應式設計**: 支持桌面和移動設備
-3. **中文化**: 所有界面文字都已中文化
-4. **狀態管理**: 使用 React Context 進行全局狀態管理
-5. **本地存儲**: 支持記住登入狀態
-6. **路由保護**: 自動保護需要認證的頁面
+1. **Based on Existing Design**: Completely based on the design style of the Notifications component in Header.tsx
+2. **Responsive Design**: Supports desktop and mobile devices
+3. **Localization**: All interface text has been localized
+4. **State Management**: Uses React Context for global state management
+5. **Local Storage**: Supports remembering login status
+6. **Route Protection**: Automatically protects pages that require authentication
 
-## 目前實現
+## Current Implementation
 
-- ✅ 用戶認證 Context
-- ✅ 登入/註冊頁面
-- ✅ 用戶菜單組件
-- ✅ 路由保護
-- ✅ 本地狀態持久化
-- ✅ 測試頁面
-- ✅ **雙模式認證系統**（模擬 + 真實 API）
-- ✅ 後端 API 整合
-- ✅ JWT Token 驗證
+- ✅ User Authentication Context
+- ✅ Login/Registration Pages
+- ✅ User Menu Component
+- ✅ Route Protection
+- ✅ Local State Persistence
+- ✅ Test Page
+- ✅ **Dual-Mode Authentication System** (Mock + Real API)
+- ✅ Backend API Integration
+- ✅ JWT Token Verification
 
-## 後續擴展
+## Future Extensions
 
-1. **後端整合**: 連接實際的認證 API
-2. **密碼重設**: 實現忘記密碼功能
-3. **用戶資料管理**: 個人資料編輯頁面
-4. **權限管理**: 基於角色的訪問控制
-5. **社交登入**: 支持第三方登入（Google、Facebook 等）
+1. **Backend Integration**: Connect to actual authentication API
+2. **Password Reset**: Implement forgot password functionality
+3. **User Profile Management**: Personal profile editing page
+4. **Permission Management**: Role-based access control
+5. **Social Login**: Support third-party login (Google, Facebook, etc.)
 
-## 雙模式認證系統
+## Dual-Mode Authentication System
 
-### 🔄 模式切換
-系統支持兩種認證模式，可在登入/註冊頁面頂部切換：
+### 🔄 Mode Switching
+The system supports two authentication modes, switchable at the top of login/registration pages:
 
-1. **模擬模式**（預設）
-   - 任何用戶名和密碼都可以登入
-   - 適合開發和測試
-   - 不需要後端服務
+1. **Mock Mode** (Default)
+   - Any username and password can login
+   - Suitable for development and testing
+   - No backend service required
 
-2. **API 模式**
-   - 連接到真實的後端 API
-   - 需要有效的用戶帳戶
-   - 支持真實的註冊和登入
+2. **API Mode**
+   - Connects to real backend API
+   - Requires valid user accounts
+   - Supports real registration and login
 
-### 🔧 後端 API 端點
+### 🔧 Backend API Endpoints
 
-- `POST /login` - 用戶登入
-- `POST /users` - 用戶註冊
-- `GET /verify-token` - Token 驗證
+- `POST /login` - User login
+- `POST /users` - User registration
+- `GET /verify-token` - Token verification
 
-### 🛠️ 技術實現
+### 🛠️ Technical Implementation
 
-- **密碼安全**: 使用 bcrypt 哈希
-- **Token 管理**: JWT Token 認證
-- **狀態持久化**: localStorage 存儲
-- **錯誤處理**: 完整的錯誤提示
+- **Password Security**: Uses bcrypt hashing
+- **Token Management**: JWT Token authentication
+- **State Persistence**: localStorage storage
+- **Error Handling**: Complete error messaging
 
-## 注意事項
+## Notes
 
-- 預設使用模擬模式，適合快速開發測試
-- API 模式需要後端服務運行在 `VITE_API_BASE_URL` 配置的地址
-- 用戶資料存儲在瀏覽器的 localStorage 中
-- 生產環境建議使用 API 模式並配置適當的安全措施
+- Uses mock mode by default, suitable for rapid development testing
+- API mode requires backend service running at the address configured in `VITE_API_BASE_URL`
+- User data is stored in browser's localStorage
+- Production environment recommends using API mode with appropriate security measures

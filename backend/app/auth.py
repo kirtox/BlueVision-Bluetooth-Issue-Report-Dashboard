@@ -14,7 +14,7 @@ optional_security = HTTPBearer(auto_error=False)
 
 
 def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)) -> models.User:
-    """獲取當前認證用戶"""
+    """Get current authenticated user"""
     try:
         token = credentials.credentials
         print(f"get_current_user: Received token: {token[:20]}..." if token else "get_current_user: No token received")
@@ -47,7 +47,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
 
 
 def get_current_user_optional(credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security), db: Session = Depends(get_db)) -> Optional[models.User]:
-    """獲取當前認證用戶（可選）"""
+    """Get current authenticated user (optional)"""
     if not credentials:
         print("get_current_user_optional: No credentials provided")
         return None
@@ -83,7 +83,7 @@ def get_current_user_optional(credentials: Optional[HTTPAuthorizationCredentials
 
 @router.post("/login")
 def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
-    """用戶登入"""
+    """User login"""
     print(f"Login attempt for user: {user_credentials.username}")
     
     user = authenticate_user(db, user_credentials.username, user_credentials.password)
@@ -115,7 +115,7 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
 
 @router.post("/register")
 def register(credentials: UserCreate, db: Session = Depends(get_db)):
-    """用戶註冊（使用 /register 路由）"""
+    """User registration (using /register route)"""
     existing_user = get_user(db, credentials.username)
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
@@ -128,14 +128,14 @@ def create_user_endpoint(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    """創建新用戶（管理員功能）"""
+    """Create new user (admin function)"""
     from .permissions import PermissionChecker
     
-    # 檢查是否有用戶管理權限
+    # Check if user has user management permission
     if not PermissionChecker.can_manage_users(current_user):
         raise HTTPException(status_code=403, detail="Permission denied: Cannot manage users")
     
-    # 檢查用戶名是否已存在
+    # Check if username already exists
     db_user = get_user(db, username=user.username)
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
@@ -147,10 +147,10 @@ def get_users_endpoint(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    """獲取所有用戶列表（管理員功能）"""
+    """Get all users list (admin function)"""
     from .permissions import PermissionChecker
     
-    # 檢查是否有用戶管理權限
+    # Check if user has user management permission
     if not PermissionChecker.can_manage_users(current_user):
         raise HTTPException(status_code=403, detail="Permission denied: Cannot manage users")
     
@@ -159,7 +159,7 @@ def get_users_endpoint(
 
 @router.get("/verify-token")
 def verify_token_endpoint(credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)):
-    """驗證 JWT Token"""
+    """Verify JWT Token"""
     token = credentials.credentials
     username = verify_token(token)
     
@@ -188,15 +188,15 @@ def change_password(
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """變更用戶密碼"""
-    # 驗證郵箱是否匹配
+    """Change user password"""
+    # Verify if email matches
     if current_user.email != password_data.email:
         raise HTTPException(
             status_code=400, 
             detail="Email address does not match your registered email"
         )
     
-    # 嘗試變更密碼
+    # Attempt to change password
     result = change_user_password(
         db, 
         current_user.id, 
@@ -214,8 +214,8 @@ def change_password(
 
 @router.get("/check-username/{username}")
 def check_username_availability(username: str, db: Session = Depends(get_db)):
-    """檢查用戶名是否可用"""
-    # 將username轉為小寫進行檢查
+    """Check if username is available"""
+    # Convert username to lowercase for checking
     username_lower = username.lower()
     existing_user = get_user(db, username_lower)
     return {
@@ -231,14 +231,14 @@ def update_user_endpoint(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    """更新用戶資料"""
+    """Update user data"""
     from .permissions import PermissionChecker
     
-    # 檢查權限：管理員可以編輯任意用戶，一般用戶只能編輯自己
+    # Check permissions: admin can edit any user, regular users can only edit themselves
     if not (PermissionChecker.can_manage_users(current_user) or current_user.id == user_id):
         raise HTTPException(status_code=403, detail="Permission denied: Cannot edit this user")
     
-    # 如果是一般用戶編輯自己，不允許修改角色
+    # If regular user editing themselves, don't allow role modification
     if current_user.id == user_id and not PermissionChecker.can_manage_users(current_user):
         if hasattr(user_update, 'role') and user_update.role is not None:
             raise HTTPException(status_code=403, detail="Permission denied: Cannot change your own role")
@@ -256,23 +256,23 @@ def delete_user_endpoint(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    """刪除用戶"""
+    """Delete user"""
     from .permissions import PermissionChecker
     
-    # 檢查是否有用戶管理權限
+    # Check if user has user management permission
     if not PermissionChecker.can_manage_users(current_user):
         raise HTTPException(status_code=403, detail="Permission denied: Cannot delete users")
     
-    # 不允許刪除自己
+    # Don't allow deleting yourself
     if current_user.id == user_id:
         raise HTTPException(status_code=400, detail="Cannot delete yourself")
     
-    # 檢查用戶是否存在
+    # Check if user exists
     user_to_delete = db.query(models.User).filter(models.User.id == user_id).first()
     if not user_to_delete:
         raise HTTPException(status_code=404, detail="User not found")
     
-    # 刪除用戶
+    # Delete user
     db.delete(user_to_delete)
     db.commit()
     
@@ -281,7 +281,7 @@ def delete_user_endpoint(
 
 @router.get("/debug/users")
 def debug_users(db: Session = Depends(get_db)):
-    """除錯用：檢查資料庫中的使用者"""
+    """Debug: Check users in database"""
     try:
         users = get_users(db)
         return {

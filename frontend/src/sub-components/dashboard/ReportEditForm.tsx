@@ -47,31 +47,31 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
         //     const value = e.target.value;
         //     handleFieldChange(field, value);
     
-        //     // 如果是 Modern Standby 且選 N，清空相依欄位
+        //     // If Modern Standby is selected as N, clear dependent fields
         //     if (field === "modern_standby" && value === "N") {
         //       handleFieldChange("ms_period", "");
         //       handleFieldChange("ms_os_waiting_time", "");
         //     }
     
-        //     // 如果是 Hibernation 且選 N，清空相依欄位
+        //     // If Hibernation is selected as N, clear dependent fields
         //     if (field === "s4" && value === "N") {
         //       handleFieldChange("s4_period", "");
         //       handleFieldChange("s4_os_waiting_time", "");
         //     }
     
-        //     // 如果是 Warm Boot 且選 N，清空相依欄位
+        //     // If Warm Boot is selected as N, clear dependent fields
         //     if (field === "warm_boot" && value === "N") {
         //       handleFieldChange("wb_period", "");
         //       handleFieldChange("wb_os_waiting_time", "");
         //     }
     
-        //     // 如果是 Cold Boot 且選 N，清空相依欄位
+        //     // If Cold Boot is selected as N, clear dependent fields
         //     if (field === "cold_boot" && value === "N") {
         //       handleFieldChange("cb_period", "");
         //       handleFieldChange("cb_os_waiting_time", "");
         //     }
     
-        //     // APM 清空 APM period
+        //     // APM clear APM period
         //     if (field === "apm" && value === "N") {
         //       handleFieldChange("apm_period", "");
         //     }

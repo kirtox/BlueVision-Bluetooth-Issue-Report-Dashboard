@@ -8,11 +8,11 @@ import {
 
 interface ReportGaugeChartProps {
   reports: any[];
-  groupBy: string; // 依哪個欄位分組
-  calcField?: string; // 計算欄位
-  calcType?: "sum" | "count"; // 計算方式
-  max?: number; // 最大值 (共用)
-  thresholds?: { value: number; color: string }[]; // 門檻值
+  groupBy: string; // Group by which field
+  calcField?: string; // Calculation field
+  calcType?: "sum" | "count"; // Calculation method
+  max?: number; // Maximum value (shared)
+  thresholds?: { value: number; color: string }[]; // Threshold values
   title?: string;
 }
 
@@ -31,7 +31,7 @@ const ReportGaugeChart: React.FC<ReportGaugeChartProps> = ({
 }) => {
   if (!reports || !reports.length) return <div>No data</div>;
 
-  // 分組計算數值
+  // Group and calculate values
   const grouped: Record<string, number> = {};
   reports.forEach((r) => {
     const key = r[groupBy] || "(Empty)";
@@ -43,7 +43,7 @@ const ReportGaugeChart: React.FC<ReportGaugeChartProps> = ({
     }
   });
 
-  // 轉成 array
+  // Convert to array
   const groups = Object.entries(grouped).map(([name, value]) => ({
     name,
     value,
@@ -64,7 +64,7 @@ const ReportGaugeChart: React.FC<ReportGaugeChartProps> = ({
         }}
       >
         {groups.map(({ name, value }) => {
-          // 找到對應門檻色
+          // Find corresponding threshold color
           let fillColor = thresholds[0].color;
           for (const th of thresholds) {
             if (value <= th.value) {

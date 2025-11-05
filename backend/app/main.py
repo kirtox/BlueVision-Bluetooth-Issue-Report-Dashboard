@@ -97,15 +97,15 @@ def read_reports(
 ):
     from .permissions import PermissionChecker
     
-    # 如果沒有認證用戶，返回401
+    # If no authenticated user, return 401
     if not current_user:
         print("Reports API: No authenticated user found")
         raise HTTPException(status_code=401, detail="Authentication required")
     
-    # 添加詳細的日誌來診斷權限問題
+    # Add detailed logging to diagnose permission issues
     print(f"Reports API called by user: {current_user.username}, role: {current_user.role}")
     
-    # 檢查是否有查看報告的權限
+    # Check if user has permission to view reports
     can_view = PermissionChecker.can_view_reports(current_user)
     print(f"User {current_user.username} can view reports: {can_view}")
     
@@ -124,11 +124,11 @@ def create_report(
 ):
     from .permissions import PermissionChecker
     
-    # 檢查是否有創建報告的權限
+    # Check if user has permission to create reports
     if not PermissionChecker.can_create_report(current_user):
         raise HTTPException(status_code=403, detail="Permission denied: Cannot create reports")
     
-    # 如果是User角色，自動設置op_name為當前用戶名
+    # If User role, automatically set op_name to current username
     if current_user.role == "User":
         report.op_name = current_user.username
     
@@ -144,7 +144,7 @@ def update_report(
 ):
     from .permissions import check_report_ownership
     
-    # 檢查報告擁有權
+    # Check report ownership
     if not check_report_ownership(current_user, report_id, db):
         raise HTTPException(
             status_code=403, 
@@ -162,7 +162,7 @@ def delete_report(
 ):
     from .permissions import check_report_ownership
     
-    # 檢查報告擁有權
+    # Check report ownership
     if not check_report_ownership(current_user, report_id, db):
         raise HTTPException(
             status_code=403, 
@@ -179,7 +179,7 @@ def get_cpu_stats(
 ):
     from .permissions import PermissionChecker
     
-    # 檢查是否有查看報告的權限
+    # Check if user has permission to view reports
     if not PermissionChecker.can_view_reports(current_user):
         raise HTTPException(status_code=403, detail="Permission denied: Cannot view reports")
     
@@ -188,8 +188,8 @@ def get_cpu_stats(
 # Read all platforms
 @app.get("/platforms", response_model=list[PlatformInDB])
 def read_platforms(db: Session = Depends(get_db)):
-    # 平台狀態查看暫時不需要認證
-    # TODO: 之後可以根據需求決定是否需要認證
+    # Platform status viewing temporarily does not require authentication
+    # TODO: Can decide whether authentication is needed based on requirements later
     return crud.get_platforms(db)
 
 # /platforms/latest_reports must place before /platform/{serial_num}
@@ -197,8 +197,8 @@ def read_platforms(db: Session = Depends(get_db)):
 # /platform/{serial_num} add prefix word "search_by_sn", so the issue should be solved.
 @app.get("/platforms/latest_reports", response_model=list[PlatformWithLatestReportInDB])
 def get_platform_latest_reports(db: Session = Depends(get_db)):
-    # 平台狀態查看暫時不需要認證，因為這是Dashboard的核心功能
-    # TODO: 之後可以根據需求決定是否需要認證
+    # Platform status viewing temporarily does not require authentication as this is a core Dashboard feature
+    # TODO: Can decide whether authentication is needed based on requirements later
     return crud.get_platform_latest_reports(db)
 
 @app.get("/platforms/search_by_sn/{serial_num}", response_model=PlatformInDB)
@@ -207,7 +207,7 @@ def get_platform_by_serial_num(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    # 所有登入用戶都可以查看平台狀態
+    # All logged-in users can view platform status
     if not current_user:
         raise HTTPException(status_code=401, detail="Authentication required")
     
@@ -225,7 +225,7 @@ def create_platform(
 ):
     from .permissions import PermissionChecker
     
-    # 檢查是否有平台管理權限
+    # Check if user has platform management permission
     if not PermissionChecker.can_manage_platforms(current_user):
         raise HTTPException(status_code=403, detail="Permission denied: Cannot manage platforms")
     
@@ -241,7 +241,7 @@ def update_platform(
 ):
     from .permissions import PermissionChecker
     
-    # 檢查是否有平台管理權限
+    # Check if user has platform management permission
     if not PermissionChecker.can_manage_platforms(current_user):
         raise HTTPException(status_code=403, detail="Permission denied: Cannot manage platforms")
     
@@ -256,7 +256,7 @@ def delete_platform(
 ):
     from .permissions import PermissionChecker
     
-    # 檢查是否有平台管理權限
+    # Check if user has platform management permission
     if not PermissionChecker.can_manage_platforms(current_user):
         raise HTTPException(status_code=403, detail="Permission denied: Cannot manage platforms")
     
@@ -272,7 +272,7 @@ def get_api_logs(
 ):
     from .permissions import PermissionChecker
     
-    # 檢查是否有查看日誌的權限
+    # Check if user has permission to view logs
     if not PermissionChecker.can_view_logs(current_user):
         raise HTTPException(status_code=403, detail="Permission denied: Cannot view API logs")
     

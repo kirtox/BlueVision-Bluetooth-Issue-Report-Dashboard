@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // 檢查本地存儲中的用戶信息
+    // Check user information in local storage
     const checkAuthStatus = async () => {
       try {
         const token = localStorage.getItem('authToken');
@@ -47,18 +47,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log('AuthContext: Checking auth status', { hasToken: !!token, hasUserData: !!userData });
 
         if (token && userData) {
-          // 先設置用戶數據，讓UI可以立即響應
+          // First set user data so UI can respond immediately
           const parsedUserData = JSON.parse(userData);
           setUser(parsedUserData);
           console.log('AuthContext: User data loaded from localStorage', parsedUserData);
 
-          // 然後在背景驗證 token
+          // Then verify token in background
           try {
             await authService.verifyToken(token);
             console.log('AuthContext: Token verification successful');
           } catch (error) {
             console.error('AuthContext: Token verification failed', error);
-            // Token 無效，清除本地存儲
+            // Token invalid, clear local storage
             localStorage.removeItem('authToken');
             localStorage.removeItem('userData');
             setUser(null);
@@ -85,7 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       const response = await authService.login({ username, password });
 
-      // 除錯：檢查回應格式
+      // Debug: Check response format
       console.log('Login response:', response);
 
       if (!response.user) {
@@ -117,7 +117,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsLoading(true);
     try {
       await authService.register({ username, password, email });
-      // 註冊成功後自動登入
+      // Auto login after successful registration
       return await login(username, password);
     } catch (error) {
       console.error('Registration failed:', error);

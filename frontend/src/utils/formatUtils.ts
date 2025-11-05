@@ -1,7 +1,7 @@
 /**
- * 將username格式化為首字母大寫的顯示格式
- * @param username - 原始username (小寫格式)
- * @returns 首字母大寫的username，用於UI顯示
+ * Format username to display format with first letter capitalized
+ * @param username - Original username (lowercase format)
+ * @returns Username with first letter capitalized for UI display
  */
 export const formatUsernameForDisplay = (username: string): string => {
   if (!username) return '';
@@ -9,9 +9,9 @@ export const formatUsernameForDisplay = (username: string): string => {
 };
 
 /**
- * 將username轉換為存儲格式 (小寫)
- * @param username - 用戶輸入的username
- * @returns 小寫的username，用於存儲和API調用
+ * Convert username to storage format (lowercase)
+ * @param username - User input username
+ * @returns Lowercase username for storage and API calls
  */
 export const formatUsernameForStorage = (username: string): string => {
   if (!username) return '';

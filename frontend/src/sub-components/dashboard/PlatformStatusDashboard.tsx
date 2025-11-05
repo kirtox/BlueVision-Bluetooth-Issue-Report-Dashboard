@@ -82,7 +82,7 @@ const PlatformStatusDashboard: React.FC = () => {
     { label: "Offline", value: summary.offline, className: "text-secondary" },
   ];
 
-  // 根據 platform 判斷 icon
+  // Determine icon based on platform
   // const getPlatformIcon = (platformBrand: string): string => {
   //   console.log("getPlatformIcon: ", platformBrand);
   //   const name = platformBrand.toLowerCase();

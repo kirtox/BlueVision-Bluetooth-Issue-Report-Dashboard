@@ -25,7 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ showMenu, toggleMenu }) => {
   const location = useLocation();
   const { user } = useAuth();
   
-  // 根據用戶角色獲取菜單
+  // Get menu based on user role
   const menuItems = getDashboardMenuByRole(user?.role);
   
   console.log('Sidebar - User role:', user?.role);

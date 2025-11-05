@@ -10,7 +10,7 @@ API_LOG_CONFIG = {
     "exclude_exact_paths": [
         "/health",
         "/reports/cpu_stats",  # Do Not track cpu_stats API
-        "/platforms/latest_reports",  # 排除這個 API，因為會固定時間自動呼叫
+        "/platforms/latest_reports",  # Exclude this API as it's called automatically at fixed intervals
         "/",
         "/docs",
         "/redoc",
@@ -25,7 +25,7 @@ API_LOG_CONFIG = {
         "/css/",
         "/js/",
         "/img/",
-        "/uploads/"  # 排除頭像等上傳檔案
+        "/uploads/"  # Exclude uploaded files like avatars
     ],
     
     # Path patterns to exclude from tracing (inclusive matching)

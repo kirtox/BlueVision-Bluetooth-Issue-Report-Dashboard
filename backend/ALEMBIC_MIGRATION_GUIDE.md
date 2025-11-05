@@ -1,126 +1,126 @@
-# Alembic 資料庫遷移指南
+# Alembic Database Migration Guide
 
-## 概述
+## Overview
 
-Alembic 是 SQLAlchemy 的資料庫遷移工具，用於管理資料庫結構的版本控制和變更。
+Alembic is SQLAlchemy's database migration tool for managing database schema version control and changes.
 
-## 核心概念
+## Core Concepts
 
-### 1. 遷移檔案結構
+### 1. Migration File Structure
 
-每個遷移檔案包含以下關鍵元素：
+Each migration file contains the following key elements:
 
 ```python
-# 版本識別資訊
-revision = '001'          # 當前遷移的版本 ID
-down_revision = None      # 上一個版本的 ID（None 表示第一個遷移）
+# Version identification information
+revision = '001'          # Current migration version ID
+down_revision = None      # Previous version ID (None indicates first migration)
 branch_labels = None
 depends_on = None
 
 def upgrade() -> None:
-    # 資料庫升級操作
+    # Database upgrade operations
     pass
 
 def downgrade() -> None:
-    # 資料庫回滾操作
+    # Database rollback operations
     pass
 ```
 
-### 2. 版本追蹤機制
+### 2. Version Tracking Mechanism
 
-- Alembic 在資料庫中創建 `alembic_version` 表來追蹤當前版本
-- 遷移檔案通過 `revision` 和 `down_revision` 形成版本鏈
-- 檔案名稱只是為了可讀性，實際版本識別靠檔案內的 `revision` 變數
+- Alembic creates an `alembic_version` table in the database to track the current version
+- Migration files form a version chain through `revision` and `down_revision`
+- File names are only for readability; actual version identification relies on the `revision` variable within the file
 
-### 3. 遷移鏈範例
+### 3. Migration Chain Example
 
 ```
 None → 001 → 002 → 003 → ...
 ```
 
-## 工作流程
+## Workflow
 
-### 方法 1：自動生成（推薦）
+### Method 1: Auto-generate (Recommended)
 
 ```bash
-# 1. 修改 app/models.py 添加/修改欄位
-# 2. 自動生成遷移檔案
-alembic revision --autogenerate -m "描述你的變更"
+# 1. Modify app/models.py to add/modify fields
+# 2. Auto-generate migration file
+alembic revision --autogenerate -m "Describe your changes"
 
-# 3. 檢查生成的遷移檔案內容
-# 4. 執行遷移
+# 3. Check the generated migration file content
+# 4. Execute migration
 alembic upgrade head
 ```
 
-### 方法 2：手動創建
+### Method 2: Manual Creation
 
 ```bash
-# 1. 創建空白遷移檔案
-alembic revision -m "描述你的變更"
+# 1. Create blank migration file
+alembic revision -m "Describe your changes"
 
-# 2. 手動編輯生成的檔案，添加 upgrade() 和 downgrade() 內容
-# 3. 執行遷移
+# 2. Manually edit the generated file, add upgrade() and downgrade() content
+# 3. Execute migration
 alembic upgrade head
 ```
 
-## 常用命令
+## Common Commands
 
-### 基本操作
+### Basic Operations
 
 ```bash
-# 查看當前版本
+# View current version
 alembic current
 
-# 查看遷移歷史
+# View migration history
 alembic history
 
-# 升級到最新版本
+# Upgrade to latest version
 alembic upgrade head
 
-# 升級到特定版本
+# Upgrade to specific version
 alembic upgrade 002
 
-# 回滾到上一個版本
+# Rollback to previous version
 alembic downgrade -1
 
-# 回滾到特定版本
+# Rollback to specific version
 alembic downgrade 001
 ```
 
-### 遷移檔案管理
+### Migration File Management
 
 ```bash
-# 自動生成遷移（比較模型與資料庫差異）
+# Auto-generate migration (compare model with database differences)
 alembic revision --autogenerate -m "Add user avatar field"
 
-# 手動創建空白遷移
+# Manually create blank migration
 alembic revision -m "Custom migration"
 
-# 查看 SQL 而不執行（乾跑）
+# View SQL without executing (dry run)
 alembic upgrade head --sql
 ```
 
-## 實際範例
+## Practical Examples
 
-### 範例 1：添加新欄位
+### Example 1: Adding New Fields
 
-**1. 修改 models.py**
+**1. Modify models.py**
 ```python
 class User(Base):
     __tablename__ = "user"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True, nullable=False)
-    # 添加新欄位
+    # Add new fields
     phone = Column(String(20), nullable=True)
     email = Column(String(255), nullable=True)
 ```
 
-**2. 生成遷移**
+**2. Generate migration**
 ```bash
 alembic revision --autogenerate -m "Add phone and email fields to user"
 ```
 
-**3. 檢查生成的遷移檔案**
+**3. Check generated migration file**
 ```python
 def upgrade() -> None:
     op.add_column('user', sa.Column('phone', sa.String(20), nullable=True))
@@ -131,14 +131,14 @@ def downgrade() -> None:
     op.drop_column('user', 'phone')
 ```
 
-**4. 執行遷移**
+**4. Execute migration**
 ```bash
 alembic upgrade head
 ```
 
-### 範例 2：創建新表
+### Example 2: Creating New Table
 
-**1. 修改 models.py**
+**1. Modify models.py**
 ```python
 class Profile(Base):
     __tablename__ = "profile"
@@ -148,13 +148,13 @@ class Profile(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 ```
 
-**2. 生成並執行遷移**
+**2. Generate and execute migration**
 ```bash
 alembic revision --autogenerate -m "Create profile table"
 alembic upgrade head
 ```
 
-### 範例 3：手動遷移
+### Example 3: Manual Migration
 
 ```python
 """Add index to username
@@ -169,140 +169,140 @@ revision = '003'
 down_revision = '002'
 
 def upgrade() -> None:
-    # 創建索引
+    # Create index
     op.create_index('idx_user_username', 'user', ['username'])
     
-    # 添加約束
+    # Add constraint
     op.create_unique_constraint('uq_user_email', 'user', ['email'])
 
 def downgrade() -> None:
-    # 移除約束
+    # Remove constraint
     op.drop_constraint('uq_user_email', 'user', type_='unique')
     
-    # 移除索引
+    # Remove index
     op.drop_index('idx_user_username', 'user')
 ```
 
-## 容器環境注意事項
+## Container Environment Considerations
 
-### 資料庫連接設定
+### Database Connection Configuration
 
-確保 `alembic.ini` 中的資料庫 URL 適用於容器環境：
+Ensure the database URL in `alembic.ini` is suitable for container environment:
 
 ```ini
-# 容器內執行時使用服務名稱
+# Use service name when running inside container
 sqlalchemy.url = postgresql://admin:password@db:5432/btird
 
-# 宿主機執行時使用 localhost
+# Use localhost when running on host machine
 # sqlalchemy.url = postgresql://admin:password@127.0.0.1:5433/btird
 ```
 
-### 在容器中執行遷移
+### Running Migrations in Container
 
 ```bash
-# 進入後端容器
+# Enter backend container
 podman exec -it $(podman ps -q --filter "name=backend") bash
 
-# 在容器內執行遷移
+# Execute migration inside container
 alembic upgrade head
 ```
 
-## 最佳實踐
+## Best Practices
 
-### 1. 遷移檔案命名
+### 1. Migration File Naming
 
-- 使用描述性的訊息：`Add user avatar field`
-- 避免過於簡短：`update user`
-- 包含操作類型：`Create`, `Add`, `Remove`, `Modify`
+- Use descriptive messages: `Add user avatar field`
+- Avoid being too brief: `update user`
+- Include operation type: `Create`, `Add`, `Remove`, `Modify`
 
-### 2. 版本 ID 管理
+### 2. Version ID Management
 
-- **推薦**：使用自動生成的唯一 ID
-- **避免**：手動指定簡單數字（多人開發時容易衝突）
+- **Recommended**: Use auto-generated unique IDs
+- **Avoid**: Manually specifying simple numbers (prone to conflicts in multi-developer environments)
 
-### 3. 遷移內容檢查
+### 3. Migration Content Review
 
-- 總是檢查自動生成的遷移內容
-- 確認 `upgrade()` 和 `downgrade()` 操作正確
-- 測試回滾操作是否能正確還原
+- Always check auto-generated migration content
+- Confirm `upgrade()` and `downgrade()` operations are correct
+- Test if rollback operations can correctly restore
 
-### 4. 資料遷移
+### 4. Data Migration
 
-對於包含資料的遷移：
+For migrations involving data:
 
 ```python
 def upgrade() -> None:
-    # 1. 先添加欄位
+    # 1. First add field
     op.add_column('user', sa.Column('status', sa.String(20), nullable=True))
     
-    # 2. 更新現有資料
+    # 2. Update existing data
     connection = op.get_bind()
     connection.execute(
         "UPDATE user SET status = 'active' WHERE is_active = 'Y'"
     )
     
-    # 3. 設定欄位為非空（如果需要）
+    # 3. Set field as non-null (if needed)
     op.alter_column('user', 'status', nullable=False)
 ```
 
-## 故障排除
+## Troubleshooting
 
-### 常見問題
+### Common Issues
 
-1. **連接錯誤**
-   - 檢查 `alembic.ini` 中的資料庫 URL
-   - 確認資料庫服務正在運行
+1. **Connection Errors**
+   - Check database URL in `alembic.ini`
+   - Confirm database service is running
 
-2. **版本衝突**
-   - 使用 `alembic history` 查看版本鏈
-   - 手動解決衝突的 `down_revision`
+2. **Version Conflicts**
+   - Use `alembic history` to view version chain
+   - Manually resolve conflicting `down_revision`
 
-3. **遷移失敗**
-   - 檢查 SQL 語法錯誤
-   - 確認資料庫權限
-   - 使用 `--sql` 參數預覽 SQL
+3. **Migration Failures**
+   - Check SQL syntax errors
+   - Confirm database permissions
+   - Use `--sql` parameter to preview SQL
 
-### 緊急回滾
+### Emergency Rollback
 
 ```bash
-# 回滾到上一個版本
+# Rollback to previous version
 alembic downgrade -1
 
-# 回滾到特定版本
+# Rollback to specific version
 alembic downgrade 001
 
-# 查看回滾 SQL（不執行）
+# View rollback SQL (without executing)
 alembic downgrade -1 --sql
 ```
 
-## 管理腳本
+## Management Scripts
 
-使用專案中的 `manage_migrations.py` 腳本：
+Use the `manage_migrations.py` script in the project:
 
 ```bash
-# 創建遷移
+# Create migration
 python manage_migrations.py user
 
-# 執行遷移
+# Execute migration
 python manage_migrations.py upgrade
 
-# 查看狀態
+# View status
 python manage_migrations.py current
 python manage_migrations.py history
 ```
 
 ---
 
-## 快速參考
+## Quick Reference
 
-| 操作 | 命令 |
-|------|------|
-| 自動生成遷移 | `alembic revision --autogenerate -m "message"` |
-| 手動創建遷移 | `alembic revision -m "message"` |
-| 執行遷移 | `alembic upgrade head` |
-| 查看當前版本 | `alembic current` |
-| 查看歷史 | `alembic history` |
-| 回滾一個版本 | `alembic downgrade -1` |
-| 預覽 SQL | `alembic upgrade head --sql` |
+| Operation | Command |
+|-----------|---------|
+| Auto-generate migration | `alembic revision --autogenerate -m "message"` |
+| Manually create migration | `alembic revision -m "message"` |
+| Execute migration | `alembic upgrade head` |
+| View current version | `alembic current` |
+| View history | `alembic history` |
+| Rollback one version | `alembic downgrade -1` |
+| Preview SQL | `alembic upgrade head --sql` |
 
-記住：修改模型後總是要生成並執行遷移！
+Remember: Always generate and execute migrations after modifying models!

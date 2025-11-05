@@ -37,7 +37,7 @@ const UserManagement: React.FC = () => {
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  // 獲取用戶列表
+  // Get user list
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('authToken');
@@ -69,7 +69,7 @@ const UserManagement: React.FC = () => {
     }
   }, [permissions]);
 
-  // 創建用戶
+  // Create user
   const handleCreateUser = async () => {
     try {
       const token = localStorage.getItem('authToken');
@@ -95,7 +95,7 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  // 更新用戶
+  // Update user
   const handleUpdateUser = async () => {
     if (!selectedUser) return;
 
@@ -129,7 +129,7 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  // 刪除用戶
+  // Delete user
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
 
@@ -155,7 +155,7 @@ const UserManagement: React.FC = () => {
     }
   };
 
-  // 打開編輯Modal
+  // Open edit Modal
   const openEditModal = (user: User) => {
     setSelectedUser(user);
     setFormData({
@@ -167,7 +167,7 @@ const UserManagement: React.FC = () => {
     setShowEditModal(true);
   };
 
-  // 打開刪除Modal
+  // Open delete Modal
   const openDeleteModal = (user: User) => {
     setSelectedUser(user);
     setShowDeleteModal(true);
@@ -295,7 +295,7 @@ const UserManagement: React.FC = () => {
         </Col>
       </Row>
 
-      {/* 創建用戶 Modal */}
+      {/* Create User Modal */}
       <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Create New User</Modal.Title>
@@ -352,7 +352,7 @@ const UserManagement: React.FC = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* 編輯用戶 Modal */}
+      {/* Edit User Modal */}
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Edit User</Modal.Title>
@@ -400,7 +400,7 @@ const UserManagement: React.FC = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* 刪除用戶 Modal */}
+      {/* Delete User Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Delete User</Modal.Title>

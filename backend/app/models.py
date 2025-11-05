@@ -110,10 +110,10 @@ class User(Base):
     username = Column(String, unique=True, index=True, nullable=False)
     email = Column(String, unique=True, index=True, nullable=True)  # email address
     hashed_password = Column(String, nullable=False)
-    role = Column(String, default="User", nullable=False)  # "Administrator" 或 "User"
-    avatar = Column(String, nullable=True)  # 頭像檔案路徑
+    role = Column(String, default="User", nullable=False)  # "Administrator" or "User"
+    avatar = Column(String, nullable=True)  # Avatar file path
     created_at = Column(DateTime, default=lambda: datetime.datetime.now(timezone(timedelta(hours=8))).replace(tzinfo=None))
-    is_active = Column(String, default="Y", nullable=False)  # "Y" 或 "N"
+    is_active = Column(String, default="Y", nullable=False)  # "Y" or "N"
 
 class APIAccessLog(Base):
     __tablename__ = "api_access_log"
@@ -123,7 +123,7 @@ class APIAccessLog(Base):
     endpoint = Column(String, nullable=False)
     client_ip = Column(String, nullable=False)
     user_agent = Column(String)
-    request_body = Column(Text)  # 使用 Text 類型來存儲較長的 JSON 內容
+    request_body = Column(Text)  # Use Text type to store longer JSON content
     response_status = Column(Integer)
     response_time_ms = Column(Integer)
     host = Column(String)

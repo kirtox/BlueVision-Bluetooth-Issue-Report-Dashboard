@@ -2,12 +2,12 @@ import React from 'react';
 import { Container, Row, Col, Card, Badge, Button } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePermissions } from '../../contexts/PermissionContext';
-import { 
-  PermissionGate, 
-  AdminOnly, 
-  UserOrAdmin, 
-  AuthenticatedOnly, 
-  GuestRestricted 
+import {
+  PermissionGate,
+  AdminOnly,
+  UserOrAdmin,
+  AuthenticatedOnly,
+  GuestRestricted
 } from '../../components/permissions/PermissionGate';
 import { ReportActions } from '../../components/permissions/ReportActions';
 
@@ -15,7 +15,7 @@ const PermissionTest: React.FC = () => {
   const { user } = useAuth();
   const permissions = usePermissions();
 
-  // 模擬報告數據
+  // Mock report data
   const sampleReports = [
     { id: 1, op_name: user?.username || 'testuser', title: 'My Report' },
     { id: 2, op_name: 'otheruser', title: 'Other User Report' },
@@ -41,8 +41,8 @@ const PermissionTest: React.FC = () => {
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h1 className="h3 mb-0">Permission System Test</h1>
             <Badge bg={
-              user?.role === 'Administrator' ? 'success' : 
-              user?.role === 'User' ? 'primary' : 'secondary'
+              user?.role === 'Administrator' ? 'success' :
+                user?.role === 'User' ? 'primary' : 'secondary'
             }>
               {user?.role || 'Not logged in'}
             </Badge>
@@ -50,7 +50,7 @@ const PermissionTest: React.FC = () => {
         </Col>
       </Row>
 
-      {/* 用戶信息 */}
+      {/* User Information */}
       <Row className="mb-4">
         <Col>
           <Card>
@@ -66,7 +66,7 @@ const PermissionTest: React.FC = () => {
         </Col>
       </Row>
 
-      {/* 權限檢查結果 */}
+      {/* Permission Check Results */}
       <Row className="mb-4">
         <Col>
           <Card>
@@ -101,7 +101,7 @@ const PermissionTest: React.FC = () => {
         </Col>
       </Row>
 
-      {/* 權限組件測試 */}
+      {/* Permission Component Tests */}
       <Row className="mb-4">
         <Col>
           <Card>
@@ -134,8 +134,8 @@ const PermissionTest: React.FC = () => {
               </div>
 
               <div className="mb-3">
-                <PermissionGate 
-                  feature="reports.create" 
+                <PermissionGate
+                  feature="reports.create"
                   fallback={<Button variant="secondary" disabled>Create Report (No Permission)</Button>}
                 >
                   <Button variant="success">Create Report (Allowed)</Button>
@@ -146,7 +146,7 @@ const PermissionTest: React.FC = () => {
         </Col>
       </Row>
 
-      {/* 報告操作權限測試 */}
+      {/* Report Operation Permission Tests */}
       <Row>
         <Col>
           <Card>

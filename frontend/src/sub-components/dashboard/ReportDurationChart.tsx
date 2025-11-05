@@ -12,18 +12,18 @@ import {
 import { useReports } from "../../hooks/useReports";
 
 interface ReportDurationChartProps {
-  reports?: any[];   // ⬅️ 可傳入 filteredReports
+  reports?: any[];   // ⬅️ Can pass in filteredReports
   title: string;
 }
 
 const ReportDurationChart: React.FC<ReportDurationChartProps> = ({ reports: externalReports, title }) => {
   const { reports: allReports, loading } = useReports();
-  const reports = externalReports ?? allReports;  // ⬅️ 優先用外部傳的
+  const reports = externalReports ?? allReports;  // ⬅️ Prioritize external data
 
   if (loading && !externalReports) return <div>Loading...</div>;
   if (!reports || !reports.length) return <div>No data</div>;
 
-  // Step 1: 累計每個 bt_driver 的 duration (轉數字)
+  // Step 1: Accumulate duration for each bt_driver (convert to number)
   const durationMap: Record<string, number> = {};
   reports.forEach((r) => {
     const driver = (r["bt_driver"] || "(Empty)").toString();
@@ -31,7 +31,7 @@ const ReportDurationChart: React.FC<ReportDurationChartProps> = ({ reports: exte
     durationMap[driver] = (durationMap[driver] || 0) + (isNaN(duration) ? 0 : duration);
   });
 
-  // Step 2: 轉成 Recharts 格式
+  // Step 2: Convert to Recharts format
   const data = Object.entries(durationMap).map(([driver, totalDuration]) => ({
     name: driver,
     totalDuration,

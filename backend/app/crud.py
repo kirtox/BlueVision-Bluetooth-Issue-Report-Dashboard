@@ -224,11 +224,11 @@ def create_user(db: Session, user: UserCreate):
     return db_user
 
 def get_users(db: Session):
-    """獲取所有用戶列表"""
+    """Get all users list"""
     return db.query(models.User).all()
 
 def authenticate_user(db: Session, username: str, password: str):
-    """驗證用戶登入"""
+    """Verify user login"""
     from .utils import verify_password
     
     print(f"Authenticating user: {username}")
@@ -276,16 +276,16 @@ def update_user(db: Session, user_id: int, user):
     return db_user
 
 def change_user_password(db: Session, user_id: int, current_password: str, new_password: str):
-    """變更用戶密碼"""
+    """Change user password"""
     db_user = db.query(models.User).filter(models.User.id == user_id).first()
     if not db_user:
         return None
     
-    # 驗證當前密碼
+    # Verify current password
     if not verify_password(current_password, db_user.hashed_password):
         return False
     
-    # 更新為新密碼
+    # Update to new password
     db_user.hashed_password = get_password_hash(new_password)
     db.commit()
     db.refresh(db_user)
@@ -293,7 +293,7 @@ def change_user_password(db: Session, user_id: int, current_password: str, new_p
 
 # API Access Log CRUD
 def create_api_access_log(db: Session, log_data: dict):
-    """創建 API 訪問日誌記錄"""
+    """Create API access log record"""
     db_log = models.APIAccessLog(**log_data)
     db.add(db_log)
     db.commit()
@@ -301,7 +301,7 @@ def create_api_access_log(db: Session, log_data: dict):
     return db_log
 
 def get_api_access_logs(db: Session, skip: int = 0, limit: int = 100):
-    """獲取 API 訪問日誌列表"""
+    """Get API access logs list"""
     return db.query(models.APIAccessLog).order_by(models.APIAccessLog.timestamp.desc()).offset(skip).limit(limit).all()
 
 

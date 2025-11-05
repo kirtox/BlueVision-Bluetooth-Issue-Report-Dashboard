@@ -39,7 +39,7 @@ const SignUp = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  // 防抖檢查username可用性
+  // Debounced username availability check
   const checkUsernameAvailability = useCallback(
     async (username: string) => {
       if (!username || username.length < 3) {
@@ -75,14 +75,14 @@ const SignUp = () => {
     const { name, value } = e.target;
     
     if (name === 'username') {
-      // 將username轉為小寫
+      // Convert username to lowercase
       const lowercaseValue = formatUsernameForStorage(value);
       setFormData({
         ...formData,
         [name]: lowercaseValue
       });
       
-      // 防抖檢查username可用性
+      // Debounced username availability check
       const timeoutId = setTimeout(() => {
         checkUsernameAvailability(lowercaseValue);
       }, 500);
@@ -133,7 +133,7 @@ const SignUp = () => {
     setIsSubmitting(true);
 
     try {
-      // username已經是小寫格式，直接使用
+      // Username is already in lowercase format, use directly
       const success = await register(formData.username, formData.password, formData.email);
       if (success) {
         navigate('/');

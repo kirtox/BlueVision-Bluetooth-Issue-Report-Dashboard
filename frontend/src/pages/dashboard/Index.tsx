@@ -56,7 +56,7 @@ const Dashboard = () => {
   const [selectedBTDrivers, setSelectedBTDrivers] = useState<string[]>([]);
   const [selectedResults, setSelectedResults] = useState<string[]>([]);
 
-  // 創建報告相關狀態
+  // Create report related states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newReport, setNewReport] = useState<Report | null>(null);
   const [dateRange, setDateRange] = useState<{ startDate: Date | null; endDate: Date | null }>({ startDate: null, endDate: null });
@@ -102,7 +102,7 @@ const Dashboard = () => {
       if (!response.ok) {
         if (response.status === 403) {
           console.error('Access denied - insufficient permissions. User role:', user?.role);
-          // 如果是403錯誤，可能是權限問題，等待一下再重試
+          // If 403 error, might be permission issue, wait and retry
           setTimeout(() => {
             console.log('Retrying fetchReports after 403 error...');
             fetchReports();
@@ -110,7 +110,7 @@ const Dashboard = () => {
           return;
         } else if (response.status === 401) {
           console.error('Authentication failed - token may be invalid');
-          // 401錯誤可能需要重新登入
+          // 401 error might require re-login
           return;
         }
         throw new Error(`Failed to fetch reports: ${response.status} ${response.statusText}`);
@@ -132,19 +132,19 @@ const Dashboard = () => {
       userRole: user?.role 
     });
     
-    // 只在用戶已認證、不在載入狀態且有用戶數據時才調用API
+    // Only call API when user is authenticated, not loading, and has user data
     if (isAuthenticated && !authLoading && user) {
       console.log('Calling fetchReports from Dashboard useEffect');
       fetchReports();
     }
   }, [isAuthenticated, authLoading, user]);
 
-  // 創建報告相關函數
+  // Create report related functions
   const handleCreateReport = () => {
-    // 創建一個新的空報告對象
+    // Create a new empty report object
     const emptyReport: Report = {
-      id: 0, // 新報告ID為0
-      op_name: '', // 這會在後端自動設置
+      id: 0, // New report ID is 0
+      op_name: '', // This will be set automatically in backend
       date: new Date().toISOString(),
       serial_num: '',
       os_version: '',
@@ -239,7 +239,7 @@ const Dashboard = () => {
 
       setShowCreateModal(false);
       setNewReport(null);
-      fetchReports(); // 重新載入報告列表
+      fetchReports(); // Reload report list
     } catch (error) {
       console.error('Error creating report:', error);
       alert('Failed to create report');
@@ -435,9 +435,9 @@ const Dashboard = () => {
                     calcType="sum"
                     max={720}
                     thresholds={[
-                      { value: 72, color: "#82ca9d" },  // 綠82ca9d
-                      { value: 360, color: "#ffc658" },  // 黃ffc658
-                      { value: 720, color: "#ff7f50" }, // 紅ff7f50
+                      { value: 72, color: "#82ca9d" },  // Green 82ca9d
+                      { value: 360, color: "#ffc658" },  // Yellow ffc658
+                      { value: 720, color: "#ff7f50" }, // Red ff7f50
                     ]}
                     title="Driver Duration Dashboard"
                   />
@@ -661,7 +661,7 @@ const Dashboard = () => {
         </Row> */}
       </Container>
 
-      {/* 創建報告 Modal */}
+      {/* Create Report Modal */}
       <Modal show={showCreateModal} onHide={handleCloseCreateModal} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Create New Report</Modal.Title>

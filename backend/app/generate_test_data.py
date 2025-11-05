@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta
 
 # Specify the path to .env (from backend/app back to BTIRD)
-env_path = Path(__file__).resolve().parents[2] / 'frontend' / '.env'  # 回到 BTIRD 資料夾
+env_path = Path(__file__).resolve().parents[2] / 'frontend' / '.env'  # Back to BTIRD folder
 load_dotenv(dotenv_path=env_path)
 
 # Load parameter
@@ -250,27 +250,27 @@ def generate_random_platform(sn: str):
     return r
 
 def upsert_platform(sn: str):
-    """如果 serial_num 存在 -> 更新，否則新增"""
-    # 1. 先查詢 serial_num 是否存在
+    """If serial_num exists -> update, otherwise create new"""
+    # 1. First check if serial_num exists
     check_url = f"{API_URL}/platforms?serial_num={sn}"
     response = requests.get(check_url)
 
     if response.status_code == 200:
         data = response.json()
-        if data:  # 有找到資料，執行更新
+        if data:  # Found data, perform update
             platform_id = data["id"] if isinstance(data, dict) else data[0]["id"]
             update_url = f"{API_URL}/platforms/{platform_id}"
             new_data = generate_random_platform(sn)
             res = requests.put(update_url, json=new_data)
             print(f"✅ Updated platform {sn}: {res.status_code}, {response.json()}")
         else:
-            # 沒找到，新增
+            # Not found, create new
             insert_platform(sn)
     else:
         print(f"⚠️ Failed to check platform: {response.status_code}, {response.text}")
 
 def insert_platform(sn: str):
-    """新增平台資料"""
+    """Add platform data"""
     url = f"{API_URL}/platforms"
     data = generate_random_platform(sn)
     response = requests.post(url, json=data)

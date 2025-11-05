@@ -1,72 +1,72 @@
-# PTL Workshop 数据导入 - 简化指南
+# PTL Workshop Data Import - Simplified Guide
 
-## 📁 唯一文件
-现在只有一个文件：**`import_ptl_workshop.py`** - 包含所有功能的一体化脚本
+## 📁 Single File
+Now there's only one file: **`import_ptl_workshop.py`** - an all-in-one script containing all functionality
 
-## 🚀 使用方法
+## 🚀 Usage
 
-### 1. 交互式界面（最简单）
+### 1. Interactive Interface (Simplest)
 ```bash
 cd backend/app
 python import_ptl_workshop.py
 ```
-会显示菜单让你选择操作。
+Will display a menu for you to choose operations.
 
-### 2. 命令行操作
+### 2. Command Line Operations
 ```bash
 cd backend/app
 
-# 分析 Excel 文件结构
+# Analyze Excel file structure
 python import_ptl_workshop.py --analyze
 
-# 测试导入（不写入数据库）
+# Test import (don't write to database)
 python import_ptl_workshop.py --dry-run
 
-# 实际导入数据
+# Actually import data
 python import_ptl_workshop.py --import
 
-# 查看帮助
+# View help
 python import_ptl_workshop.py --help
 ```
 
-## 📊 功能说明
+## 📊 Feature Description
 
-1. **--analyze**: 分析 Excel 文件结构，显示找到的数据
-2. **--dry-run**: 测试导入过程，不实际写入数据库
-3. **--import**: 实际导入数据到数据库
-4. **无参数**: 启动交互式菜单
+1. **--analyze**: Analyze Excel file structure, display found data
+2. **--dry-run**: Test import process, don't actually write to database
+3. **--import**: Actually import data to database
+4. **No parameters**: Start interactive menu
 
-## 📋 Excel 文件要求
+## 📋 Excel File Requirements
 
-- 文件放在：`backend/app/test_data/PTL_Workshop/`
-- 格式：`.xlsx` 或 `.xls`
-- 结构：A 列包含 "Database data"，下面是 key-value 对
+- File location: `backend/app/test_data/PTL_Workshop/`
+- Format: `.xlsx` or `.xls`
+- Structure: Column A contains "Database data", followed by key-value pairs
 
-## ✅ 测试结果
+## ✅ Test Results
 
-当前测试文件 `test_report_20251015_135924.xlsx`：
-- ✅ 找到 "Database data" 区段（第 28 行）
-- ✅ 提取 66 个 key-value 对
-- ✅ 成功映射 **66 个字段**到 Report 模型（完整映射！）
-- ✅ 统计 20 个 null/empty 值
-- ✅ 包含所有设备栏位（headset, headset_brand, mouse, keyboard 等）
-- ✅ 干跑测试通过
+Current test file `test_report_20251015_135924.xlsx`:
+- ✅ Found "Database data" section (row 28)
+- ✅ Extracted 66 key-value pairs
+- ✅ Successfully mapped **66 fields** to Report model (complete mapping!)
+- ✅ Counted 20 null/empty values
+- ✅ Contains all device fields (headset, headset_brand, mouse, keyboard, etc.)
+- ✅ Dry run test passed
 
-## 🔧 程式化使用
+## 🔧 Programmatic Usage
 
 ```python
 from import_ptl_workshop import PTLWorkshopImporter
 
 importer = PTLWorkshopImporter()
 
-# 分析文件
+# Analyze files
 importer.analyze_excel_files()
 
-# 测试导入
+# Test import
 successful, failed = importer.process_folder(dry_run=True)
 
-# 实际导入
+# Actually import
 successful, failed = importer.process_folder(dry_run=False)
 ```
 
-就这么简单！一个文件搞定所有功能。
+That's it! One file handles all functionality.

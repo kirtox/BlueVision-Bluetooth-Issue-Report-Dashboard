@@ -179,7 +179,7 @@ export const DashboardMenu: DashboardMenuProps[] = [
   // },
 ];
 
-// 使用固定ID來避免Accordion展開問題
+// Use fixed IDs to avoid Accordion expansion issues
 const MENU_IDS = {
   DASHBOARD: 'dashboard-menu',
   USER_MANAGEMENT: 'user-management-menu',
@@ -190,9 +190,9 @@ const MENU_IDS = {
   PERMISSION_TEST: 'permission-test'
 };
 
-// 根據用戶角色生成菜單
+// Generate menu based on user role
 export const getDashboardMenuByRole = (userRole?: string): DashboardMenuProps[] => {
-  // 基礎菜單項（所有用戶都可見）
+  // Base menu items (visible to all users)
   const baseMenuItems: DashboardMenuProps[] = [
     {
       id: MENU_IDS.DASHBOARD,
@@ -202,7 +202,7 @@ export const getDashboardMenuByRole = (userRole?: string): DashboardMenuProps[] 
     },
   ];
 
-  // 管理員專用菜單項
+  // Admin-only menu items
   const adminMenuItems: DashboardMenuProps[] = [
     {
       id: MENU_IDS.USER_MANAGEMENT,
@@ -220,7 +220,7 @@ export const getDashboardMenuByRole = (userRole?: string): DashboardMenuProps[] 
     },
   ];
 
-  // 開發測試菜單項
+  // Development test menu items
   const developmentMenuItems: DashboardMenuProps[] = [
     {
       id: MENU_IDS.DEVELOPMENT,
@@ -240,7 +240,7 @@ export const getDashboardMenuByRole = (userRole?: string): DashboardMenuProps[] 
   } else if (userRole === 'User') {
     menuItems = [...menuItems, ...developmentMenuItems];
   }
-  // Guest 用戶只能看到基礎菜單
+  // Guest users can only see base menu
 
   return menuItems;
 };

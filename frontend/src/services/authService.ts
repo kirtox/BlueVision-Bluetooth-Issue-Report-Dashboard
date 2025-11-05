@@ -1,4 +1,4 @@
-// API 服務層
+// API service layer
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 export interface LoginRequest {
@@ -26,7 +26,7 @@ export interface RegisterRequest {
 }
 
 export const authService = {
-  // 登入
+  // Login
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     console.log('Attempting login to:', `${API_BASE_URL}/login`);
     console.log('Credentials:', { username: credentials.username, password: '***' });
@@ -70,7 +70,7 @@ export const authService = {
     }
   },
 
-  // 註冊
+  // Register
   async register(userData: RegisterRequest): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/register`, {
       method: 'POST',
@@ -88,7 +88,7 @@ export const authService = {
     return response.json();
   },
 
-  // 驗證 token
+  // Verify token
   async verifyToken(token: string): Promise<any> {
     const response = await fetch(`${API_BASE_URL}/verify-token`, {
       method: 'GET',
@@ -104,7 +104,7 @@ export const authService = {
     return response.json();
   },
 
-  // 檢查用戶名是否可用
+  // Check if username is available
   async checkUsernameAvailability(username: string): Promise<{ available: boolean; username: string }> {
     const response = await fetch(`${API_BASE_URL}/check-username/${encodeURIComponent(username)}`, {
       method: 'GET',
@@ -117,7 +117,7 @@ export const authService = {
     return response.json();
   },
 
-  // 上傳頭像
+  // Upload avatar
   async uploadAvatar(file: File, token: string): Promise<any> {
     const formData = new FormData();
     formData.append('file', file);

@@ -4,14 +4,14 @@ import { usePermissions } from '../../contexts/PermissionContext';
 interface PermissionGateProps {
   children: ReactNode;
   fallback?: ReactNode;
-  // 角色權限
+  // Role permissions
   adminOnly?: boolean;
   userOnly?: boolean;
   guestOnly?: boolean;
   roles?: string[];
-  // 功能權限
+  // Feature permissions
   feature?: string;
-  // 自定義權限檢查
+  // Custom permission check
   condition?: boolean;
 }
 
@@ -27,12 +27,12 @@ export const PermissionGate: React.FC<PermissionGateProps> = ({
 }) => {
   const permissions = usePermissions();
 
-  // 自定義條件檢查
+  // Custom condition check
   if (condition !== undefined) {
     return condition ? <>{children}</> : <>{fallback}</>;
   }
 
-  // 角色檢查
+  // Role checks
   if (adminOnly && !permissions.isAdmin()) {
     return <>{fallback}</>;
   }
@@ -49,7 +49,7 @@ export const PermissionGate: React.FC<PermissionGateProps> = ({
     return <>{fallback}</>;
   }
 
-  // 功能權限檢查
+  // Feature permission check
   if (feature && !permissions.canAccess(feature)) {
     return <>{fallback}</>;
   }
@@ -57,7 +57,7 @@ export const PermissionGate: React.FC<PermissionGateProps> = ({
   return <>{children}</>;
 };
 
-// 便捷組件
+// Convenience components
 export const AdminOnly: React.FC<{ children: ReactNode; fallback?: ReactNode }> = ({ 
   children, 
   fallback = null 

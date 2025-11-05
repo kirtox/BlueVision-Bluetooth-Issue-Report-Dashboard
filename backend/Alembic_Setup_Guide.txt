@@ -1,172 +1,172 @@
-# Alembic 資料庫遷移設定指南
+# Alembic Database Migration Setup Guide
 
-## 概述
-Alembic 是 SQLAlchemy 的資料庫遷移工具，用於管理資料庫結構的版本控制。
+## Overview
+Alembic is SQLAlchemy's database migration tool for managing database schema version control.
 
-## 已完成的設定
+## Completed Setup
 
-### 1. 依賴項目
-已在 requirements.txt 中加入 alembic
+### 1. Dependencies
+Added alembic to requirements.txt
 
-### 2. 配置文件
-- alembic.ini: Alembic 主配置文件
-- alembic/env.py: 環境配置，已設定導入 app.models
-- alembic/script.py.mako: 遷移腳本模板
-- alembic/versions/: 遷移腳本存放目錄
+### 2. Configuration Files
+- alembic.ini: Alembic main configuration file
+- alembic/env.py: Environment configuration, set to import app.models
+- alembic/script.py.mako: Migration script template
+- alembic/versions/: Migration script storage directory
 
-### 3. 管理腳本
-- manage_migrations.py: 遷移管理腳本
-- init_alembic.py: 初始化腳本（備用）
+### 3. Management Scripts
+- manage_migrations.py: Migration management script
+- init_alembic.py: Initialization script (backup)
 
-## 執行步驟
+## Execution Steps
 
-### 步驟 1: 重新建置容器
+### Step 1: Rebuild Container
 ```bash
-# 重新建置容器（安裝 alembic）
+# Rebuild container (install alembic)
 podman-compose -f podman-compose.prod.yml down
 podman-compose -f podman-compose.prod.yml up --build -d
 ```
 
-### 步驟 2: 進入容器
+### Step 2: Enter Container
 ```bash
 podman exec -it <backend_container_name> bash
 ```
 
-### 步驟 3: 執行遷移
+### Step 3: Execute Migration
 ```bash
-# 在容器內執行以下命令：
+# Execute the following commands inside container:
 
-# 1. 創建初始遷移（基於現有資料表）
+# 1. Create initial migration (based on existing tables)
 python manage_migrations.py init
 
-# 2. 升級資料庫
+# 2. Upgrade database
 python manage_migrations.py upgrade
 
-# 3. 檢查當前版本
+# 3. Check current version
 python manage_migrations.py current
 ```
 
-### 步驟 4: 如果需要更新 user 表
+### Step 4: If user table update is needed
 ```bash
-# 創建 user 表更新遷移
+# Create user table update migration
 python manage_migrations.py user
 
-# 升級資料庫
+# Upgrade database
 python manage_migrations.py upgrade
 ```
 
-### 步驟 5: 驗證結果
+### Step 5: Verify Results
 ```bash
-# 查看遷移歷史
+# View migration history
 python manage_migrations.py history
 ```
 
-## 管理腳本使用方法
+## Management Script Usage
 
 ```bash
-python manage_migrations.py init          # 創建初始遷移
-python manage_migrations.py user          # 創建 user 表更新遷移
-python manage_migrations.py upgrade       # 升級資料庫
-python manage_migrations.py current       # 顯示當前版本
-python manage_migrations.py history       # 顯示遷移歷史
+python manage_migrations.py init          # Create initial migration
+python manage_migrations.py user          # Create user table update migration
+python manage_migrations.py upgrade       # Upgrade database
+python manage_migrations.py current       # Show current version
+python manage_migrations.py history       # Show migration history
 ```
 
-## 常用 Alembic 命令
+## Common Alembic Commands
 
-### 創建遷移
+### Creating Migrations
 ```bash
-# 自動檢測模型變更並創建遷移
-alembic revision --autogenerate -m "描述變更內容"
+# Auto-detect model changes and create migration
+alembic revision --autogenerate -m "Describe changes"
 
-# 手動創建空白遷移
-alembic revision -m "描述變更內容"
+# Manually create blank migration
+alembic revision -m "Describe changes"
 ```
 
-### 執行遷移
+### Executing Migrations
 ```bash
-# 升級到最新版本
+# Upgrade to latest version
 alembic upgrade head
 
-# 升級到特定版本
+# Upgrade to specific version
 alembic upgrade <revision_id>
 
-# 回滾一個版本
+# Rollback one version
 alembic downgrade -1
 
-# 回滾到特定版本
+# Rollback to specific version
 alembic downgrade <revision_id>
 ```
 
-### 查看狀態
+### Viewing Status
 ```bash
-# 查看當前版本
+# View current version
 alembic current
 
-# 查看遷移歷史
+# View migration history
 alembic history
 
-# 查看詳細歷史
+# View detailed history
 alembic history --verbose
 ```
 
-## 資料庫連接配置
+## Database Connection Configuration
 
-alembic.ini 中的資料庫連接字串：
+Database connection string in alembic.ini:
 ```
 sqlalchemy.url = postgresql://admin:password@127.0.0.1:5433/btird
 ```
 
-## User 表結構更新
+## User Table Structure Update
 
-更新後的 User 模型包含：
-- id: 主鍵
-- username: 用戶名（唯一）
-- hashed_password: 加密後的密碼
-- role: 權限等級（"Administrator" 或 "User"，預設 "User"）
-- created_at: 創建時間（預設當前時間）
-- is_active: 是否啟用（"Y" 或 "N"，預設 "Y"）
+Updated User model contains:
+- id: Primary key
+- username: Username (unique)
+- hashed_password: Encrypted password
+- role: Permission level ("Administrator" or "User", default "User")
+- created_at: Creation time (default current time)
+- is_active: Whether enabled ("Y" or "N", default "Y")
 
-## Alembic 的優點
+## Alembic Advantages
 
-1. **版本控制**: 每個資料庫變更都有版本記錄
-2. **可回滾**: 可以回滾到之前的版本
-3. **自動生成**: 可以自動檢測模型變更並生成遷移腳本
-4. **團隊協作**: 遷移腳本可以版本控制，團隊成員可以同步資料庫結構
-5. **安全性**: 可以在執行前預覽 SQL 語句
+1. **Version Control**: Each database change has version record
+2. **Rollback Capability**: Can rollback to previous versions
+3. **Auto-generation**: Can automatically detect model changes and generate migration scripts
+4. **Team Collaboration**: Migration scripts can be version controlled, team members can sync database structure
+5. **Security**: Can preview SQL statements before execution
 
-## 注意事項
+## Notes
 
-1. 每次修改模型後，都應該創建新的遷移
-2. 遷移腳本應該加入版本控制系統
-3. 在生產環境執行遷移前，建議先在測試環境驗證
-4. 重要資料變更前，建議先備份資料庫
+1. Should create new migration after each model modification
+2. Migration scripts should be added to version control system
+3. Recommend testing in test environment before executing migrations in production
+4. Recommend backing up database before important data changes
 
-## 故障排除
+## Troubleshooting
 
-### 如果遇到 "Target database is not up to date" 錯誤：
+### If encountering "Target database is not up to date" error:
 ```bash
-# 標記當前資料庫狀態為最新
+# Mark current database state as latest
 alembic stamp head
 ```
 
-### 如果需要重置遷移歷史：
+### If need to reset migration history:
 ```bash
-# 刪除 alembic_version 表
-# 重新創建初始遷移
+# Delete alembic_version table
+# Recreate initial migration
 python manage_migrations.py init
 ```
 
-### 如果遇到模型導入錯誤：
-檢查 alembic/env.py 中的模型導入路徑是否正確。
+### If encountering model import errors:
+Check if the model import path in alembic/env.py is correct.
 
-## 創建管理員帳號
+## Creating Administrator Account
 
-遷移完成後，創建預設管理員帳號：
+After migration completion, create default administrator account:
 ```bash
 python create_admin.py
 ```
 
-或通過 API：
+Or through API:
 ```bash
 curl -X POST "http://192.168.0.145:8001/users" \
 -H "Content-Type: application/json" \

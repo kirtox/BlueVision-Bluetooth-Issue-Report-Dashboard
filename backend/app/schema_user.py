@@ -8,11 +8,11 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     username: str
-    email: Optional[str] = None  # 註冊時可選擇提供 email
+    email: Optional[str] = None  # Email is optional during registration
     password: str
-    role: Optional[str] = "User"  # 預設為 User
-    avatar: Optional[str] = None  # 註冊時可選擇上傳頭像
-    is_active: Optional[bool] = True  # 預設為 True
+    role: Optional[str] = "User"  # Default to User
+    avatar: Optional[str] = None  # Avatar upload is optional during registration
+    is_active: Optional[bool] = True  # Default to True
 
     @field_validator('username')
     @classmethod
