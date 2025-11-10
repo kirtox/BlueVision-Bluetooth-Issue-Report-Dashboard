@@ -11,11 +11,18 @@ from datetime import datetime, timedelta
 env_path = Path(__file__).resolve().parents[2] / 'frontend' / '.env'  # Back to BTIRD folder
 load_dotenv(dotenv_path=env_path)
 
-# Load parameter
+# Load API URL from environment
 API_URL = os.getenv("VITE_API_BASE_URL")
-print(f"VITE_API_BASE_URL: {API_URL}")
+if not API_URL:
+    raise ValueError("VITE_API_BASE_URL not found in environment variables")
+print(f"API URL: {API_URL}")
 
-# API_URL = "http://localhost:8000/reports"  # Change to your FastAPI service URL
+# Authentication credentials
+USERNAME = os.getenv("TEST_USERNAME", "admin")  # Default to admin
+PASSWORD = os.getenv("TEST_PASSWORD", "intel123")  # Default password
+
+# Global variable to store auth token
+AUTH_TOKEN = None
 
 # === Data Definition ===
 op_name = ["Ernie", "Tony", "Alex", "Angus", "Ben", "Fiona"]
@@ -28,36 +35,8 @@ serial_num = {
     "Dali": ["641621182654680", "710338712422480"], "Precog": ["816837056742685", "081934550767478"], 
     "RVP": ["889628435761245", "768000973226214"], 
 }
-serial_num_list = [
-    "622341264479122",
-    "303621461704379",
-    "603757811140431",
-    "457471291662564",
-    "468005824512677",
-    "706055898196153",
-    "997918224905674",
-    "161998895303213",
-    "470804706495200",
-    "785745431065530",
-    "639529702605165",
-    "562743853422310",
-    "085956185209698",
-    "963355246872600",
-    "821133815186250",
-    "082675767235281",
-    "534100923605487",
-    "922914444683890",
-    "543036661905098",
-    "624087830741545",
-    "804587742061783",
-    "731420553518466",
-    "641621182654680",
-    "710338712422480",
-    "816837056742685",
-    "081934550767478",
-    "889628435761245",
-    "768000973226214"
-]
+# Generate serial number list from the dictionary
+serial_num_list = [sn for sns in serial_num.values() for sn in sns]
 
 os_version = ["26100.4656", "22631.5624", "22621.5624", "22631.5472"]
 platform_brand = ["HP", "Lenovo", "Dell", "Samsung", "Microsoft", "Acer", "Asus", "Intel"]
@@ -85,6 +64,8 @@ platform_bios = {
 cpu = ["MTL", "ARL", "LNL", "PTL"]
 wlan = ["AX211", "AX201", "BE200", "BE202", "BE211"]
 wlan_phase = ["A0", "B0"]
+wifi_name = ["Lab_WiFi_2.4G", "Lab_WiFi_5G", "Lab_WiFi_6G"]
+wifi_band = ["2.4GHz", "5GHz", "6GHz"]
 bt_driver = ["23.165.0.3", "23.165.0.4", "23.165.0.7", "23.160.0.9", "23.130.0.3"]
 bt_interface = ["USB", "PCIe"]
 wifi_driver = ["99.0.96.3", "23.140.0.5", "23.160.0.4"]
@@ -155,6 +136,34 @@ cycles = {
 }
 current_status = ["Online", "Running", "Offline"]
 log_path = ["https://www.intel.com/content/www/us/en/homepage.html", None]
+bt_type = ["Classic", "BLE"]
+duration_options = ["1", "2", "4", "8", "16", "24", "48", "72"]
+
+def login():
+    """Login and get authentication token"""
+    global AUTH_TOKEN
+    try:
+        login_url = f"{API_URL}/login"
+        response = requests.post(
+            login_url,
+            json={"username": USERNAME, "password": PASSWORD}  # Use JSON format
+        )
+        response.raise_for_status()
+        data = response.json()
+        AUTH_TOKEN = data.get("access_token")
+        print(f"✅ Login successful as {USERNAME}")
+        return AUTH_TOKEN
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Login failed: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            print(f"Response: {e.response.text}")
+        return None
+
+def get_auth_headers():
+    """Get authorization headers with token"""
+    if not AUTH_TOKEN:
+        login()
+    return {"Authorization": f"Bearer {AUTH_TOKEN}"} if AUTH_TOKEN else {}
 
 def random_date_2025():
     start = datetime(2025, 1, 1)
@@ -182,6 +191,8 @@ def generate_random_report():
         "cpu": random.choice(cpu),
         "wlan": random.choice(wlan),
         "wlan_phase": random.choice(wlan_phase),
+        "wifi_name": random.choice(wifi_name),
+        "wifi_band": random.choice(wifi_band),
         "bt_driver": random.choice(bt_driver),
         "bt_interface": random.choice(bt_interface),
         "wifi_driver": random.choice(wifi_driver),
@@ -190,15 +201,22 @@ def generate_random_report():
         "wrt_preset": random.choice(wrt_preset),
         "msft_teams_version": random.choice(msft_teams_version),
         "scenario": random.choice(scenario),
+        "mouse_bt": random.choice(bt_type),
         "mouse_brand": mb,
         "mouse": random.choice(mouse[mb]),
         "mouse_click_period": random.choice(mouse_click_period),
+        "keyboard_bt": random.choice(bt_type),
         "keyboard_brand": kb,
         "keyboard": random.choice(keyboard[kb]),
         "keyboard_click_period": random.choice(keyboard_click_period),
+        "headset_bt": random.choice(bt_type),
         "headset_brand": hs,
+        "headset": random.choice(headset[hs]),
+        "speaker_bt": random.choice(bt_type),
         "speaker_brand": sp,
+        "speaker": random.choice(speaker[sp]),
         "phone_brand": ph,
+        "phone": random.choice(phone[ph]),
         "device1_brand": "",
         "device1": "",
         "modern_standby": random.choice(yn),
@@ -226,19 +244,37 @@ def generate_random_report():
         "ips_id": "",
         "hsd_id": "",
         "result": (res := random.choice(result)),
-        # "fail_rate": random.choice(fail_rate[res]),
         "fail_cycles": random.choice(fail_cycles[res]),
         "cycles": random.choice(cycles[res]),
-        # "current_status": random.choice(current_status),
+        "duration": random.choice(duration_options),
         "log_path": random.choice(log_path)
     }
     return r
 
 def post_report():
-    data = generate_random_report()
-    response = requests.post(API_URL, json=data)
-    print(f"Status: {response.status_code}")
-    print(response.json())
+    """Post a single random report to the API"""
+    try:
+        data = generate_random_report()
+        headers = get_auth_headers()
+        response = requests.post(f"{API_URL}/reports", json=data, headers=headers)
+        response.raise_for_status()
+        print(f"✅ Report posted successfully: {response.status_code}")
+        print(response.json())
+        return True
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 401:
+            print(f"❌ Authentication failed. Please check credentials.")
+        elif e.response.status_code == 403:
+            print(f"❌ Permission denied. User doesn't have permission to create reports.")
+        else:
+            print(f"❌ Failed to post report: {e}")
+        return False
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Failed to post report: {e}")
+        return False
+    except Exception as e:
+        print(f"❌ Unexpected error: {e}")
+        return False
 
 def generate_random_platform(sn: str):
     r = {
@@ -251,44 +287,85 @@ def generate_random_platform(sn: str):
 
 def upsert_platform(sn: str):
     """If serial_num exists -> update, otherwise create new"""
-    # 1. First check if serial_num exists
-    check_url = f"{API_URL}/platforms?serial_num={sn}"
-    response = requests.get(check_url)
-
-    if response.status_code == 200:
-        data = response.json()
-        if data:  # Found data, perform update
-            platform_id = data["id"] if isinstance(data, dict) else data[0]["id"]
+    try:
+        headers = get_auth_headers()
+        
+        # Get all platforms and search for matching serial_num
+        check_url = f"{API_URL}/platforms"
+        response = requests.get(check_url, headers=headers)
+        response.raise_for_status()
+        
+        platforms = response.json()
+        
+        # Find platform with matching serial_num
+        existing_platform = None
+        for platform in platforms:
+            if platform.get("serial_num") == sn:
+                existing_platform = platform
+                break
+        
+        if existing_platform:  # Found data, perform update
+            platform_id = existing_platform["id"]
             update_url = f"{API_URL}/platforms/{platform_id}"
             new_data = generate_random_platform(sn)
-            res = requests.put(update_url, json=new_data)
-            print(f"✅ Updated platform {sn}: {res.status_code}, {response.json()}")
+            update_response = requests.put(update_url, json=new_data, headers=headers)
+            update_response.raise_for_status()
+            print(f"✅ Updated platform {sn}: {update_response.status_code}")
         else:
             # Not found, create new
             insert_platform(sn)
-    else:
-        print(f"⚠️ Failed to check platform: {response.status_code}, {response.text}")
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Failed to upsert platform {sn}: {e}")
+    except Exception as e:
+        print(f"❌ Unexpected error for platform {sn}: {e}")
 
 def insert_platform(sn: str):
     """Add platform data"""
-    url = f"{API_URL}/platforms"
-    data = generate_random_platform(sn)
-    response = requests.post(url, json=data)
-    print(f"✅ Inserted platform {sn}: {response.status_code}, {response.json()}")
+    try:
+        headers = get_auth_headers()
+        url = f"{API_URL}/platforms"
+        data = generate_random_platform(sn)
+        response = requests.post(url, json=data, headers=headers)
+        response.raise_for_status()
+        print(f"✅ Inserted platform {sn}: {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Failed to insert platform {sn}: {e}")
+    except Exception as e:
+        print(f"❌ Unexpected error inserting platform {sn}: {e}")
 
+
+def main():
+    """Main function to generate test data"""
+    print("=== Test Data Generator ===")
+    print(f"Username: {USERNAME}")
+    
+    # Login first
+    print("\n1. Logging in...")
+    if not login():
+        print("❌ Cannot proceed without authentication")
+        return
+    
+    # Generate sample report data (for testing)
+    # print("\n2. Sample report data:")
+    # sample_report = generate_random_report()
+    # print(f"Generated: {sample_report}")
+    
+    # Uncomment to actually post report
+    # print("\n3. Posting sample report...")
+    # post_report()
+
+    # Uncomment to actually post reports
+    # print("\n4. Posting sample reports...")
+    # for i in range(100):
+    #     post_report()
+    
+    # Uncomment to update platform data continuously
+    print("\n5. Starting platform data updates...")
+    while True:
+        for sn in serial_num_list:
+            upsert_platform(sn)
+        print("Waiting 5 seconds before next update cycle...")
+        time.sleep(5)
 
 if __name__ == "__main__":
-    for _ in range(1):
-        print(f"report_data: {generate_random_report()}")
-        # report_data = generate_random_report()
-        # response = requests.post(API_URL+"/reports", json=report_data)
-        # print(f"Status: {response.status_code}, Response: {response.json()}")
-
-    # while True:
-    #     for sn in serial_num_list:
-    #         # platform_data = generate_random_platform(sn)
-    #         # print(f"platform_data: {platform_data}")
-    #         # response = requests.post(API_URL+"/platforms", json=platform_data)
-    #         # print(f"Status: {response.status_code}, Response: {response.json()}")
-    #         upsert_platform(sn)
-    #     time.sleep(5)
+    main()
