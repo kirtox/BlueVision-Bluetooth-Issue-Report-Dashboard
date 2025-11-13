@@ -73,7 +73,7 @@ const SignUp = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
+
     if (name === 'username') {
       // Convert username to lowercase
       const lowercaseValue = formatUsernameForStorage(value);
@@ -81,12 +81,12 @@ const SignUp = () => {
         ...formData,
         [name]: lowercaseValue
       });
-      
+
       // Debounced username availability check
       const timeoutId = setTimeout(() => {
         checkUsernameAvailability(lowercaseValue);
       }, 500);
-      
+
       return () => clearTimeout(timeoutId);
     } else {
       setFormData({
@@ -233,8 +233,8 @@ const SignUp = () => {
 
                 <div className="mb-3">
                   <Form.Check type="checkbox" id="check-api-checkbox">
-                    <Form.Check.Input 
-                      type="checkbox" 
+                    <Form.Check.Input
+                      type="checkbox"
                       checked={agreed}
                       onChange={(e) => setAgreed(e.target.checked)}
                     />
@@ -247,8 +247,8 @@ const SignUp = () => {
 
                 <div>
                   <div className="d-grid">
-                    <Button 
-                      variant="primary" 
+                    <Button
+                      variant="primary"
                       type="submit"
                       disabled={isSubmitting || !agreed || usernameStatus.available === false || usernameStatus.checking}
                     >
