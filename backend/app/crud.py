@@ -291,6 +291,24 @@ def change_user_password(db: Session, user_id: int, current_password: str, new_p
     db.refresh(db_user)
     return db_user
 
+def reset_user_password(db: Session, username: str, email: str, new_password: str):
+    """Reset user password (for forgot password)"""
+    # Find user by username
+    db_user = db.query(models.User).filter(models.User.username == username.lower()).first()
+    
+    if not db_user:
+        return None  # User not found
+    
+    # Verify email matches
+    if not db_user.email or db_user.email.lower() != email.lower():
+        return False  # Email doesn't match
+    
+    # Update to new password
+    db_user.hashed_password = get_password_hash(new_password)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
 # API Access Log CRUD
 def create_api_access_log(db: Session, log_data: dict):
     """Create API access log record"""

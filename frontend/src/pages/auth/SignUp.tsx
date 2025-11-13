@@ -257,8 +257,9 @@ const SignUp = () => {
                   </div>
                   <div className="d-md-flex justify-content-between mt-4">
                     <div className="mb-2 mb-md-0">
+                      Already member?{" "}
                       <Link to="/signin" className="fs-5">
-                        Already membe? Login
+                        Login
                       </Link>
                     </div>
                     <div>

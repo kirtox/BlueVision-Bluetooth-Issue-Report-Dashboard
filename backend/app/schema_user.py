@@ -59,6 +59,21 @@ class ChangePassword(BaseModel):
     def email_to_lowercase(cls, v):
         return v.lower() if v else v
 
+class ResetPassword(BaseModel):
+    username: str
+    email: str
+    new_password: str
+
+    @field_validator('username')
+    @classmethod
+    def username_to_lowercase(cls, v):
+        return v.lower() if v else v
+
+    @field_validator('email')
+    @classmethod
+    def email_to_lowercase(cls, v):
+        return v.lower() if v else v
+
 class UserInDB(UserBase):
     id: int
     username: str

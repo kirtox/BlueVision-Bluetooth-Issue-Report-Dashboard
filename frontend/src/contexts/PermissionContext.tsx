@@ -72,14 +72,32 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
     const canEditReport = (report: Report): boolean => {
         if (!user) return false;
         if (user.role === 'Administrator') return true;
-        if (user.role === 'User') return report.op_name === user.username;
+        if (user.role === 'User') {
+            // Case-insensitive comparison
+            const canEdit = report.op_name?.toLowerCase() === user.username?.toLowerCase();
+            console.log('canEditReport:', {
+                reportOpName: report.op_name,
+                username: user.username,
+                canEdit
+            });
+            return canEdit;
+        }
         return false;
     };
 
     const canDeleteReport = (report: Report): boolean => {
         if (!user) return false;
         if (user.role === 'Administrator') return true;
-        if (user.role === 'User') return report.op_name === user.username;
+        if (user.role === 'User') {
+            // Case-insensitive comparison
+            const canDelete = report.op_name?.toLowerCase() === user.username?.toLowerCase();
+            console.log('canDeleteReport:', {
+                reportOpName: report.op_name,
+                username: user.username,
+                canDelete
+            });
+            return canDelete;
+        }
         return false;
     };
 

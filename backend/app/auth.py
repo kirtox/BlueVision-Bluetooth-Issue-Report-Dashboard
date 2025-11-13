@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from .db import get_db
-from .crud import get_user, create_user, get_users, authenticate_user, change_user_password, update_user
+from .crud import get_user, create_user, get_users, authenticate_user, change_user_password, update_user, reset_user_password
 from .utils import verify_password, create_token, verify_token
-from .schema_user import UserCreate, UserLogin, UserResponse, ChangePassword, UserUpdate
+from .schema_user import UserCreate, UserLogin, UserResponse, ChangePassword, UserUpdate, ResetPassword
 from . import models
 from typing import Optional
 
@@ -210,6 +210,27 @@ def change_password(
         raise HTTPException(status_code=400, detail="Current password is incorrect")
     
     return {"message": "Password changed successfully"}
+
+
+@router.post("/reset-password")
+def reset_password(
+    reset_data: ResetPassword,
+    db: Session = Depends(get_db)
+):
+    """Reset user password (for forgot password)"""
+    result = reset_user_password(
+        db,
+        reset_data.username,
+        reset_data.email,
+        reset_data.new_password
+    )
+    
+    if result is None:
+        raise HTTPException(status_code=400, detail="Username or email is incorrect")
+    elif result is False:
+        raise HTTPException(status_code=400, detail="Username or email is incorrect")
+    
+    return {"message": "Password reset successfully"}
 
 
 @router.get("/check-username/{username}")

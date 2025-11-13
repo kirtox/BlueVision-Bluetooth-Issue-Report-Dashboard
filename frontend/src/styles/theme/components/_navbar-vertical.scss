@@ -29,7 +29,8 @@
     margin-right: 0px;
     display: block;
     img {
-      height: 1.875rem;
+      height: auto;
+      max-width: 100%;
     }
   }
   .navbar-heading {
