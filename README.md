@@ -150,11 +150,11 @@ The dashboard implements a role-based access control system with three user role
 >
 > *And only **admin** role can see the **User Management** and **Logs** in sidebar.*
 
-![Setting_ProfilePage_Admin](https://file+.vscode-resource.vscode-cdn.net/c%3A/BTIRD/demo/images/Setting_ProfilePage_Admin.png "Setting_ProfilePage_Admin")![Setting_ProfilePage_User](https://file+.vscode-resource.vscode-cdn.net/c%3A/BTIRD/demo/images/Setting_ProfilePage_User.png "Setting_ProfilePage_User")
+![Setting_ProfilePage_Admin](./demo/images/Setting_ProfilePage_Admin.png "Setting_ProfilePage_Admin")![Setting_ProfilePage_User](./demo/images/Setting_ProfilePage_User.png "Setting_ProfilePage_User")
 
 > User Management - Admin can manage all the user.
 
-![User_Management](https://file+.vscode-resource.vscode-cdn.net/c%3A/BTIRD/demo/images/User_Management.png "User_Management")
+![User_Management](./demo/images/User_Management.png "User_Management")
 
 ---
 
@@ -170,18 +170,18 @@ The dashboard implements a role-based access control system with three user role
 
 > Table Summary – Summarized each selected conditions based on the duration of data. (Also follow the filter conditions)
 
-![Charts_Table_Summary_wo_Filters_1](./demo/images/Charts_Table_Summary_wo_Filters_1.png "Charts_Table_Summary_wo_Filters_1")![Charts_Table_Summary_wo_Filters_2](https://file+.vscode-resource.vscode-cdn.net/c%3A/BTIRD/demo/images/Charts_Table_Summary_wo_Filters_2.png "Charts_Table_Summary_wo_Filters_2")
+![Charts_Table_Summary_wo_Filters_1](./demo/images/Charts_Table_Summary_wo_Filters_1.png "Charts_Table_Summary_wo_Filters_1")![Charts_Table_Summary_wo_Filters_2](./demo/images/Charts_Table_Summary_wo_Filters_2.png "Charts_Table_Summary_wo_Filters_2")
 
-![Charts_Table_Summary_wo_Filters_3](https://file+.vscode-resource.vscode-cdn.net/c%3A/BTIRD/demo/images/Charts_Table_Summary_wo_Filters_3.png "Charts_Table_Summary_wo_Filters_3")
+![Charts_Table_Summary_wo_Filters_3](./demo/images/Charts_Table_Summary_wo_Filters_3.png "Charts_Table_Summary_wo_Filters_3")
 
 > Reliability Summary – Summarized across different conditions based on the number of data. (Also follow the filter conditions)
 
-![Charts_Table_Reliability_Summary_wo_Filters](https://file+.vscode-resource.vscode-cdn.net/c%3A/BTIRD/demo/images/Charts_Table_Reliability_Summary_wo_Filters.png "Charts_Table_Reliability_Summary_wo_Filters")
+![Charts_Table_Reliability_Summary_wo_Filters](./demo/images/Charts_Table_Reliability_Summary_wo_Filters.png "Charts_Table_Reliability_Summary_wo_Filters")
 
 > Durability Summary – Summarized across different conditions based on the duration of data. (Also follow the filter conditions)
 
-![Charts_Table_Durability_Summary_wo_Filters](https://file+.vscode-resource.vscode-cdn.net/c%3A/BTIRD/demo/images/Charts_Table_Durability_Summary_wo_Filters.png "Charts_Table_Durability_Summary_wo_Filters")
+![Charts_Table_Durability_Summary_wo_Filters](./demo/images/Charts_Table_Durability_Summary_wo_Filters.png "Charts_Table_Durability_Summary_wo_Filters")
 
 > Create report - In case there is necessary to create report manually.
 
-![CreateReport_Manually](https://file+.vscode-resource.vscode-cdn.net/c%3A/BTIRD/demo/images/CreateReport_Manually.png "CreateReport_Manually")
+![CreateReport_Manually](./demo/images/CreateReport_Manually.png "CreateReport_Manually")
