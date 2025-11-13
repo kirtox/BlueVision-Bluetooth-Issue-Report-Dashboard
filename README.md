@@ -152,7 +152,7 @@ The dashboard implements a role-based access control system with three user role
 
 ![Setting_ProfilePage_Admin](./demo/images/Setting_ProfilePage_Admin.png "Setting_ProfilePage_Admin")![Setting_ProfilePage_User](./demo/images/Setting_ProfilePage_User.png "Setting_ProfilePage_User")
 
-> User Management - Admin can manage all the user.
+> *User Management - Admin can manage all the user.*
 
 ![User_Management](./demo/images/User_Management.png "User_Management")
 
@@ -168,20 +168,20 @@ The dashboard implements a role-based access control system with three user role
 
 ![ReportTable_Filters](./demo/images/ReportTable_Filters_Coverd.png "ReportTable_Filters")
 
-> Table Summary – Summarized each selected conditions based on the duration of data. (Also follow the filter conditions)
+> *Table Summary – Summarized each selected conditions based on the duration of data. (Also follow the filter conditions)*
 
 ![Charts_Table_Summary_wo_Filters_1](./demo/images/Charts_Table_Summary_wo_Filters_1.png "Charts_Table_Summary_wo_Filters_1")![Charts_Table_Summary_wo_Filters_2](./demo/images/Charts_Table_Summary_wo_Filters_2.png "Charts_Table_Summary_wo_Filters_2")
 
 ![Charts_Table_Summary_wo_Filters_3](./demo/images/Charts_Table_Summary_wo_Filters_3.png "Charts_Table_Summary_wo_Filters_3")
 
-> Reliability Summary – Summarized across different conditions based on the number of data. (Also follow the filter conditions)
+> *Reliability Summary – Summarized across different conditions based on the number of data. (Also follow the filter conditions)*
 
 ![Charts_Table_Reliability_Summary_wo_Filters](./demo/images/Charts_Table_Reliability_Summary_wo_Filters.png "Charts_Table_Reliability_Summary_wo_Filters")
 
-> Durability Summary – Summarized across different conditions based on the duration of data. (Also follow the filter conditions)
+> *Durability Summary – Summarized across different conditions based on the duration of data. (Also follow the filter conditions)*
 
 ![Charts_Table_Durability_Summary_wo_Filters](./demo/images/Charts_Table_Durability_Summary_wo_Filters.png "Charts_Table_Durability_Summary_wo_Filters")
 
-> Create report - In case there is necessary to create report manually.
+> *Create report - In case there is necessary to create report manually.*
 
 ![CreateReport_Manually](./demo/images/CreateReport_Manually.png "CreateReport_Manually")
