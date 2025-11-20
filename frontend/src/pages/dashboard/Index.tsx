@@ -144,7 +144,7 @@ const Dashboard = () => {
     // Create a new empty report object
     const emptyReport: Report = {
       id: 0, // New report ID is 0
-      op_name: '', // This will be set automatically in backend
+      op_name: user?.username || '', // Auto-fill with current username
       date: new Date().toISOString(),
       serial_num: '',
       os_version: '',

@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Form, Card, Row, Col } from "react-bootstrap";
 import { Report } from "types";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface ReportEditFormProps {
   report: Report | null;
@@ -9,6 +10,15 @@ interface ReportEditFormProps {
 }
 
 const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, readonly = false }) => {
+  const { user } = useAuth();
+
+  // Auto-fill op_name with username for new reports
+  useEffect(() => {
+    if (report && report.id === 0 && user && !report.op_name) {
+      onChange({ ...report, op_name: user.username });
+    }
+  }, [report, user]);
+
   if (!report) return null;
 
   const handleFieldChange = (field: keyof Report, value: any) => {
@@ -19,7 +29,8 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
     label: string,
     field: keyof Report,
     type: string = "text",
-    colSize: number = 6
+    colSize: number = 6,
+    customReadOnly?: boolean
   ) => (
     <Form.Group as={Col} md={colSize} className="mb-3">
       <Form.Label className="fw-bold">{label}</Form.Label>
@@ -27,7 +38,7 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
         type={type}
         value={report[field] || ""}
         onChange={(e) => handleFieldChange(field, e.target.value)}
-        readOnly={readonly}
+        readOnly={customReadOnly !== undefined ? customReadOnly : readonly}
       />
     </Form.Group>
   );
@@ -95,7 +106,14 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
         <Card.Body>
           <Card.Title className="fw-bold">Operator</Card.Title>
           <Row>
-            {renderField("Operator", "op_name")}
+            {renderField(
+              "Operator", 
+              "op_name", 
+              "text", 
+              6, 
+              // User role cannot edit op_name, Administrator can
+              user?.role === "User" || readonly
+            )}
           </Row>
           <hr></hr>
           <Card.Title className="fw-bold">Date</Card.Title>
