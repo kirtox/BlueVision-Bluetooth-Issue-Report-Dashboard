@@ -27,16 +27,16 @@ services:
       - DATABASE_URL=postgresql://admin:password@db:5432/btird
       - TZ=Asia/Taipei
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     # restart: always
     volumes:
       - avatar_uploads:/app/uploads
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8001/health || exit 1"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
     networks:
       - app-network
     ports:
@@ -57,9 +57,10 @@ services:
       - app-network
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "admin", "-d", "btird"]
-      interval: 10s
-      timeout: 5s
+      interval: 5s
+      timeout: 3s
       retries: 5
+      start_period: 10s
 
 volumes:
   pgdata_prod:

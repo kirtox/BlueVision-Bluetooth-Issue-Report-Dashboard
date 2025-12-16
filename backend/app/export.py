@@ -31,7 +31,7 @@ HEADERS = [
     "Cold Boot", "CB Period", "CB OS Waiting Time",
     "Microsoft Teams", "APM", "APM Period", "OPP", "Swift Pair",
     "Power Type", "Urgent Level", "Fix Work Week", "Fix BT Driver", "JIRA ID", "IPS ID", "HSD ID",
-    "Result", "Fail Cycles", "Cycles", "Duration", "Log Path"
+    "Result", "Fail Cycles", "Cycles", "Duration", "Sys Event Log", "Log Path"
 ]
 
 @router.get("/export/csv")
@@ -137,6 +137,7 @@ def export_csv(
             r.fail_cycles,
             r.cycles,
             r.duration,
+            r.sys_event_log,
             r.log_path,
         ])
     stream.seek(0)
@@ -262,7 +263,8 @@ def export_excel(
         ws.cell(row=row, column=66, value=report.fail_cycles)
         ws.cell(row=row, column=67, value=report.cycles)
         ws.cell(row=row, column=68, value=report.duration)
-        ws.cell(row=row, column=69, value=report.log_path)
+        ws.cell(row=row, column=69, value=report.sys_event_log)
+        ws.cell(row=row, column=70, value=report.log_path)
     
     # Auto adjust the width of columns 
     for column in ws.columns:

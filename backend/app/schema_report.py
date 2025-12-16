@@ -87,6 +87,7 @@ class ReportBase(BaseModel):
     fail_cycles: Optional[str] = None
     cycles: Optional[str] = None
     duration: Optional[str] = None
+    sys_event_log: Optional[str] = None
 
     log_path: Optional[str] = None
 

@@ -20,13 +20,13 @@ const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   // Modal states
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  
+
   // Form states
   const [formData, setFormData] = useState({
     username: '',
@@ -190,8 +190,8 @@ const UserManagement: React.FC = () => {
         <Col>
           <div className="d-flex justify-content-between align-items-center mb-4">
             <h1 className="h3 mb-0">User Management</h1>
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               onClick={() => setShowCreateModal(true)}
             >
               <i className="fe fe-plus me-1"></i>
@@ -254,8 +254,8 @@ const UserManagement: React.FC = () => {
                         <td>{user.email || 'Not provided'}</td>
                         <td>
                           <Badge bg={
-                            user.role === 'Administrator' ? 'success' : 
-                            user.role === 'User' ? 'primary' : 'secondary'
+                            user.role === 'Administrator' ? 'success' :
+                              user.role === 'User' ? 'primary' : 'secondary'
                           }>
                             {user.role}
                           </Badge>
@@ -307,7 +307,7 @@ const UserManagement: React.FC = () => {
               <Form.Control
                 type="text"
                 value={formData.username}
-                onChange={(e) => setFormData({...formData, username: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                 placeholder="Enter username"
               />
             </Form.Group>
@@ -316,7 +316,7 @@ const UserManagement: React.FC = () => {
               <Form.Control
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="Enter email"
               />
             </Form.Group>
@@ -325,7 +325,7 @@ const UserManagement: React.FC = () => {
               <Form.Control
                 type="password"
                 value={formData.password}
-                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="Enter password"
               />
             </Form.Group>
@@ -333,7 +333,7 @@ const UserManagement: React.FC = () => {
               <Form.Label>Role</Form.Label>
               <Form.Select
                 value={formData.role}
-                onChange={(e) => setFormData({...formData, role: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               >
                 <option value="User">User</option>
                 <option value="Administrator">Administrator</option>
@@ -373,7 +373,7 @@ const UserManagement: React.FC = () => {
               <Form.Control
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="Enter email"
               />
             </Form.Group>
@@ -381,7 +381,7 @@ const UserManagement: React.FC = () => {
               <Form.Label>Role</Form.Label>
               <Form.Select
                 value={formData.role}
-                onChange={(e) => setFormData({...formData, role: e.target.value})}
+                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
               >
                 <option value="User">User</option>
                 <option value="Administrator">Administrator</option>

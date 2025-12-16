@@ -40,7 +40,7 @@ def create_tables_if_not_exist():
             try:
                 # Create tables with built-in check mechanism
                 models.Base.metadata.create_all(bind=engine, checkfirst=True)
-                logging.info("✅ Database tables ready")
+                logging.info("[SUCCESS] Database tables ready")
             finally:
                 # Always release the lock, even if table creation fails
                 conn.execute(text("SELECT pg_advisory_unlock(123456)"))
@@ -48,10 +48,10 @@ def create_tables_if_not_exist():
         # Test database connection
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
-        logging.info("✅ Database connection successful")
+        logging.info("[SUCCESS] Database connection successful")
         
     except Exception as e:
-        logging.error(f"❌ Database setup failed: {e}")
+        logging.error(f"[ERROR] Database setup failed: {e}")
         # Don't fail startup, but log the error
 
 create_tables_if_not_exist()
@@ -70,7 +70,7 @@ app.add_middleware(APIAccessLogMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # ⚠️ For dev mode "*"
+    allow_origins=["*"],  # WARNING: For dev mode "*"
     # allow_origins=["http://localhost:5173"], # For production mode
     allow_credentials=True,
     allow_methods=["*"],
@@ -131,6 +131,44 @@ def create_report(
     # If User role, automatically set op_name to current username
     if current_user.role == "User":
         report.op_name = current_user.username
+    
+    # Ensure op_name is lowercase before saving to database
+    if report.op_name:
+        report.op_name = report.op_name.lower()
+    
+    return crud.create_report(db, report)
+
+# Script API - Only validate if op_name exists in user table
+@app.post("/reports/script", response_model=ReportInDB)
+def create_report_script(
+    report: ReportCreate, 
+    db: Session = Depends(get_db)
+):
+    """
+    Report upload endpoint designed for Python scripts
+    Only validates if op_name exists in user table
+    """
+    # Check if op_name is provided
+    if not report.op_name:
+        raise HTTPException(status_code=400, detail="op_name is required for script uploads")
+    
+    # Validate if op_name exists in user table
+    user = db.query(models.User).filter(models.User.username == report.op_name.lower()).first()
+    if not user:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Invalid op_name: '{report.op_name}({report.op_name.lower()}, {len(report.op_name)})' not found in user table"
+        )
+    
+    # Check if user is active
+    if user.is_active != "Y":
+        raise HTTPException(
+            status_code=400, 
+            detail=f"User '{report.op_name}' is not active"
+        )
+    
+    # Convert op_name to lowercase before saving to database
+    report.op_name = report.op_name.lower()
     
     return crud.create_report(db, report)
 
@@ -306,9 +344,9 @@ async def upload_avatar(
         if not new_file_path.exists():
             with open(new_file_path, "wb") as buffer:
                 buffer.write(content)
-            print(f"💾 Saved new avatar file: {hashed_filename}")
+            print(f"[SAVE] Saved new avatar file: {hashed_filename}")
         else:
-            print(f"♻️ Reusing existing avatar file: {hashed_filename}")
+            print(f"[REUSE] Reusing existing avatar file: {hashed_filename}")
         
         # Clean up old avatar file safely
         if current_user.avatar:
@@ -326,9 +364,9 @@ async def upload_avatar(
                 old_file_path = UPLOAD_DIR / old_filename
                 if old_file_path.exists() and old_filename != hashed_filename:
                     old_file_path.unlink()
-                    print(f"🗑️ Deleted unused avatar: {old_filename}")
+                    print(f"[DELETE] Deleted unused avatar: {old_filename}")
             else:
-                print(f"📎 Keeping shared avatar: {old_filename} (used by {other_users_count} other users)")
+                print(f"[KEEP] Keeping shared avatar: {old_filename} (used by {other_users_count} other users)")
         
         # Update user avatar in database
         avatar_url = f"/uploads/avatars/{hashed_filename}"
@@ -342,11 +380,11 @@ async def upload_avatar(
                 new_file_path.unlink()
             raise HTTPException(status_code=500, detail="Failed to update user avatar")
         
-        print(f"✅ Avatar updated for user {current_user.username}: {hashed_filename}")
+        print(f"[SUCCESS] Avatar updated for user {current_user.username}: {hashed_filename}")
         return updated_user
         
     except Exception as e:
-        print(f"❌ Avatar upload failed: {str(e)}")
+        print(f"[ERROR] Avatar upload failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to process avatar: {str(e)}")
 
 

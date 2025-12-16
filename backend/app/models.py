@@ -94,6 +94,7 @@ class Report(Base):
     fail_cycles = Column(String)
     cycles = Column(String)
     duration = Column(String)
+    sys_event_log = Column(String)
 
     log_path = Column(String)
 

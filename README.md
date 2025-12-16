@@ -96,6 +96,17 @@ netsh interface portproxy show all
 
 This allows external devices on your LAN to access the dashboard services through the host machine.
 
+>  If the podman compose didn't work successfully, the below steps should be work.
+
+```
+# Activate the services in order
+podman-compose -p btird_prod -f .\podman-compose.prod.yml up -d db
+# Wait the db check successfully
+podman-compose -p btird_prod -f .\podman-compose.prod.yml up -d backend
+# Wait the backend activating
+podman-compose -p btird_prod -f .\podman-compose.prod.yml up -d frontend
+```
+
 ---
 
 ## 🛠️ Tech Stack

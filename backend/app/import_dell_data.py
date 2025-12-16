@@ -157,9 +157,9 @@ if __name__ == "__main__":
     print("create_report_data_single() end")
 
     # Import Dell platform data
-    print("create_platform_data_single() running...")
-    create_platform_data_single()
-    print("create_platform_data_single() end")
+    # print("create_platform_data_single() running...")
+    # create_platform_data_single()
+    # print("create_platform_data_single() end")
 
     # Simulate few platforms simultaneously, and change each platform status
     # simulate_multiple_platforms([

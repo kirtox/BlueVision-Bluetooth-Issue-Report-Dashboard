@@ -37,6 +37,13 @@ load_dotenv(dotenv_path=env_path)
 API_URL = os.getenv("VITE_API_BASE_URL")
 API_REPORTS = f"{API_URL}/reports"
 
+# Authentication credentials
+USERNAME = os.getenv("TEST_USERNAME", "admin")  # Default to admin
+PASSWORD = os.getenv("TEST_PASSWORD", "intel123")  # Default password
+
+# Global variable to store auth token
+AUTH_TOKEN = None
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -47,6 +54,33 @@ logging.basicConfig(
     ]
 )
 logger = logging.getLogger(__name__)
+
+
+def login():
+    """Login and get authentication token"""
+    global AUTH_TOKEN
+    try:
+        login_url = f"{API_URL}/login"
+        response = requests.post(
+            login_url,
+            json={"username": USERNAME, "password": PASSWORD}
+        )
+        response.raise_for_status()
+        data = response.json()
+        AUTH_TOKEN = data.get("access_token")
+        logger.info(f"[SUCCESS] Login successful as {USERNAME}")
+        return AUTH_TOKEN
+    except requests.exceptions.RequestException as e:
+        logger.error(f"[ERROR] Login failed: {e}")
+        if hasattr(e, 'response') and e.response is not None:
+            logger.error(f"Response: {e.response.text}")
+        return None
+
+def get_auth_headers():
+    """Get authorization headers with token"""
+    if not AUTH_TOKEN:
+        login()
+    return {"Authorization": f"Bearer {AUTH_TOKEN}"} if AUTH_TOKEN else {}
 
 
 class PTLWorkshopImporter:
@@ -200,6 +234,7 @@ class PTLWorkshopImporter:
             'fail_cycles': 'fail_cycles', 'Fail Cycles': 'fail_cycles',
             'cycles': 'cycles', 'Cycles': 'cycles',
             'duration': 'duration', 'Duration': 'duration',
+            'sys_event_log': 'sys_event_log', 'Sys Event Log': 'sys_event_log',
             
             'log_path': 'log_path', 'Log Path': 'log_path',
         }
@@ -255,7 +290,8 @@ class PTLWorkshopImporter:
     def create_report_record(self, data: Dict[str, str]) -> bool:
         """Create a new report record via API"""
         try:
-            response = requests.post(API_REPORTS, json=data, timeout=30)
+            headers = get_auth_headers()
+            response = requests.post(API_REPORTS, json=data, headers=headers, timeout=30)
             if response.status_code in (200, 201):
                 logger.info(f"Successfully created report record via API")
                 return True
@@ -347,13 +383,13 @@ class PTLWorkshopImporter:
     def analyze_excel_files(self):
         """Analyze Excel files structure"""
         if not self.folder_path.exists():
-            print(f"❌ PTL_Workshop folder not found: {self.folder_path}")
+            print(f"[ERROR] PTL_Workshop folder not found: {self.folder_path}")
             return
         
         excel_files = list(self.folder_path.glob("*.xlsx")) + list(self.folder_path.glob("*.xls"))
         
         if not excel_files:
-            print(f"❌ No Excel files found in {self.folder_path}")
+            print(f"[ERROR] No Excel files found in {self.folder_path}")
             return
         
         print(f"🚀 Found {len(excel_files)} Excel file(s) to analyze")
@@ -397,7 +433,7 @@ class PTLWorkshopImporter:
             
             # Search for "Database data" in column A
             database_data_row = None
-            print(f"\n🔍 Searching for 'Database data' in column A...")
+            print(f"\n[SEARCH] Searching for 'Database data' in column A...")
             
             for row in range(1, min(100, worksheet.max_row + 1)):
                 cell_value = worksheet.cell(row=row, column=1).value
@@ -410,7 +446,7 @@ class PTLWorkshopImporter:
                         print(f"   Row {row:2d}: {cell_value}")
             
             if database_data_row is None:
-                print("❌ 'Database data' not found in first 100 rows")
+                print("[ERROR] 'Database data' not found in first 100 rows")
                 return None
             
             # Extract data after "Database data"
@@ -444,7 +480,7 @@ class PTLWorkshopImporter:
             return data_pairs
             
         except Exception as e:
-            print(f"❌ Error analyzing file: {e}")
+            print(f"[ERROR] Error analyzing file: {e}")
             return None
     
     def print_summary(self, successful_count: int, failed_count: int):
@@ -458,12 +494,12 @@ class PTLWorkshopImporter:
         if self.processed_files:
             print(f"\nSuccessful files:")
             for filename in self.processed_files:
-                print(f"  ✅ {filename}")
+                print(f"  [SUCCESS] {filename}")
         
         if self.failed_files:
             print(f"\nFailed files:")
             for filename in self.failed_files:
-                print(f"  ❌ {filename}")
+                print(f"  [ERROR] {filename}")
         
         print("="*50)
 
@@ -482,6 +518,9 @@ def show_menu():
 
 def run_interactive():
     """Run interactive menu"""
+    print(f"API_URL: {API_URL}")
+    print(f"Username: {USERNAME}")
+    
     importer = PTLWorkshopImporter()
     
     while True:
@@ -491,36 +530,46 @@ def run_interactive():
             choice = input("\nSelect an option (1-4): ").strip()
             
             if choice == '1':
-                print("\n🔍 Analyzing Excel files...")
+                print("\n[ANALYZE] Analyzing Excel files...")
                 importer.analyze_excel_files()
                 
             elif choice == '2':
-                print("\n🧪 Running test import (dry run)...")
+                print("\n[AUTH] Logging in...")
+                if not login():
+                    print("[ERROR] Cannot proceed without authentication")
+                    continue
+                    
+                print("\n[TEST] Running test import (dry run)...")
                 successful, failed = importer.process_folder(dry_run=True)
                 importer.print_summary(successful, failed)
                 
             elif choice == '3':
-                print("\n⚠️  This will import data to the database!")
+                print("\n[AUTH] Logging in...")
+                if not login():
+                    print("[ERROR] Cannot proceed without authentication")
+                    continue
+                    
+                print("\n[WARNING] This will import data to the database!")
                 confirm = input("Are you sure you want to continue? (y/N): ").strip().lower()
                 
                 if confirm == 'y':
-                    print("\n📥 Importing data to database...")
+                    print("\n[IMPORT] Importing data to database...")
                     successful, failed = importer.process_folder(dry_run=False)
                     importer.print_summary(successful, failed)
                 else:
-                    print("❌ Import cancelled")
+                    print("[INFO] Import cancelled")
                     
             elif choice == '4':
-                print("👋 Goodbye!")
+                print("[INFO] Goodbye!")
                 break
             else:
-                print("❌ Invalid choice. Please select 1-4.")
+                print("[ERROR] Invalid choice. Please select 1-4.")
                 
         except KeyboardInterrupt:
-            print("\n\n👋 Goodbye!")
+            print("\n\n[INFO] Goodbye!")
             break
         except Exception as e:
-            print(f"❌ Unexpected error: {e}")
+            print(f"[ERROR] Unexpected error: {e}")
         
         input("\nPress Enter to continue...")
 
@@ -539,20 +588,28 @@ def main():
         logging.getLogger().setLevel(logging.DEBUG)
     
     print(f"API_URL: {API_URL}")
+    print(f"Username: {USERNAME}")
+    
+    # Login first if we need to import data
+    if args.do_import or args.dry_run:
+        print("\n[AUTH] Logging in...")
+        if not login():
+            print("[ERROR] Cannot proceed without authentication")
+            return
     
     importer = PTLWorkshopImporter()
     
     if args.analyze:
-        print("🔍 Analyzing Excel files...")
+        print("[ANALYZE] Analyzing Excel files...")
         importer.analyze_excel_files()
         
     elif args.dry_run:
-        print("🧪 Running test import (dry run)...")
+        print("[TEST] Running test import (dry run)...")
         successful, failed = importer.process_folder(dry_run=True)
         importer.print_summary(successful, failed)
         
     elif args.do_import:
-        print("📥 Importing data to database...")
+        print("[IMPORT] Importing data to database...")
         successful, failed = importer.process_folder(dry_run=False)
         importer.print_summary(successful, failed)
         
