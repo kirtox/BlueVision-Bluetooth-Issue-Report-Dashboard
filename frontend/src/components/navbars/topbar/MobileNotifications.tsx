@@ -35,14 +35,14 @@ export const MobileNotifications: React.FC<MobileNotificationProps> = ({
             </Link>
           </div>
           <NotificationList notificationItems={data} />
-          <div className="border-top px-3 pt-3 pb-3">
+          {/* <div className="border-top px-3 pt-3 pb-3">
             <Link
               to="/dashboard/notification-history"
               className="text-link fw-semi-bold"
             >
               See all Notifications
             </Link>
-          </div>
+          </div> */}
         </Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>

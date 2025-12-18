@@ -130,6 +130,14 @@ podman-compose -p btird_prod -f .\podman-compose.prod.yml up -d frontend
 
 The dashboard implements a role-based access control system with three user roles:
 
+> Enter the container to activate the administrator account:
+>
+> ```
+> podman exec -it <container_name_or_id> bash
+> ```
+>
+> And run ``python create_admin.py`` to create the first account.
+
 ### Administrator
 
 - Full access to all features
