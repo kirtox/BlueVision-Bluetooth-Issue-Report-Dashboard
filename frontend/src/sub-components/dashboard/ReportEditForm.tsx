@@ -263,7 +263,7 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
             {renderSelectField("Result", "result", ["Pass", "Fail", "On-Going"])}
             {renderField("Cycles", "cycles")}
             {renderField("Fail Cycles", "fail_cycles")}
-            {renderField("Duration", "duration")}
+            {renderField("Duration (seconds)", "duration")}
             {renderField("Log Path", "log_path")}
             {/* {renderSelectField("Current Status", "current_status", ["Finish", "Running", "Stop"])} */}
           </Row>

@@ -435,9 +435,9 @@ const Dashboard = () => {
                     calcType="sum"
                     max={720}
                     thresholds={[
-                      { value: 72, color: "#82ca9d" },  // Green 82ca9d
-                      { value: 360, color: "#ffc658" },  // Yellow ffc658
-                      { value: 720, color: "#ff7f50" }, // Red ff7f50
+                      { value: 72, color: "#82ca9d" },  // Green 82ca9d (10% of max)
+                      { value: 360, color: "#ffc658" },  // Yellow ffc658 (50% of max)
+                      { value: 720, color: "#ff7f50" }, // Red ff7f50 (100% of max)
                     ]}
                     title="Driver Duration Dashboard"
                   />

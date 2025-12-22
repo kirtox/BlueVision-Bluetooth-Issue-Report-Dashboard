@@ -96,7 +96,7 @@ def test_create_report():
 
         "result": "PASS", # Not null (None)
         "cycles": "5",
-        "duration": "30m",
+        "duration": "108000",  # 30 hours in seconds
         "log_path": "/logs/report1"
     }
 

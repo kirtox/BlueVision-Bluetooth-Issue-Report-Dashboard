@@ -116,7 +116,7 @@ REPORT_DATA = {
     "result": "PASS",
     "fail_cycles": None,
     "cycles": "5",
-    "duration": "30m",
+    "duration": "108000",  # 30 hours in seconds
     "sys_event_log": None,
     
     "log_path": "/logs/script_upload"

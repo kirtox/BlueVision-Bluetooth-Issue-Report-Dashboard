@@ -31,13 +31,16 @@ const ReportGaugeChart: React.FC<ReportGaugeChartProps> = ({
 }) => {
   if (!reports || !reports.length) return <div>No data</div>;
 
-  // Group and calculate values
+  // Group and calculate values (convert seconds to hours for duration field)
   const grouped: Record<string, number> = {};
   reports.forEach((r) => {
     const key = r[groupBy] || "(Empty)";
     if (!grouped[key]) grouped[key] = 0;
     if (calcType === "sum") {
-      grouped[key] += Number(r[calcField]) || 0;
+      const value = Number(r[calcField]) || 0;
+      // Convert seconds to hours if calcField is duration
+      const convertedValue = calcField === "duration" ? value / 3600 : value;
+      grouped[key] += convertedValue;
     } else {
       grouped[key] += 1;
     }
@@ -113,7 +116,7 @@ const ReportGaugeChart: React.FC<ReportGaugeChartProps> = ({
                   fontWeight: "bold",
                 }}
               >
-                {value} / {max}
+                {calcField === "duration" ? `${value.toFixed(2)}` : `${value}`} / {max}
               </div>
             </div>
           );

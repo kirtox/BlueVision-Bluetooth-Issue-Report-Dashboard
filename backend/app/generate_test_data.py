@@ -137,7 +137,7 @@ cycles = {
 current_status = ["Online", "Running", "Offline"]
 log_path = ["https://www.intel.com/content/www/us/en/homepage.html", None]
 bt_type = ["Classic", "BLE"]
-duration_options = ["1", "2", "4", "8", "16", "24", "48", "72"]
+duration_options = ["3600", "7200", "14400", "28800", "57600", "86400", "172800", "259200"]  # 1, 2, 4, 8, 16, 24, 48, 72 hours in seconds
 
 def login():
     """Login and get authentication token"""

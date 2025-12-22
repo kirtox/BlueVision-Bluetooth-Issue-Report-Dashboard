@@ -74,13 +74,19 @@ const ReportMultipleGaugeChart: React.FC<ReportMultipleGaugeChartProps> = ({
 }) => {
   if (!reports || !reports.length) return <div>No data</div>;
 
-  // Group calculation
+  // Group calculation (convert seconds to hours for duration field)
   const grouped: Record<string, number> = {};
   reports.forEach((r) => {
     const key = r[groupBy] || "(Empty)";
     if (!grouped[key]) grouped[key] = 0;
-    if (calcType === "sum") grouped[key] += Number(r[calcField]) || 0;
-    else grouped[key] += 1;
+    if (calcType === "sum") {
+      const value = Number(r[calcField]) || 0;
+      // Convert seconds to hours if calcField is duration
+      const convertedValue = calcField === "duration" ? value / 3600 : value;
+      grouped[key] += convertedValue;
+    } else {
+      grouped[key] += 1;
+    }
   });
 
   const groups = Object.entries(grouped).map(([name, value]) => ({
@@ -169,7 +175,7 @@ const ReportMultipleGaugeChart: React.FC<ReportMultipleGaugeChartProps> = ({
                   fontWeight: "bold",
                 }}
               >
-                {value} hrs
+                {calcField === "duration" ? `${value.toFixed(2)} hrs` : `${value} hrs`}
               </div>
             </div>
           );

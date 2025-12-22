@@ -66,7 +66,7 @@ REPORT_DATA = {
 - `scenario`: Test scenario description
 - `result`: Test result (PASS/FAIL)
 - `cycles`: Test cycle count
-- `duration`: Test duration
+- `duration`: Test duration (in seconds)
 
 ## Data Field Format
 

@@ -50,17 +50,18 @@ const ReportMultipleDurationCrossBarChart: React.FC<ReportMultipleDurationCrossB
   if (loading && !externalReports) return <div>Loading...</div>;
   if (!reports || !reports.length) return <div>No data</div>;
 
-  // Step 1: Create a two-dimensional cumulative map
+  // Step 1: Create a two-dimensional cumulative map (convert seconds to hours)
   const dataMap: Record<string, Record<string, number>> = {};
   const groupSet = new Set<string>();
 
   reports.forEach((r) => {
     const xKey = (r[fieldX] || "(Empty)").toString();
     const groupKey = (r[groupBy] || "(Empty)").toString();
-    const value = Number(r[fieldY]) || 0;
+    const valueInSeconds = Number(r[fieldY]) || 0;
+    const valueInHours = valueInSeconds / 3600; // Convert seconds to hours
 
     if (!dataMap[xKey]) dataMap[xKey] = {};
-    dataMap[xKey][groupKey] = (dataMap[xKey][groupKey] || 0) + value;
+    dataMap[xKey][groupKey] = (dataMap[xKey][groupKey] || 0) + valueInHours;
     groupSet.add(groupKey);
   });
 
@@ -93,7 +94,7 @@ const ReportMultipleDurationCrossBarChart: React.FC<ReportMultipleDurationCrossB
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis type="number" allowDecimals={false} label={{ value: "(hr)", position: "insideBottomRight", offset: -5 }} />
           <YAxis type="category" dataKey="name" width={120} />
-          <Tooltip wrapperStyle={{ zIndex: 1000 }} />
+          <Tooltip wrapperStyle={{ zIndex: 1000 }} formatter={(value, name) => [`${Number(value).toFixed(2)} hrs`, name]} />
           <Legend verticalAlign="bottom" align="center" wrapperStyle={{ paddingTop: 8 }} />
           {groups.map((g, idx) => (
             <Bar key={g} dataKey={g} stackId="a" fill={COLORS[idx % COLORS.length]}>
@@ -112,7 +113,7 @@ const ReportMultipleDurationCrossBarChart: React.FC<ReportMultipleDurationCrossB
                       fontSize={14}
                       fontWeight="bold"
                     >
-                      {value}
+                      {Number(value).toFixed(1)}h
                     </text>
                   );
                 }}

@@ -31,7 +31,7 @@ HEADERS = [
     "Cold Boot", "CB Period", "CB OS Waiting Time",
     "Microsoft Teams", "APM", "APM Period", "OPP", "Swift Pair",
     "Power Type", "Urgent Level", "Fix Work Week", "Fix BT Driver", "JIRA ID", "IPS ID", "HSD ID",
-    "Result", "Fail Cycles", "Cycles", "Duration", "Sys Event Log", "Log Path"
+    "Result", "Fail Cycles", "Cycles", "Duration (seconds)", "Sys Event Log", "Log Path"
 ]
 
 @router.get("/export/csv")
