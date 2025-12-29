@@ -206,7 +206,7 @@ const PlatformStatusDashboard: React.FC = () => {
                     <ul className="list-unstyled mb-0">
                       <li><strong>Serial Number:</strong> {platform.serial_num}</li>
                       <li><strong>Platform:</strong> {platform.platform}</li>
-                      <li><strong>CPU:</strong> {platform.cpu}</li>
+                      <li><strong>CPU:</strong> {platform.cpu_codename || platform.cpu}</li>
                       <li><strong>WLAN:</strong> {platform.wlan}</li>
                       <li><strong>Status:</strong> {platform.current_status}</li>
                       <li><strong>Last Status Updated:</strong> {formatDate(platform.platform_date)}</li>

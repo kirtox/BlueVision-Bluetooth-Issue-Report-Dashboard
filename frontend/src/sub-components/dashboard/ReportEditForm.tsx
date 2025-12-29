@@ -138,6 +138,7 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
             {renderField("Platform Phase", "platform_phase")}
             {renderField("Platform BIOS", "platform_bios")}
             {renderField("CPU", "cpu")}
+            {renderField("CPU Codename", "cpu_codename", "text", 6, true)}
             {renderField("MS Teams Version", "msft_teams_version")}
             {renderSelectField("Power Type", "power_type", ["AC", "DC"])}
           </Row>
@@ -245,7 +246,7 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
         <Card.Body>
           <Card.Title className="fw-bold">Issue Info.</Card.Title>
           <Row>
-            {renderSelectField("Urgent Level", "urgent_level", ["Fireball", "P1", "P2", "P3"])}
+            {renderSelectField("Urgent Level", "urgent_level", ["NA", "Fireball", "P1", "P2", "P3"])}
             {renderField("Fix in ? WW", "fix_work_week")}
             {renderField("Fix in ? BT driver", "fix_bt_driver")}
             {renderField("Jira ID", "jira_id")}

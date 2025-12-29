@@ -117,6 +117,7 @@ export interface Report {
   platform_brand: string;
   platform: string;
   cpu: string;
+  cpu_codename?: string;
   wlan: string;
   wifi_name?: string;
   wifi_band?: string;
@@ -158,6 +159,7 @@ export interface PlatformStatusProps {
   platform_brand: string | null;
   platform: string | null;
   cpu: string | null;
+  cpu_codename?: string | null;
   wlan: string | null;
   report_date: string | null;
 }

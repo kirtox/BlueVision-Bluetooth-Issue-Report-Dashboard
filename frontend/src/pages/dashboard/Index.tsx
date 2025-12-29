@@ -153,6 +153,7 @@ const Dashboard = () => {
       platform_phase: '',
       platform_bios: '',
       cpu: '',
+      cpu_codename: '',
       wlan: '',
       wlan_phase: '',
       wifi_name: '',
@@ -256,7 +257,7 @@ const Dashboard = () => {
       item.op_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.platform_brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.platform.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.cpu.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.cpu_codename && item.cpu_codename.toLowerCase().includes(searchTerm.toLowerCase())) ||
       item.wlan.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.scenario.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.bt_driver.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -268,7 +269,7 @@ const Dashboard = () => {
     const matchesPlatform =
       selectedPlatforms.length === 0 || selectedPlatforms.includes(item.platform);
     const matchesCPU =
-      selectedCPUs.length === 0 || selectedCPUs.includes(item.cpu);
+      selectedCPUs.length === 0 || selectedCPUs.includes(item.cpu_codename || item.cpu);
     const matchesWlan =
       selectedWlans.length === 0 || selectedWlans.includes(item.wlan);
     const matchesScenario =
@@ -389,7 +390,7 @@ const Dashboard = () => {
                 selectedPlatforms={selectedPlatforms}
                 setSelectedPlatforms={setSelectedPlatforms}
 
-                cpuOptions={[...new Set(reports.map(r => r.cpu))]}
+                cpuOptions={[...new Set(reports.map(r => r.cpu_codename || r.cpu).filter(Boolean))]}
                 selectedCPUs={selectedCPUs}
                 setSelectedCPUs={setSelectedCPUs}
 

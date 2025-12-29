@@ -89,7 +89,17 @@ def get_reports_filtered(
     return query.all()
 
 def create_report(db: Session, report: ReportCreate):
-    db_report = models.Report(**report.dict())
+    from .cpu_translater import identify_intel_cpu
+    
+    # Convert report to dict
+    report_dict = report.dict()
+    
+    # Generate CPU codename if CPU data is provided
+    if report_dict.get('cpu'):
+        cpu_codename = identify_intel_cpu(report_dict['cpu'])
+        report_dict['cpu_codename'] = cpu_codename
+    
+    db_report = models.Report(**report_dict)
     db.add(db_report)
     db.commit()
     db.refresh(db_report)
@@ -114,8 +124,8 @@ def delete_report(db: Session, report_id: int):
     return {"deleted": True}
 
 def get_cpu_stats(db: Session):
-    result = db.query(models.Report.cpu, func.count(models.Report.cpu)).group_by(models.Report.cpu).all()
-    return [{"cpu": cpu, "count": count} for cpu, count in result]
+    result = db.query(models.Report.cpu_codename, func.count(models.Report.cpu_codename)).group_by(models.Report.cpu_codename).all()
+    return [{"cpu": cpu_codename, "count": count} for cpu_codename, count in result if cpu_codename is not None]
 
 # Platform CRUD
 def get_platforms(db: Session):

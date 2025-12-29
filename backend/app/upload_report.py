@@ -38,7 +38,7 @@ REPORT_DATA = {
     "platform": "Tributo",
     "platform_phase": "EVT",
     "platform_bios": "BIOS_v1.0",
-    "cpu": "LNL",
+    "cpu": "Intel(R) Core(TM) Ultra 7 358H",
     "wlan": "BE200",
     "wlan_phase": "QS",
     "wifi_name": "TestWiFi",

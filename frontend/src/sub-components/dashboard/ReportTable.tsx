@@ -201,8 +201,8 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
           <th onClick={() => handleSort('platform')} style={{ cursor: 'pointer' }}>
             Platform {sortField === 'platform' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
           </th>
-          <th onClick={() => handleSort('cpu')} style={{ cursor: 'pointer' }}>
-            CPU {sortField === 'cpu' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+          <th onClick={() => handleSort('cpu_codename')} style={{ cursor: 'pointer' }}>
+            CPU Codename {sortField === 'cpu_codename' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
           </th>
           <th onClick={() => handleSort('wlan')} style={{ cursor: 'pointer' }}>
             WLAN {sortField === 'wlan' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
@@ -242,7 +242,7 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
               <td className="align-middle">{new Date(item.date).toLocaleString()}</td>
               <td className="align-middle">{item.platform_brand}</td>
               <td className="align-middle">{item.platform}</td>
-              <td className="align-middle">{item.cpu}</td>
+              <td className="align-middle">{item.cpu_codename || item.cpu}</td>
               <td className="align-middle">{item.wlan}</td>
               <td className="align-middle">{item.wifi_name || ''}</td>
               <td className="align-middle">{item.wifi_band || ''}</td>
@@ -378,7 +378,7 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
               <li><b>Date:</b> {new Date(deletingReport.date).toLocaleString()}</li>
               <li><b>Platform Brand:</b> {deletingReport.platform_brand}</li>
               <li><b>Platform:</b> {deletingReport.platform}</li>
-              <li><b>CPU:</b> {deletingReport.cpu}</li>
+              <li><b>CPU:</b> {deletingReport.cpu_codename || deletingReport.cpu}</li>
               <li><b>WLAN:</b> {deletingReport.wlan}</li>
               <li><b>BT driver:</b> {deletingReport.bt_driver}</li>
               <li><b>Wi-Fi driver:</b> {deletingReport.wifi_driver}</li>

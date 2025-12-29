@@ -20,6 +20,7 @@ class Report(Base):
     platform_phase = Column(String, nullable=False)
     platform_bios = Column(String, nullable=False)
     cpu = Column(String, nullable=False)
+    cpu_codename = Column(String, nullable=True)
     wlan = Column(String, nullable=False)
     wlan_phase = Column(String, nullable=False)
     wifi_name = Column(String, nullable=True)

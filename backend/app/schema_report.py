@@ -13,6 +13,7 @@ class ReportBase(BaseModel):
     platform_phase: Optional[str] = None
     platform_bios: Optional[str] = None
     cpu: Optional[str] = None
+    cpu_codename: Optional[str] = None
     wlan: Optional[str] = None
     wlan_phase: Optional[str] = None
     wifi_name: Optional[str] = None
