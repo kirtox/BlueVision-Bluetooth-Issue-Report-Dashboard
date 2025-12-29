@@ -130,6 +130,7 @@ export interface Report {
   fail_rate: string;
   // current_status: string;
   log_path: string;
+  comment?: string;
   [key: string]: any; // ← To accommodate extra fields
 }
 

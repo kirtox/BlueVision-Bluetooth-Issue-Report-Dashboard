@@ -119,7 +119,8 @@ REPORT_DATA = {
     "duration": "108000",  # 30 hours in seconds
     "sys_event_log": None,
     
-    "log_path": "/logs/script_upload"
+    "log_path": "/logs/script_upload",
+    "comment": None
 }
 # ==================== END OF REPORT DATA DEFINITION ====================
 

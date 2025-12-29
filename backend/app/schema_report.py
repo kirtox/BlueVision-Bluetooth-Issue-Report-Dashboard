@@ -91,6 +91,7 @@ class ReportBase(BaseModel):
     sys_event_log: Optional[str] = None
 
     log_path: Optional[str] = None
+    comment: Optional[str] = None
 
 class ReportCreate(ReportBase):
     pass

@@ -247,7 +247,8 @@ def generate_random_report():
         "fail_cycles": random.choice(fail_cycles[res]),
         "cycles": random.choice(cycles[res]),
         "duration": random.choice(duration_options),
-        "log_path": random.choice(log_path)
+        "log_path": random.choice(log_path),
+        "comment": None
     }
     return r
 

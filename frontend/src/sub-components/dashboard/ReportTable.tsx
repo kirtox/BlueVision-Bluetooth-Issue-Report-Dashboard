@@ -228,8 +228,8 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
           <th onClick={() => handleSort('fail_rate')} style={{ cursor: 'pointer' }}>
             Fail Rate {sortField === 'fail_rate' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
           </th>
-          <th onClick={() => handleSort('log_path')} style={{ cursor: 'pointer' }}>
-            Log {sortField === 'log_path' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+          <th onClick={() => handleSort('comment')} style={{ cursor: 'pointer' }}>
+            Comment {sortField === 'comment' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
           </th>
           <th></th>
         </tr>
@@ -285,9 +285,9 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
                 )}
               </td>
               <td className="align-middle">
-                <a href={item.log_path} className="text-blue-600 underline" target="_blank" rel="noreferrer">
-                  Log Link
-                </a>
+                <div style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {item.comment || ''}
+                </div>
               </td>
               <td className="align-middle">
                 {/* <ActionMenu /> */}

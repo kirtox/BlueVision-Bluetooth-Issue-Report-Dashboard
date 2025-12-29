@@ -57,31 +57,31 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
         // onChange={(e) => {
         //     const value = e.target.value;
         //     handleFieldChange(field, value);
-    
+
         //     // If Modern Standby is selected as N, clear dependent fields
         //     if (field === "modern_standby" && value === "N") {
         //       handleFieldChange("ms_period", "");
         //       handleFieldChange("ms_os_waiting_time", "");
         //     }
-    
+
         //     // If Hibernation is selected as N, clear dependent fields
         //     if (field === "s4" && value === "N") {
         //       handleFieldChange("s4_period", "");
         //       handleFieldChange("s4_os_waiting_time", "");
         //     }
-    
+
         //     // If Warm Boot is selected as N, clear dependent fields
         //     if (field === "warm_boot" && value === "N") {
         //       handleFieldChange("wb_period", "");
         //       handleFieldChange("wb_os_waiting_time", "");
         //     }
-    
+
         //     // If Cold Boot is selected as N, clear dependent fields
         //     if (field === "cold_boot" && value === "N") {
         //       handleFieldChange("cb_period", "");
         //       handleFieldChange("cb_os_waiting_time", "");
         //     }
-    
+
         //     // APM clear APM period
         //     if (field === "apm" && value === "N") {
         //       handleFieldChange("apm_period", "");
@@ -96,7 +96,7 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
       </Form.Select>
     </Form.Group>
   );
-  
+
 
   return (
     <Form>
@@ -107,10 +107,10 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
           <Card.Title className="fw-bold">Operator</Card.Title>
           <Row>
             {renderField(
-              "Operator", 
-              "op_name", 
-              "text", 
-              6, 
+              "Operator",
+              "op_name",
+              "text",
+              6,
               // User role cannot edit op_name, Administrator can
               user?.role === "User" || readonly
             )}
@@ -130,7 +130,7 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
       {/* System Info. */}
       <Card className="mb-4 shadow-sm">
         <Card.Body>
-            <Card.Title className="fw-bold">System Information</Card.Title>
+          <Card.Title className="fw-bold">System Information</Card.Title>
           <Row>
             {renderField("OS Version", "os_version")}
             {renderField("Platform Brand", "platform_brand")}
@@ -267,6 +267,19 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
             {renderField("Duration (seconds)", "duration")}
             {renderField("Log Path", "log_path")}
             {/* {renderSelectField("Current Status", "current_status", ["Finish", "Running", "Stop"])} */}
+          </Row>
+          <Row>
+            <Form.Group as={Col} md={12} className="mb-3">
+              <Form.Label className="fw-bold">Comment</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={report.comment || ""}
+                onChange={(e) => handleFieldChange("comment", e.target.value)}
+                readOnly={readonly}
+                placeholder="Add any additional comments or notes..."
+              />
+            </Form.Group>
           </Row>
         </Card.Body>
       </Card>

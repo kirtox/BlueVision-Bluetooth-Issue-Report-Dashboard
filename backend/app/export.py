@@ -31,7 +31,7 @@ HEADERS = [
     "Cold Boot", "CB Period", "CB OS Waiting Time",
     "Microsoft Teams", "APM", "APM Period", "OPP", "Swift Pair",
     "Power Type", "Urgent Level", "Fix Work Week", "Fix BT Driver", "JIRA ID", "IPS ID", "HSD ID",
-    "Result", "Fail Cycles", "Cycles", "Duration (seconds)", "Sys Event Log", "Log Path"
+    "Result", "Fail Cycles", "Cycles", "Duration (seconds)", "Sys Event Log", "Log Path", "Comment"
 ]
 
 @router.get("/export/csv")
@@ -139,6 +139,7 @@ def export_csv(
             r.duration,
             r.sys_event_log,
             r.log_path,
+            getattr(r, 'comment', ''),
         ])
     stream.seek(0)
     return StreamingResponse(stream, media_type="text/csv", headers={"Content-Disposition": "attachment; filename=reports.csv"})
@@ -265,6 +266,7 @@ def export_excel(
         ws.cell(row=row, column=68, value=report.duration)
         ws.cell(row=row, column=69, value=report.sys_event_log)
         ws.cell(row=row, column=70, value=report.log_path)
+        ws.cell(row=row, column=71, value=getattr(report, 'comment', ''))
     
     # Auto adjust the width of columns 
     for column in ws.columns:

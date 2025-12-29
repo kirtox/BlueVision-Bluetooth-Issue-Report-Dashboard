@@ -98,6 +98,7 @@ class Report(Base):
     sys_event_log = Column(String)
 
     log_path = Column(String)
+    comment = Column(Text, nullable=True)
 
 class Platform(Base):
     __tablename__ = "platform"
