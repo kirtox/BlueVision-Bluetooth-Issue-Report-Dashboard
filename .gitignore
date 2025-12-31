@@ -205,3 +205,10 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Database backups
+# Exclude database backup files to prevent sensitive data from being committed
+db_backups/
+*.sql
+*.sql.gz
+*.dump
