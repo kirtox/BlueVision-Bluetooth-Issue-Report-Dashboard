@@ -123,6 +123,7 @@ const UserManagement: React.FC = () => {
 
       setShowEditModal(false);
       setSelectedUser(null);
+      setFormData({ username: '', email: '', password: '', role: 'User' });
       fetchUsers();
     } catch (error: any) {
       setError(error.message);
@@ -192,7 +193,10 @@ const UserManagement: React.FC = () => {
             <h1 className="h3 mb-0">User Management</h1>
             <Button
               variant="primary"
-              onClick={() => setShowCreateModal(true)}
+              onClick={() => {
+                setFormData({ username: '', email: '', password: '', role: 'User' });
+                setShowCreateModal(true);
+              }}
             >
               <i className="fe fe-plus me-1"></i>
               Create User
@@ -256,7 +260,7 @@ const UserManagement: React.FC = () => {
                           <Badge bg={
                             user.role === 'Administrator' ? 'success' :
                               user.role === 'User' ? 'primary' :
-                              user.role === 'Auditor' ? 'warning' : 'secondary'
+                                user.role === 'Auditor' ? 'warning' : 'secondary'
                           }>
                             {user.role}
                           </Badge>
@@ -345,7 +349,10 @@ const UserManagement: React.FC = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowCreateModal(false)}>
+          <Button variant="secondary" onClick={() => {
+            setShowCreateModal(false);
+            setFormData({ username: '', email: '', password: '', role: 'User' });
+          }}>
             Cancel
           </Button>
           <Button variant="primary" onClick={handleCreateUser}>
@@ -394,7 +401,11 @@ const UserManagement: React.FC = () => {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+          <Button variant="secondary" onClick={() => {
+            setShowEditModal(false);
+            setSelectedUser(null);
+            setFormData({ username: '', email: '', password: '', role: 'User' });
+          }}>
             Cancel
           </Button>
           <Button variant="primary" onClick={handleUpdateUser}>
