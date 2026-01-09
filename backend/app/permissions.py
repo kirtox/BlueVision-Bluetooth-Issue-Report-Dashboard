@@ -61,10 +61,11 @@ def check_report_ownership(user: models.User, report_id: int, db: Session) -> bo
     """
     Check if user can modify specified report
     - Administrator: Can modify any report
+    - Auditor: Can modify any report (like Administrator)
     - User: Can only modify their own reports (op_name == username)
     - Guest: Cannot modify any reports
     """
-    if user.role == "Administrator":
+    if user.role in ["Administrator", "Auditor"]:
         return True
     
     if user.role == "Guest":
@@ -128,19 +129,34 @@ class PermissionChecker:
     @staticmethod
     def can_create_report(user: models.User) -> bool:
         """Check if user can create reports"""
-        return user.role in ["Administrator", "User"]
+        return user.role in ["Administrator", "User", "Auditor"]
     
     @staticmethod
     def can_view_reports(user: models.User) -> bool:
         """Check if user can view reports"""
-        return user.role in ["Administrator", "User", "Guest"]
+        return user.role in ["Administrator", "User", "Guest", "Auditor"]
     
     @staticmethod
     def can_export_reports(user: models.User) -> bool:
         """Check if user can export reports"""
-        return user.role in ["Administrator", "User"]
+        return user.role in ["Administrator", "User", "Auditor"]
     
     @staticmethod
     def can_edit_profile(user: models.User) -> bool:
         """Check if user can edit profile"""
-        return user.role in ["Administrator", "User"]
+        return user.role in ["Administrator", "User", "Auditor"]
+    
+    @staticmethod
+    def can_view_all_reports(user: models.User) -> bool:
+        """Check if user can view all reports (not just their own)"""
+        return user.role in ["Administrator", "Auditor"]
+    
+    @staticmethod
+    def can_edit_all_reports(user: models.User) -> bool:
+        """Check if user can edit all reports (not just their own)"""
+        return user.role in ["Administrator", "Auditor"]
+    
+    @staticmethod
+    def can_view_platforms(user: models.User) -> bool:
+        """Check if user can view platforms"""
+        return user.role in ["Administrator", "User", "Guest", "Auditor"]

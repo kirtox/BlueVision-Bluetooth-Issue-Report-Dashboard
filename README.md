@@ -97,6 +97,8 @@ netsh interface portproxy show all
 This allows external devices on your LAN to access the dashboard services through the host machine.
 
 > If the podman compose didn't work successfully, the below steps should be work.
+>
+> Sometimes the below steps would not be able to enable the system after PC reboot. Remove NAT and 
 
 ```
 # Activate the services in order

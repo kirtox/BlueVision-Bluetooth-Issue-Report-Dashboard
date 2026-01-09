@@ -12,12 +12,15 @@ interface PermissionContextType {
     isAdmin: () => boolean;
     isUser: () => boolean;
     isGuest: () => boolean;
+    isAuditor: () => boolean;
 
     // Feature permission checks
     canCreateReport: () => boolean;
     canEditReport: (report: Report) => boolean;
+    canEditAllReports: () => boolean;
     canDeleteReport: (report: Report) => boolean;
     canViewReports: () => boolean;
+    canViewAllReports: () => boolean;
     canExportReports: () => boolean;
     canManageUsers: () => boolean;
     canViewLogs: () => boolean;
@@ -59,6 +62,10 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
         return user?.role === 'Guest';
     };
 
+    const isAuditor = (): boolean => {
+        return user?.role === 'Auditor';
+    };
+
     const hasRole = (role: string): boolean => {
         return user?.role === role;
     };
@@ -66,12 +73,12 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
     // Feature permission checks
     const canCreateReport = (): boolean => {
         if (!user) return false;
-        return ['Administrator', 'User'].includes(user.role);
+        return ['Administrator', 'User', 'Auditor'].includes(user.role);
     };
 
     const canEditReport = (report: Report): boolean => {
         if (!user) return false;
-        if (user.role === 'Administrator') return true;
+        if (user.role === 'Administrator' || user.role === 'Auditor') return true;
         if (user.role === 'User') {
             // Case-insensitive comparison
             const canEdit = report.op_name?.toLowerCase() === user.username?.toLowerCase();
@@ -85,9 +92,14 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
         return false;
     };
 
+    const canEditAllReports = (): boolean => {
+        if (!user) return false;
+        return ['Administrator', 'Auditor'].includes(user.role);
+    };
+
     const canDeleteReport = (report: Report): boolean => {
         if (!user) return false;
-        if (user.role === 'Administrator') return true;
+        if (user.role === 'Administrator' || user.role === 'Auditor') return true;
         if (user.role === 'User') {
             // Case-insensitive comparison
             const canDelete = report.op_name?.toLowerCase() === user.username?.toLowerCase();
@@ -103,12 +115,17 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
 
     const canViewReports = (): boolean => {
         if (!user) return false;
-        return ['Administrator', 'User', 'Guest'].includes(user.role);
+        return ['Administrator', 'User', 'Guest', 'Auditor'].includes(user.role);
+    };
+
+    const canViewAllReports = (): boolean => {
+        if (!user) return false;
+        return ['Administrator', 'Auditor'].includes(user.role);
     };
 
     const canExportReports = (): boolean => {
         if (!user) return false;
-        return ['Administrator', 'User'].includes(user.role);
+        return ['Administrator', 'User', 'Auditor'].includes(user.role);
     };
 
     const canManageUsers = (): boolean => {
@@ -128,7 +145,7 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
 
     const canEditProfile = (): boolean => {
         if (!user) return false;
-        return ['Administrator', 'User'].includes(user.role);
+        return ['Administrator', 'User', 'Auditor'].includes(user.role);
     };
 
     // General permission checks
@@ -136,13 +153,13 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
         if (!user) return false;
 
         const permissions: Record<string, string[]> = {
-            'reports.view': ['Administrator', 'User', 'Guest'],
-            'reports.create': ['Administrator', 'User'],
-            'reports.export': ['Administrator', 'User'],
+            'reports.view': ['Administrator', 'User', 'Guest', 'Auditor'],
+            'reports.create': ['Administrator', 'User', 'Auditor'],
+            'reports.export': ['Administrator', 'User', 'Auditor'],
             'users.manage': ['Administrator'],
             'logs.view': ['Administrator'],
             'platforms.manage': ['Administrator'],
-            'profile.edit': ['Administrator', 'User'],
+            'profile.edit': ['Administrator', 'User', 'Auditor'],
         };
 
         const allowedRoles = permissions[feature];
@@ -153,10 +170,13 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
         isAdmin,
         isUser,
         isGuest,
+        isAuditor,
         canCreateReport,
         canEditReport,
+        canEditAllReports,
         canDeleteReport,
         canViewReports,
+        canViewAllReports,
         canExportReports,
         canManageUsers,
         canViewLogs,

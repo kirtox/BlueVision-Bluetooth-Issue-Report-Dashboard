@@ -255,7 +255,8 @@ const UserManagement: React.FC = () => {
                         <td>
                           <Badge bg={
                             user.role === 'Administrator' ? 'success' :
-                              user.role === 'User' ? 'primary' : 'secondary'
+                              user.role === 'User' ? 'primary' :
+                              user.role === 'Auditor' ? 'warning' : 'secondary'
                           }>
                             {user.role}
                           </Badge>
@@ -337,6 +338,7 @@ const UserManagement: React.FC = () => {
               >
                 <option value="User">User</option>
                 <option value="Administrator">Administrator</option>
+                <option value="Auditor">Auditor</option>
                 <option value="Guest">Guest</option>
               </Form.Select>
             </Form.Group>
@@ -385,6 +387,7 @@ const UserManagement: React.FC = () => {
               >
                 <option value="User">User</option>
                 <option value="Administrator">Administrator</option>
+                <option value="Auditor">Auditor</option>
                 <option value="Guest">Guest</option>
               </Form.Select>
             </Form.Group>

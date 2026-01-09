@@ -129,6 +129,7 @@ def create_report(
         raise HTTPException(status_code=403, detail="Permission denied: Cannot create reports")
     
     # If User role, automatically set op_name to current username
+    # Auditor role can set op_name to any valid username
     if current_user.role == "User":
         report.op_name = current_user.username
     
