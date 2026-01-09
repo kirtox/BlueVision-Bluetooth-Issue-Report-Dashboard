@@ -125,6 +125,7 @@ class APIAccessLog(Base):
     method = Column(String, nullable=False)
     endpoint = Column(String, nullable=False)
     client_ip = Column(String, nullable=False)
+    username = Column(String, nullable=True)  # Username of the authenticated user, or "Python" for scripts
     user_agent = Column(String)
     request_body = Column(Text)  # Use Text type to store longer JSON content
     response_status = Column(Integer)

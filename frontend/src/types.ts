@@ -202,6 +202,7 @@ export interface APIAccessLog {
   method: string;
   endpoint: string;
   client_ip: string;
+  username?: string;
   user_agent?: string;
   request_body?: string;
   response_status?: number;

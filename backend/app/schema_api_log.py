@@ -8,6 +8,7 @@ class APIAccessLogInDB(BaseModel):
     method: str
     endpoint: str
     client_ip: str
+    username: Optional[str] = None
     user_agent: Optional[str] = None
     request_body: Optional[str] = None
     response_status: Optional[int] = None

@@ -6,6 +6,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from app.db import SessionLocal
 from app import crud
 from app.config import API_LOG_CONFIG
+from app.utils import verify_token
 import logging
 
 logger = logging.getLogger(__name__)
@@ -33,6 +34,9 @@ class APIAccessLogMiddleware(BaseHTTPMiddleware):
         user_agent = request.headers.get("user-agent", "")
         host = request.headers.get("host", "")
         referer = request.headers.get("referer", "")
+        
+        # Get username from JWT token
+        username = self.get_username_from_request(request)
         
         # Optional debug output
         if self.config.get("debug_print_request", False):
@@ -77,6 +81,7 @@ class APIAccessLogMiddleware(BaseHTTPMiddleware):
                 "method": method,
                 "endpoint": endpoint,
                 "client_ip": client_ip,
+                "username": username,
                 "user_agent": user_agent,
                 "request_body": request_body,
                 "response_status": response.status_code,
@@ -91,6 +96,33 @@ class APIAccessLogMiddleware(BaseHTTPMiddleware):
             logger.error(f"Failed to log API access: {e}")
         
         return response
+    
+    def get_username_from_request(self, request: Request) -> str:
+        """Extract username from JWT token in request headers"""
+        try:
+            # Check for Authorization header
+            auth_header = request.headers.get("authorization", "")
+            if not auth_header.startswith("Bearer "):
+                # Check if this is a Python script request based on user agent
+                user_agent = request.headers.get("user-agent", "").lower()
+                if any(python_indicator in user_agent for python_indicator in ["python", "requests", "urllib", "httpx"]):
+                    return "Python"
+                return None
+            
+            # Extract token
+            token = auth_header.split(" ")[1]
+            
+            # Verify token and get username
+            username = verify_token(token)
+            return username if username else None
+            
+        except Exception as e:
+            logger.debug(f"Failed to extract username from request: {e}")
+            # Check if this is a Python script request based on user agent
+            user_agent = request.headers.get("user-agent", "").lower()
+            if any(python_indicator in user_agent for python_indicator in ["python", "requests", "urllib", "httpx"]):
+                return "Python"
+            return None
     
     def print_request_summary(self, method: str, url: str, client_ip: str):
         """Print simple request info"""
