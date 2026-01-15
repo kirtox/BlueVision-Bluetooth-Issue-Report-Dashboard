@@ -65,8 +65,22 @@ podman-compose -p btird_prod -f podman-compose.prod.yml down
 
 For checking current status of each podman container:
 
-```bash
+```podman
 podman ps
+```
+
+**Correct build process:**
+
+```bash
+# To stop all services
+podman-compose -p btird_prod -f .\podman-compose.prod.yml down
+
+# Build the services that need to be built
+podman build -t btird_prod_backend -f backend/Dockerfile.prod backend/
+podman build -t btird_prod_frontend -f frontend/Dockerfile.prod frontend/
+
+# Restart all services (included db)
+podman-compose -p btird_prod -f .\podman-compose.prod.yml up -d
 ```
 
 ### 3. Production Environment Setup
@@ -98,7 +112,7 @@ This allows external devices on your LAN to access the dashboard services throug
 
 > If the podman compose didn't work successfully, the below steps should be work.
 >
-> Sometimes the below steps would not be able to enable the system after PC reboot. Remove NAT and 
+> Sometimes the below steps would not be able to enable the system after PC reboot. Remove NAT and
 
 ```
 # Activate the services in order
