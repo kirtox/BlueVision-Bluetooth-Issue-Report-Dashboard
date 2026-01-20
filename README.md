@@ -69,7 +69,7 @@ For checking current status of each podman container:
 podman ps
 ```
 
-**Correct build process:**
+**Another build process:**
 
 ```bash
 # To stop all services
@@ -97,12 +97,18 @@ Run the following commands in an **PowerShell / CMD**:
 
 ```bash
 # Add NAT
-netsh interface portproxy add v4tov4 listenaddress=myIP listenport=5174 connectaddress=127.0.0.1 connectport=5174
-netsh interface portproxy add v4tov4 listenaddress=myIP listenport=8001 connectaddress=127.0.0.1 connectport=8001
+netsh interface portproxy add v4tov4 listenaddress=192.168.70.122 listenport=5174 connectaddress=127.0.0.1 connectport=5174
+netsh interface portproxy add v4tov4 listenaddress=192.168.70.122 listenport=8001 connectaddress=127.0.0.1 connectport=8001
+
+netsh interface portproxy add v4tov4 listenaddress=10.225.74.155 listenport=5174 connectaddress=127.0.0.1 connectport=5174
+netsh interface portproxy add v4tov4 listenaddress=10.225.74.155 listenport=8001 connectaddress=127.0.0.1 connectport=8001
 
 # Remove NAT
-netsh interface portproxy delete v4tov4 listenaddress=myIP listenport=5174
-netsh interface portproxy delete v4tov4 listenaddress=myIP listenport=8001
+netsh interface portproxy delete v4tov4 listenaddress=192.168.70.122 listenport=5174
+netsh interface portproxy delete v4tov4 listenaddress=192.168.70.122 listenport=8001
+
+netsh interface portproxy delete v4tov4 listenaddress=10.225.74.155 listenport=5174
+netsh interface portproxy delete v4tov4 listenaddress=10.225.74.155 listenport=8001
 
 # Check NAT table
 netsh interface portproxy show all

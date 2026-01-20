@@ -16,7 +16,7 @@ services:
     networks:
       - app-network
     ports:
-      - "5174:80"
+      - "0.0.0.0:5174:80"  # 綁定所有網卡，讓兩個網域都能訪問
 
   backend:
     build:
@@ -40,7 +40,7 @@ services:
     networks:
       - app-network
     ports:
-      - "8001:8000"
+      - "0.0.0.0:8001:8000"  # 綁定所有網卡，讓兩個網域都能訪問
 
   db:
     image: postgres:15
