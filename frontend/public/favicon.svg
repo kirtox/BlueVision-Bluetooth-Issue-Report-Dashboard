@@ -1,0 +1,172 @@
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 主漸層 - 深藍到青藍 -->
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a46ff;stop-opacity:1"/>
+      <stop offset="50%" style="stop-color:#0093f0;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:1"/>
+    </linearGradient>
+    
+    <!-- 背景漸層 -->
+    <radialGradient id="bgGradient" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#0d1b2a;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#000510;stop-opacity:1"/>
+    </radialGradient>
+    
+    <!-- 光暈漸層 -->
+    <radialGradient id="auraGradient" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.3"/>
+      <stop offset="50%" style="stop-color:#0093f0;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#0a46ff;stop-opacity:0"/>
+    </radialGradient>
+    
+    <!-- 藍牙符號漸層 -->
+    <linearGradient id="bluetoothGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#35f0ff;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0093f0;stop-opacity:1"/>
+    </linearGradient>
+    
+    <!-- 發光濾鏡 -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3.4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="strongGlow">
+      <feGaussianBlur stdDeviation="5.1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- 陰影 -->
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="3.4" stdDeviation="6.8" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="256" height="256" fill="url(#bgGradient)"/>
+  
+  <!-- 光暈背景 -->
+  <circle cx="128" cy="128" r="153" fill="url(#auraGradient)"/>
+  
+  <!-- 主體設計：六邊形視窗結構 -->
+  <g filter="url(#shadow)">
+    <!-- 外六邊形框架 -->
+    <path d="M 128 51 L 193.2 89.25 L 193.2 166.75 L 128 205 L 62.8 166.75 L 62.8 89.25 Z" 
+          fill="none" 
+          stroke="url(#mainGradient)" 
+          stroke-width="2.55"
+          filter="url(#glow)"
+          opacity="0.9"/>
+    
+    <!-- 內六邊形 -->
+    <path d="M 128 68 L 176.8 102 L 176.8 154 L 128 188 L 79.2 154 L 79.2 102 Z" 
+          fill="none" 
+          stroke="#00d4ff" 
+          stroke-width="1.7"
+          opacity="0.6"/>
+    
+    <!-- 六邊形分割線 - 創造儀表板格線感 -->
+    <g opacity="0.4" stroke="#00d4ff" stroke-width="0.85">
+      <line x1="128" y1="51" x2="128" y2="205"/>
+      <line x1="62.8" y1="89.25" x2="193.2" y2="166.75"/>
+      <line x1="62.8" y1="166.75" x2="193.2" y2="89.25"/>
+    </g>
+    
+    <!-- 數據節點 -->
+    <g filter="url(#glow)">
+      <circle cx="128" cy="51" r="4.25" fill="#00d4ff"/>
+      <circle cx="193.2" cy="89.25" r="4.25" fill="#0093f0"/>
+      <circle cx="193.2" cy="166.75" r="4.25" fill="#0093f0"/>
+      <circle cx="128" cy="205" r="4.25" fill="#00d4ff"/>
+      <circle cx="62.8" cy="166.75" r="4.25" fill="#0093f0"/>
+      <circle cx="62.8" cy="89.25" r="4.25" fill="#0093f0"/>
+    </g>
+  </g>
+  
+  <!-- 中心藍牙符號 - 重新設計為幾何圖形 -->
+  <g transform="translate(128, 128)" filter="url(#strongGlow)">
+    <!-- 藍牙符號主體 -->
+    <g fill="url(#bluetoothGradient)">
+      <!-- 中央豎線 -->
+      <rect x="-1.7" y="-27.2" width="3.4" height="54.4" rx="1.7"/>
+      
+      <!-- 上半部三角 -->
+      <path d="M 1.7 -27.2 L 20.4 -10.2 L 1.7 0 Z" opacity="0.95"/>
+      
+      <!-- 下半部三角 -->
+      <path d="M 1.7 27.2 L 20.4 10.2 L 1.7 0 Z" opacity="0.95"/>
+      
+      <!-- 左側連接線 -->
+      <path d="M -1.7 0 L -15.3 -11.9 M -1.7 0 L -15.3 11.9" 
+            stroke="url(#bluetoothGradient)" 
+            stroke-width="2.55" 
+            stroke-linecap="round"
+            fill="none"/>
+    </g>
+    
+    <!-- 中心光點 -->
+    <circle cx="0" cy="0" r="5.1" fill="#35f0ff" opacity="0.6">
+      <animate attributeName="r" values="5.1;6.8;5.1" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.6;0.9;0.6" dur="2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- 環繞軌道線 -->
+  <g opacity="0.3" fill="none" stroke="#00d4ff" stroke-width="0.85" stroke-dasharray="3.4,3.4">
+    <circle cx="128" cy="128" r="85">
+      <animateTransform 
+        attributeName="transform"
+        type="rotate"
+        from="0 128 128"
+        to="360 128 128"
+        dur="20s"
+        repeatCount="indefinite"/>
+    </circle>
+    <circle cx="128" cy="128" r="102">
+      <animateTransform 
+        attributeName="transform"
+        type="rotate"
+        from="360 128 128"
+        to="0 128 128"
+        dur="25s"
+        repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- 數據流動效果點 -->
+  <g filter="url(#glow)">
+    <!-- 上方流動點 -->
+    <circle cx="128" cy="51" r="3.4" fill="#35f0ff">
+      <animate attributeName="cy" values="51;89.25;51" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- 右上流動點 -->
+    <circle cx="193.2" cy="89.25" r="3.4" fill="#0093f0">
+      <animate attributeName="cx" values="193.2;160.6;193.2" dur="3.5s" begin="0.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" dur="3.5s" begin="0.5s" repeatCount="indefinite"/>
+    </circle>
+    
+    <!-- 右下流動點 -->
+    <circle cx="193.2" cy="166.75" r="3.4" fill="#0093f0">
+      <animate attributeName="cy" values="166.75;128;166.75" dur="4s" begin="1s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0;1;0" dur="4s" begin="1s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+  
+  <!-- 裝飾性弧線 - 形成雷達掃描感 -->
+  <g opacity="0.25" fill="none" stroke="url(#mainGradient)" stroke-width="1.7" stroke-linecap="round">
+    <path d="M 79.2 60 Q 102 51 128 51"/>
+    <path d="M 176.8 60 Q 154 51 128 51"/>
+    <path d="M 79.2 196 Q 102 205 128 205"/>
+    <path d="M 176.8 196 Q 154 205 128 205"/>
+  </g>
+</svg>

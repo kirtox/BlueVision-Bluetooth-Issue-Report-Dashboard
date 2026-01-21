@@ -72,7 +72,7 @@ const SignIn = () => {
             <div className="mb-4">
               <Link to="/">
                 <Image
-                  src="/images/brand/logo/logo-primary.svg"
+                  src="/images/banner/logo-primary-light.svg"
                   className="mb-2"
                   alt=""
                 />
