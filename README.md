@@ -20,7 +20,7 @@ The project provides both backend and frontend components, supports containerize
 ## 📂 Project Structure
 
 ```
-Bluetooth-Issue-Report-Dashboard/
+BlueSight-Bluetooth-Issue-Report-Dashboard/
 ├── backend/                 # Backend services and APIs
 ├── frontend/                # Frontend dashboard (UI)
 ├── db_backups/              # Database backup files
@@ -48,20 +48,20 @@ For development:
 
 ```bash
 # Run in PowerShell window
-podman-compose -p btird_dev -f podman-compose.dev.yml up --build
+podman-compose -p bluesight_dev -f podman-compose.dev.yml up --build
 
 # Stop
-podman-compose -p btird_dev -f podman-compose.dev.yml down
+podman-compose -p bluesight_dev -f podman-compose.dev.yml down
 ```
 
 For production:
 
 ```bash
 # Run in background
-podman-compose -p btird_prod -f podman-compose.prod.yml up --build -d
+podman-compose -p bluesight_prod -f podman-compose.prod.yml up --build -d
 
 # Stop
-podman-compose -p btird_prod -f podman-compose.prod.yml down
+podman-compose -p bluesight_prod -f podman-compose.prod.yml down
 ```
 
 For checking current status of each podman container:
@@ -74,14 +74,14 @@ podman ps
 
 ```bash
 # To stop all services
-podman-compose -p btird_prod -f .\podman-compose.prod.yml down
+podman-compose -p bluesight_prod -f .\podman-compose.prod.yml down
 
 # Build the services that need to be built
-podman build -t btird_prod_backend -f backend/Dockerfile.prod backend/
-podman build -t btird_prod_frontend -f frontend/Dockerfile.prod frontend/
+podman build -t bluesight_prod_backend -f backend/Dockerfile.prod backend/
+podman build -t bluesight_prod_frontend -f frontend/Dockerfile.prod frontend/
 
 # Restart all services (included db)
-podman-compose -p btird_prod -f .\podman-compose.prod.yml up -d
+podman-compose -p bluesight_prod -f .\podman-compose.prod.yml up -d
 ```
 
 ### 3. Production Environment Setup
@@ -123,12 +123,12 @@ This allows external devices on your LAN to access the dashboard services throug
 
 ```
 # Activate the services in order
-podman-compose -p btird_prod -f .\podman-compose.prod.yml up -d db
-podman-compose -p btird_prod -f .\podman-compose.prod.yml up -d db-backup
+podman-compose -p bluesight_prod -f .\podman-compose.prod.yml up -d db
+podman-compose -p bluesight_prod -f .\podman-compose.prod.yml up -d db-backup
 # Wait the db check successfully
-podman-compose -p btird_prod -f .\podman-compose.prod.yml up -d backend
+podman-compose -p bluesight_prod -f .\podman-compose.prod.yml up -d backend
 # Wait the backend activating
-podman-compose -p btird_prod -f .\podman-compose.prod.yml up -d frontend
+podman-compose -p bluesight_prod -f .\podman-compose.prod.yml up -d frontend
 ```
 
 ---
