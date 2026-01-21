@@ -1,4 +1,5 @@
-# Bluetooth Issue Report Dashboard (BTIRD)
+# BlueSight
+## Bluetooth Issue Report Dashboard
 
 A dashboard for collecting, visualizing, and reporting Bluetooth issue data.
 The project provides both backend and frontend components, supports containerized deployment, and is designed to streamline Bluetooth testing and debugging workflows.
@@ -37,8 +38,8 @@ Bluetooth-Issue-Report-Dashboard/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/kirtox/Bluetooth-Issue-Report-Dashboard.git
-cd Bluetooth-Issue-Report-Dashboard
+git clone https://github.com/kirtox/BlueSight-Bluetooth-Issue-Report-Dashboard.git
+cd BlueSight-Bluetooth-Issue-Report-Dashboard
 ```
 
 ### 2. Podman Compose Commands by PowerShell
