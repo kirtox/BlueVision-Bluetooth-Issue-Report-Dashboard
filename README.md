@@ -1,5 +1,9 @@
-# BlueSight
+# BlueVision
 ## Bluetooth Issue Report Dashboard
+
+   {\_/}
+{\ (OwO)
+{ \/>  )>
 
 A dashboard for collecting, visualizing, and reporting Bluetooth issue data.
 The project provides both backend and frontend components, supports containerized deployment, and is designed to streamline Bluetooth testing and debugging workflows.
@@ -20,7 +24,7 @@ The project provides both backend and frontend components, supports containerize
 ## 📂 Project Structure
 
 ```
-BlueSight-Bluetooth-Issue-Report-Dashboard/
+BlueVision-Bluetooth-Issue-Report-Dashboard/
 ├── backend/                 # Backend services and APIs
 ├── frontend/                # Frontend dashboard (UI)
 ├── db_backups/              # Database backup files
@@ -38,8 +42,8 @@ BlueSight-Bluetooth-Issue-Report-Dashboard/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/kirtox/BlueSight-Bluetooth-Issue-Report-Dashboard.git
-cd BlueSight-Bluetooth-Issue-Report-Dashboard
+git clone https://github.com/kirtox/BlueVision-Bluetooth-Issue-Report-Dashboard.git
+cd BlueVision-Bluetooth-Issue-Report-Dashboard
 ```
 
 ### 2. Podman Compose Commands by PowerShell
@@ -48,20 +52,20 @@ For development:
 
 ```bash
 # Run in PowerShell window
-podman-compose -p bluesight_dev -f podman-compose.dev.yml up --build
+podman-compose -p BlueVision_dev -f podman-compose.dev.yml up --build
 
 # Stop
-podman-compose -p bluesight_dev -f podman-compose.dev.yml down
+podman-compose -p BlueVision_dev -f podman-compose.dev.yml down
 ```
 
 For production:
 
 ```bash
 # Run in background
-podman-compose -p bluesight_prod -f podman-compose.prod.yml up --build -d
+podman-compose -p BlueVision_prod -f podman-compose.prod.yml up --build -d
 
 # Stop
-podman-compose -p bluesight_prod -f podman-compose.prod.yml down
+podman-compose -p BlueVision_prod -f podman-compose.prod.yml down
 ```
 
 For checking current status of each podman container:
@@ -74,14 +78,14 @@ podman ps
 
 ```bash
 # To stop all services
-podman-compose -p bluesight_prod -f .\podman-compose.prod.yml down
+podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml down
 
 # Build the services that need to be built
-podman build -t bluesight_prod_backend -f backend/Dockerfile.prod backend/
-podman build -t bluesight_prod_frontend -f frontend/Dockerfile.prod frontend/
+podman build -t BlueVision_prod_backend -f backend/Dockerfile.prod backend/
+podman build -t BlueVision_prod_frontend -f frontend/Dockerfile.prod frontend/
 
 # Restart all services (included db)
-podman-compose -p bluesight_prod -f .\podman-compose.prod.yml up -d
+podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d
 ```
 
 ### 3. Production Environment Setup
@@ -123,12 +127,12 @@ This allows external devices on your LAN to access the dashboard services throug
 
 ```
 # Activate the services in order
-podman-compose -p bluesight_prod -f .\podman-compose.prod.yml up -d db
-podman-compose -p bluesight_prod -f .\podman-compose.prod.yml up -d db-backup
+podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d db
+podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d db-backup
 # Wait the db check successfully
-podman-compose -p bluesight_prod -f .\podman-compose.prod.yml up -d backend
+podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d backend
 # Wait the backend activating
-podman-compose -p bluesight_prod -f .\podman-compose.prod.yml up -d frontend
+podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d frontend
 ```
 
 ---

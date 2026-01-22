@@ -1,0 +1,42 @@
+<svg width="300" height="100" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Wireless Signal Icon -->
+  <g id="wireless-icon">
+    <!-- Outer signal wave -->
+    <path d="M 50 50 Q 30 30, 20 50" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    <path d="M 50 50 Q 70 30, 80 50" fill="none" stroke="#2563eb" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+    
+    <!-- Middle signal wave -->
+    <path d="M 50 50 Q 35 37, 28 50" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+    <path d="M 50 50 Q 65 37, 72 50" fill="none" stroke="#3b82f6" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+    
+    <!-- Inner signal wave -->
+    <path d="M 50 50 Q 40 44, 36 50" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 50 50 Q 60 44, 64 50" fill="none" stroke="#60a5fa" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Center dot -->
+    <circle cx="50" cy="50" r="5" fill="#2563eb"/>
+    
+    <!-- Vision eye element integrated -->
+    <ellipse cx="50" cy="70" rx="18" ry="10" fill="none" stroke="#2563eb" stroke-width="2" opacity="0.7"/>
+    <circle cx="50" cy="70" r="4" fill="#2563eb" opacity="0.7"/>
+  </g>
+  
+  <!-- BlueVision Text -->
+  <g id="text">
+    <text x="110" y="55" font-family="'Segoe UI', Arial, sans-serif" font-size="32" font-weight="bold" fill="#2563eb">
+      Blue
+    </text>
+    <text x="110" y="55" font-family="'Segoe UI', Arial, sans-serif" font-size="32" font-weight="300" fill="#60a5fa">
+      <tspan dx="75">Vision</tspan>
+    </text>
+  </g>
+  
+  <!-- Decorative network nodes -->
+  <g id="network-dots" opacity="0.4">
+    <circle cx="95" cy="25" r="2.5" fill="#60a5fa"/>
+    <circle cx="105" cy="20" r="2" fill="#3b82f6"/>
+    <circle cx="115" cy="25" r="2.5" fill="#60a5fa"/>
+    <line x1="95" y1="25" x2="105" y2="20" stroke="#60a5fa" stroke-width="1"/>
+    <line x1="105" y1="20" x2="115" y2="25" stroke="#60a5fa" stroke-width="1"/>
+  </g>
+</svg>

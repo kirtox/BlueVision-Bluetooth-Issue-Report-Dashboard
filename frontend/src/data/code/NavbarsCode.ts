@@ -1,7 +1,7 @@
 export const DefaultNavbar = `   
 <Navbar expand="lg">                             
     <Navbar.Brand href="#home">
-        <Image src="/images/brand/logo/logo-primary.svg" alt="" loading="lazy"/> 
+        <Image src="/images/brand/logo/logo-bluevision.svg" alt="" loading="lazy"/> 
     </Navbar.Brand>
     <Navbar.Toggle aria-controls="basic-navbar-nav" />
     <Navbar.Collapse id="basic-navbar-nav">

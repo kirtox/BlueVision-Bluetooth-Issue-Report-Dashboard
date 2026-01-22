@@ -1,0 +1,308 @@
+<svg viewBox="0 0 700 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 主漸層 - 深藍到青藍 -->
+    <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a46ff;stop-opacity:1"/>
+      <stop offset="50%" style="stop-color:#0093f0;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:1"/>
+    </linearGradient>
+    
+    <!-- 背景漸層 -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#000510;stop-opacity:1"/>
+      <stop offset="50%" style="stop-color:#0d1b2a;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#000510;stop-opacity:1"/>
+    </linearGradient>
+    
+    <!-- 光暈漸層 -->
+    <radialGradient id="auraGradient" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.3"/>
+      <stop offset="50%" style="stop-color:#0093f0;stop-opacity:0.15"/>
+      <stop offset="100%" style="stop-color:#0a46ff;stop-opacity:0"/>
+    </radialGradient>
+    
+    <!-- WiFi漸層 -->
+    <linearGradient id="wifiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#35f0ff;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:1"/>
+    </linearGradient>
+    
+    <!-- 藍牙符號漸層 -->
+    <linearGradient id="bluetoothGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#35f0ff;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0093f0;stop-opacity:1"/>
+    </linearGradient>
+    
+    <!-- 發光濾鏡 -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="strongGlow">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <!-- 陰影 -->
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- 背景 -->
+  <rect width="700" height="300" fill="url(#bgGradient)"/>
+  
+  <!-- 左側圖標區域 -->
+  <g transform="translate(167, 150)">
+    <!-- 光暈背景 -->
+    <circle cx="0" cy="0" r="135" fill="url(#auraGradient)"/>
+    
+    <!-- 主體設計：六邊形視窗結構 -->
+    <g filter="url(#shadow)">
+      <!-- 外六邊形框架 -->
+      <path d="M 0 -77 L 65.2 -38.75 L 65.2 38.75 L 0 77 L -65.2 38.75 L -65.2 -38.75 Z" 
+            fill="none" 
+            stroke="url(#mainGradient)" 
+            stroke-width="3"
+            filter="url(#glow)"
+            opacity="0.9"/>
+      
+      <!-- 內六邊形 -->
+      <path d="M 0 -60 L 48.8 -30 L 48.8 30 L 0 60 L -48.8 30 L -48.8 -30 Z" 
+            fill="none" 
+            stroke="#00d4ff" 
+            stroke-width="2"
+            opacity="0.6"/>
+      
+      <!-- 六邊形分割線 - 創造儀表板格線感 -->
+      <g opacity="0.4" stroke="#00d4ff" stroke-width="1">
+        <line x1="0" y1="-77" x2="0" y2="77"/>
+        <line x1="-65.2" y1="-38.75" x2="65.2" y2="38.75"/>
+        <line x1="-65.2" y1="38.75" x2="65.2" y2="-38.75"/>
+      </g>
+      
+      <!-- 數據節點 -->
+      <g filter="url(#glow)">
+        <circle cx="0" cy="-77" r="5" fill="#00d4ff"/>
+        <circle cx="65.2" cy="-38.75" r="5" fill="#0093f0"/>
+        <circle cx="65.2" cy="38.75" r="5" fill="#0093f0"/>
+        <circle cx="0" cy="77" r="5" fill="#00d4ff"/>
+        <circle cx="-65.2" cy="38.75" r="5" fill="#0093f0"/>
+        <circle cx="-65.2" cy="-38.75" r="5" fill="#0093f0"/>
+      </g>
+    </g>
+    
+    <!-- 中央輪流出現設計 -->
+    <g filter="url(#strongGlow)">
+      <!-- WiFi符號 - 輪流出現 -->
+      <g opacity="1">
+        <!-- WiFi同心圓波 -->
+        <g fill="none" stroke="url(#wifiGrad)" stroke-linecap="round">
+          <!-- 最外層 -->
+          <path d="M -20 10 Q -20 -5, 0 -25 Q 20 -5, 20 10" stroke-width="2.5" opacity="0.7">
+            <animate attributeName="opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite"/>
+          </path>
+          
+          <!-- 中層 -->
+          <path d="M -13 8 Q -13 0, 0 -15 Q 13 0, 13 8" stroke-width="2.5" opacity="0.85">
+            <animate attributeName="opacity" values="0.85;1;0.85" dur="2.5s" begin="0.3s" repeatCount="indefinite"/>
+          </path>
+          
+          <!-- 內層 -->
+          <path d="M -6 6 Q -6 2, 0 -5 Q 6 2, 6 6" stroke-width="2.5" opacity="1">
+            <animate attributeName="opacity" values="1;0.8;1" dur="2.5s" begin="0.6s" repeatCount="indefinite"/>
+          </path>
+        </g>
+        
+        <!-- WiFi中心圓點 -->
+        <circle cx="0" cy="10" r="3" fill="url(#wifiGrad)">
+          <animate attributeName="r" values="3;4;3" dur="2s" repeatCount="indefinite"/>
+        </circle>
+        
+        <!-- WiFi輪流顯示動畫 -->
+        <animate attributeName="opacity" values="1;1;1;0;0;0;1;1;1" dur="6s" repeatCount="indefinite"/>
+      </g>
+      
+      <!-- 藍牙符號 - 輪流出現（與WiFi相反） -->
+      <g opacity="0">
+        <g fill="url(#bluetoothGradient)">
+          <!-- 中央豎線 -->
+          <rect x="-1.5" y="-20" width="3" height="40" rx="1.5"/>
+          
+          <!-- 上半部三角 -->
+          <path d="M 1.5 -20 L 15 -8 L 1.5 -2 Z" opacity="0.95"/>
+          
+          <!-- 下半部三角 -->
+          <path d="M 1.5 20 L 15 8 L 1.5 2 Z" opacity="0.95"/>
+          
+          <!-- 左側連接線 -->
+          <path d="M -1.5 0 L -10 -10 M -1.5 0 L -10 10" 
+                stroke="url(#bluetoothGradient)" 
+                stroke-width="2" 
+                stroke-linecap="round"
+                fill="none"/>
+        </g>
+        
+        <!-- 藍牙中心光點脈動 -->
+        <circle cx="0" cy="0" r="4" fill="#35f0ff" opacity="0.8">
+          <animate attributeName="r" values="4;5.5;4" dur="1.8s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.8;0.5;0.8" dur="1.8s" repeatCount="indefinite"/>
+        </circle>
+        
+        <!-- 藍牙輪流顯示動畫（與WiFi相反） -->
+        <animate attributeName="opacity" values="0;0;0;1;1;1;0;0;0" dur="6s" repeatCount="indefinite"/>
+      </g>
+      
+      <!-- 中央融合光點 - 始終存在 -->
+      <circle cx="0" cy="0" r="5.5" fill="#35f0ff" opacity="0.7">
+        <animate attributeName="r" values="5.5;7;5.5" dur="1.5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.7;0.4;0.7" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      
+      <!-- 融合能量環 - 持續脈動 -->
+      <g opacity="0.45">
+        <circle cx="0" cy="0" r="20" fill="none" stroke="url(#wifiGrad)" stroke-width="1.3">
+          <animate attributeName="r" values="16;28;16" dur="2.8s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.6;0;0.6" dur="2.8s" repeatCount="indefinite"/>
+        </circle>
+        <circle cx="0" cy="0" r="20" fill="none" stroke="url(#bluetoothGradient)" stroke-width="1.3">
+          <animate attributeName="r" values="16;28;16" dur="2.8s" begin="1.4s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.6;0;0.6" dur="2.8s" begin="1.4s" repeatCount="indefinite"/>
+        </circle>
+      </g>
+    </g>
+    
+    <!-- 環繞軌道線 -->
+    <g opacity="0.3" fill="none" stroke="#00d4ff" stroke-width="1" stroke-dasharray="4,4">
+      <circle cx="0" cy="0" r="85">
+        <animateTransform 
+          attributeName="transform"
+          type="rotate"
+          from="0 0 0"
+          to="360 0 0"
+          dur="20s"
+          repeatCount="indefinite"/>
+      </circle>
+      <circle cx="0" cy="0" r="102">
+        <animateTransform 
+          attributeName="transform"
+          type="rotate"
+          from="360 0 0"
+          to="0 0 0"
+          dur="25s"
+          repeatCount="indefinite"/>
+      </circle>
+    </g>
+    
+    <!-- 數據流動效果點 -->
+    <g filter="url(#glow)">
+      <circle cx="0" cy="-77" r="4" fill="#35f0ff">
+        <animate attributeName="cy" values="-77;-38.75;-77" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="3s" repeatCount="indefinite"/>
+      </circle>
+      
+      <circle cx="65.2" cy="-38.75" r="4" fill="#0093f0">
+        <animate attributeName="cx" values="65.2;32.6;65.2" dur="3.5s" begin="0.5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="3.5s" begin="0.5s" repeatCount="indefinite"/>
+      </circle>
+      
+      <circle cx="65.2" cy="38.75" r="4" fill="#0093f0">
+        <animate attributeName="cy" values="38.75;0;38.75" dur="4s" begin="1s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="4s" begin="1s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+    
+    <!-- 裝飾性弧線 - 形成雷達掃描感 -->
+    <g opacity="0.25" fill="none" stroke="url(#mainGradient)" stroke-width="2" stroke-linecap="round">
+      <path d="M -48.8 -68 Q -24.4 -77 0 -77"/>
+      <path d="M 48.8 -68 Q 24.4 -77 0 -77"/>
+      <path d="M -48.8 68 Q -24.4 77 0 77"/>
+      <path d="M 48.8 68 Q 24.4 77 0 77"/>
+    </g>
+  </g>
+  
+  <!-- 分隔線 -->
+  <line x1="233" y1="80" x2="233" y2="220" stroke="url(#mainGradient)" stroke-width="1.5" opacity="0.4"/>
+  
+  <!-- 右側文字區域 -->
+  <g transform="translate(300, 0)">
+    <!-- 主標題 BlueVision -->
+    <text x="0" y="155" 
+          font-family="'Segoe UI', 'Arial', sans-serif"
+          font-size="62" 
+          font-weight="700"
+          fill="url(#mainGradient)" 
+          letter-spacing="2"
+          filter="url(#glow)">BlueVision</text>
+    
+    <!-- 副標題 WIRELESS DASHBOARD -->
+    <text x="0" y="192" 
+          font-family="'Segoe UI', 'Arial', sans-serif"
+          font-size="16" 
+          font-weight="300"
+          fill="#0093f0" 
+          letter-spacing="6"
+          opacity="0.8">WIRELESS DASHBOARD</text>
+    
+    <!-- 裝飾線 -->
+    <line x1="0" y1="215" x2="200" y2="215" stroke="url(#mainGradient)" stroke-width="1.5" opacity="0.4"/>
+    <circle cx="100" cy="215" r="3" fill="#00d4ff" filter="url(#glow)" opacity="0.7"/>
+  </g>
+  
+  <!-- 裝飾性背景元素 -->
+  <g opacity="0.15" fill="none" stroke="#00d4ff" stroke-width="1.5">
+    <circle cx="45" cy="50" r="10"/>
+    <circle cx="45" cy="250" r="10"/>
+    <circle cx="655" cy="50" r="10"/>
+    <circle cx="655" cy="250" r="10"/>
+  </g>
+  
+  <!-- 角落科技框 -->
+  <g opacity="0.3" fill="#00d4ff">
+    <rect x="15" y="20" width="2" height="12" rx="1"/>
+    <rect x="15" y="20" width="12" height="2" rx="1"/>
+    
+    <rect x="683" y="20" width="2" height="12" rx="1"/>
+    <rect x="671" y="20" width="12" height="2" rx="1"/>
+    
+    <rect x="15" y="270" width="2" height="12" rx="1"/>
+    <rect x="15" y="280" width="12" height="2" rx="1"/>
+    
+    <rect x="683" y="270" width="2" height="12" rx="1"/>
+    <rect x="671" y="280" width="12" height="2" rx="1"/>
+  </g>
+  
+  <!-- 背景數據流線條 -->
+  <g opacity="0.12" stroke="#00d4ff" stroke-width="1" fill="none">
+    <path d="M 480 100 Q 520 110 560 100">
+      <animate attributeName="d" 
+               values="M 480 100 Q 520 110 560 100; M 480 100 Q 520 90 560 100; M 480 100 Q 520 110 560 100" 
+               dur="5s" 
+               repeatCount="indefinite"/>
+    </path>
+    <path d="M 480 200 Q 520 190 560 200">
+      <animate attributeName="d" 
+               values="M 480 200 Q 520 190 560 200; M 480 200 Q 520 210 560 200; M 480 200 Q 520 190 560 200" 
+               dur="6s" 
+               repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <!-- 動態光點 -->
+  <g filter="url(#glow)">
+    <circle cx="570" cy="80" r="2" fill="#00d4ff" opacity="0.6">
+      <animate attributeName="opacity" values="0.3;0.8;0.3" dur="3s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="600" cy="220" r="2" fill="#0093f0" opacity="0.6">
+      <animate attributeName="opacity" values="0.3;0.8;0.3" dur="4s" begin="1s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

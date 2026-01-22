@@ -58,7 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({ showMenu, toggleMenu }) => {
       <SimpleBar style={{ maxHeight: "100vh" }}>
         <div className="nav-scroller">
           <Link to="/" className="navbar-brand">
-            <Image src="/images/banner/logo-banner-sidebar.svg" alt="" fluid={false}/>
+            <Image src="/images/banner/logo-bluevision-sidebar.svg" alt="" fluid={false}/>
           </Link>
         </div>
         {/* Dashboard Menu */}

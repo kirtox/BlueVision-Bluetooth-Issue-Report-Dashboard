@@ -96,7 +96,7 @@ const ForgetPassword = () => {
             <div className="mb-4">
               <Link to="/">
                 <Image
-                  src="/images/banner/logo-primary-light.svg"
+                  src="/images/banner/logo-bluevision-light.svg"
                   className="mb-2"
                   alt=""
                 />
