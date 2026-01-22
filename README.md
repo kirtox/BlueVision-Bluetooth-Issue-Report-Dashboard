@@ -28,10 +28,10 @@ BlueVision-Bluetooth-Issue-Report-Dashboard/
 ├── backend/                 # Backend services and APIs
 ├── frontend/                # Frontend dashboard (UI)
 ├── db_backups/              # Database backup files
-├── scripts/                 # Helper scripts (**Not yet**)
-├── .github/workflows/       # CI/CD configurations (**Not yet**)
-├── podman-compose.dev.yml   # Dev environment config
-├── podman-compose.prod.yml  # Prod environment config
+├── scripts/                 # Helper scripts (Not yet)
+├── .github/workflows/       # CI/CD configurations (Not yet)
+├── podman-compose.dev.yml   # Development environment config
+├── podman-compose.prod.yml  # Production environment config
 └── README.md
 ```
 
@@ -74,7 +74,7 @@ For checking current status of each podman container:
 podman ps
 ```
 
-**Another build process:**
+**Alternative build process:**
 
 ```bash
 # To stop all services
@@ -88,17 +88,50 @@ podman build -t BlueVision_prod_frontend -f frontend/Dockerfile.prod frontend/
 podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d
 ```
 
+**Migrating Container Data**
+```bash
+# 1. Check current volumes
+podman volume ls
+
+# Create new volume
+podman volume create bluevision_prod_pgdata_prod
+
+# Copy data from old volume to new volume
+podman run --rm -v oldname_prod_pgdata_prod:/old_data -v bluevision_prod_pgdata_prod:/new_data postgres:15 sh -c "cp -r /old_data/* /new_data/"
+
+# WARNING: Run cleanup after migrating data! Clean up unused containers first
+podman container prune
+
+# Clean up unused images
+podman image prune
+
+# Clean up unused volumes
+podman volume prune
+
+# Clean up unused networks
+podman network prune
+
+# Clean up all unused resources (containers, images, networks, volumes)
+podman system prune
+
+# Clean up all unused resources, including images not used by any container
+podman system prune -a
+
+# Also clean up volumes (WARNING! This will delete data)
+podman system prune -a --volumes
+```
+
 ### 3. Production Environment Setup
 
 In production, make sure to configure firewall rules and port forwarding:
 
-#### 🔥 Firewall
+#### 🔥 Firewall Configuration
 
 Allow inbound traffic on ports **8001** and **5174**.
 
-#### 🔀 Port Proxy (Windows)
+#### 🔀 Port Proxy Configuration (Windows)
 
-Run the following commands in an **PowerShell / CMD**:
+Run the following commands in **PowerShell** or **Command Prompt** (Administrator):
 
 ```bash
 # Add NAT
@@ -121,17 +154,17 @@ netsh interface portproxy show all
 
 This allows external devices on your LAN to access the dashboard services through the host machine.
 
-> If the podman compose didn't work successfully, the below steps should be work.
+> If the podman compose did not work successfully, try the steps below.
 >
-> Sometimes the below steps would not be able to enable the system after PC reboot. Remove NAT and
+> Note: Sometimes after a PC reboot, services may not start automatically. Remove NAT rules if needed and retry.
 
 ```
-# Activate the services in order
+# Start services in the correct order
 podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d db
 podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d db-backup
-# Wait the db check successfully
+# Wait for the database to become healthy
 podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d backend
-# Wait the backend activating
+# Wait for the backend to fully start
 podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d frontend
 ```
 
@@ -158,13 +191,13 @@ podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d frontend
 
 The dashboard implements a role-based access control system with three user roles:
 
-> Enter the container to activate the administrator account:
+> To create the administrator account, enter the backend container:
 >
 > ```
 > podman exec -it <container_name_or_id> bash
 > ```
 >
-> And run ``python create_admin.py`` to create the first account.
+> Then run ``python create_admin.py`` to create the first administrator account.
 
 ### Administrator
 
@@ -191,44 +224,44 @@ The dashboard implements a role-based access control system with three user role
 - Cannot export reports
 - Cannot access user management or logs
 
-### 🖼️ Screenshots
+### 🖼️ User Interface Screenshots
 
-> *Profile will display some information about the user.*
+> *The Profile page displays user information.*
 >
-> *And only **admin** role can see the **User Management** and **Logs** in sidebar.*
+> *Only users with **admin** role can see **User Management** and **Logs** in the sidebar.*
 
 ![Setting_ProfilePage_Admin](./demo/images/Setting_ProfilePage_Admin.png "Setting_ProfilePage_Admin")![Setting_ProfilePage_User](./demo/images/Setting_ProfilePage_User.png "Setting_ProfilePage_User")
 
-> *User Management - Admin can manage all the user.*
+> *User Management – Administrators can manage all user accounts and permissions.*
 
 ![User_Management](./demo/images/User_Management.png "User_Management")
 
 ---
 
-## 🖼️ System Screenshots
+## 🖼️ System Interface Screenshots
 
-> _Homepage – Display platforms summary, platforms status, report table, gauge charts, bar charts._
+> _Homepage – Shows platform summary, platform status, report table, gauge charts, and bar charts._
 
 ![HomepageScreenshot Placeholder](./demo/images/Homepage1.png "Homepage")
 
-> *Report table and filters – Display platforms summary, platforms status, report table, gauge charts, bar charts.*
+> *Report table and filters – Display platform summary, platform status, report data, gauge charts, and bar charts.*
 
 ![ReportTable_Filters](./demo/images/ReportTable_Filters_Coverd.png "ReportTable_Filters")
 
-> *Table Summary – Summarized each selected conditions based on the duration of data. (Also follow the filter conditions)*
+> *Table Summary – Aggregates data based on selected conditions and time duration. (Respects active filter conditions)*
 
 ![Charts_Table_Summary_wo_Filters_1](./demo/images/Charts_Table_Summary_wo_Filters_1.png "Charts_Table_Summary_wo_Filters_1")![Charts_Table_Summary_wo_Filters_2](./demo/images/Charts_Table_Summary_wo_Filters_2.png "Charts_Table_Summary_wo_Filters_2")
 
 ![Charts_Table_Summary_wo_Filters_3](./demo/images/Charts_Table_Summary_wo_Filters_3.png "Charts_Table_Summary_wo_Filters_3")
 
-> *Reliability Summary – Summarized across different conditions based on the number of data. (Also follow the filter conditions)*
+> *Reliability Summary – Aggregates reliability metrics across different conditions based on data count. (Respects active filter conditions)*
 
 ![Charts_Table_Reliability_Summary_wo_Filters](./demo/images/Charts_Table_Reliability_Summary_wo_Filters.png "Charts_Table_Reliability_Summary_wo_Filters")
 
-> *Durability Summary – Summarized across different conditions based on the duration of data. (Also follow the filter conditions)*
+> *Durability Summary – Aggregates durability metrics across different conditions based on time duration. (Respects active filter conditions)*
 
 ![Charts_Table_Durability_Summary_wo_Filters](./demo/images/Charts_Table_Durability_Summary_wo_Filters.png "Charts_Table_Durability_Summary_wo_Filters")
 
-> *Create report - In case there is necessary to create report manually.*
+> *Create Report – Manual report creation interface for ad-hoc report generation.*
 
 ![CreateReport_Manually](./demo/images/CreateReport_Manually.png "CreateReport_Manually")
