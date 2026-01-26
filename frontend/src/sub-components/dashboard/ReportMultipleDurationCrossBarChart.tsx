@@ -95,9 +95,11 @@ const ReportMultipleDurationCrossBarChart: React.FC<ReportMultipleDurationCrossB
           <XAxis type="number" allowDecimals={false} label={{ value: "(hr)", position: "insideBottomRight", offset: -5 }} />
           <YAxis type="category" dataKey="name" width={120} />
           <Tooltip wrapperStyle={{ zIndex: 1000 }} formatter={(value, name) => [`${Number(value).toFixed(2)} hrs`, name]} />
+          {/* Because current legend is too long, it will influence layout. */}
+          {/* Thus, it was commented out. */}
           <Legend verticalAlign="bottom" align="center" wrapperStyle={{ paddingTop: 8 }} />
           {groups.map((g, idx) => (
-            <Bar key={g} dataKey={g} stackId="a" fill={COLORS[idx % COLORS.length]}>
+            <Bar key={g} dataKey={g} stackId="a" fill={COLORS[idx % COLORS.length]} legendType="none">
               {/* Single bar value */}
               <LabelList
                 dataKey={g}
