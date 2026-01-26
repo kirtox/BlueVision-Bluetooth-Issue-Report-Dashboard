@@ -191,18 +191,28 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
             {renderField("Mouse BT", "mouse_bt")}
             {renderField("Mouse", "mouse")}
             {renderField("Mouse Click Period", "mouse_click_period")}
+          </Row>
+          <Row>
             {renderField("Keyboard Brand", "keyboard_brand")}
             {renderField("Keyboard BT", "keyboard_bt")}
             {renderField("Keyboard", "keyboard")}
             {renderField("Keyboard Click Period", "keyboard_click_period")}
+          </Row>
+          <Row>
             {renderField("Headset Brand", "headset_brand")}
             {renderField("Headset BT", "headset_bt")}
             {renderField("Headset", "headset")}
-            {renderField("Speaker Brand", "Speaker_brand")}
+          </Row>
+          <Row>
+            {renderField("Speaker Brand", "speaker_brand")}
             {renderField("Speaker BT", "Speaker_bt")}
             {renderField("Speaker", "Speaker")}
+          </Row>
+          <Row>
             {renderField("Phone Brand", "phone_brand")}
             {renderField("Phone", "phone")}
+          </Row>
+          <Row>
             {renderField("Device1 Brand", "device1_brand")}
             {renderField("Device", "device1")}
           </Row>
@@ -217,15 +227,18 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
             {renderSelectField("Modern Standby", "modern_standby", ["Y", "N"])}
             {renderField("MS Period", "ms_period")}
             {renderField("MS Waiting Time", "ms_os_waiting_time")}
-
+          </Row>
+          <Row>
             {renderSelectField("Hibernation", "s4", ["Y", "N"])}
             {renderField("Hibernation Period", "s4_period")}
             {renderField("Hibernation Waiting Time", "s4_os_waiting_time")}
-
+          </Row>
+          <Row>
             {renderSelectField("Warm Boot", "warm_boot", ["Y", "N"])}
             {renderField("WB Period", "wb_period")}
             {renderField("WB Waiting Time", "wb_os_waiting_time")}
-
+          </Row>
+          <Row>
             {renderSelectField("Cold Boot", "cold_boot", ["Y", "N"])}
             {renderField("CB Period", "cb_period")}
             {renderField("CB Waiting Time", "cb_os_waiting_time")}
@@ -246,7 +259,7 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
         <Card.Body>
           <Card.Title className="fw-bold">Issue Info.</Card.Title>
           <Row>
-            {renderSelectField("Urgent Level", "urgent_level", ["NA", "Fireball", "P1", "P2", "P3"])}
+            {renderSelectField("Urgent Level", "urgent_level", ["None", "Fireball", "P1", "P2", "P3"])}
             {renderField("Fix in ? WW", "fix_work_week")}
             {renderField("Fix in ? BT driver", "fix_bt_driver")}
             {renderField("Jira ID", "jira_id")}
