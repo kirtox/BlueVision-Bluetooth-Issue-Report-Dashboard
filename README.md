@@ -70,7 +70,7 @@ podman-compose -p BlueVision_prod -f podman-compose.prod.yml down
 
 For checking current status of each podman container:
 
-```podman
+```podman list
 podman ps
 ```
 
@@ -150,6 +150,26 @@ netsh interface portproxy delete v4tov4 listenaddress=10.225.74.155 listenport=8
 
 # Check NAT table
 netsh interface portproxy show all
+```
+
+**For development**
+- VScode debugging mode
+- Need to setup Dev_db for testing
+- Build a container for Dev_db
+```bash
+podman-compose -p bluevision_dev -f podman-compose.dev.yml up db -d
+```
+- Load latest db_backups sql file to container
+```bash
+# Find Dev_db container ID
+$DB_CONTAINER = podman ps -q -f name=bluevision_dev_db
+# Restore database
+Get-Content .\db_backups\backup_20260127_163729.sql | podman exec -i $DB_CONTAINER psql -U admin -d btird
+```
+- Test finished.
+```bash
+# Stop container
+podman-compose -f podman-compose.dev.yml down
 ```
 
 This allows external devices on your LAN to access the dashboard services through the host machine.
