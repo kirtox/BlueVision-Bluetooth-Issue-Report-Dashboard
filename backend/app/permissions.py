@@ -62,22 +62,25 @@ def check_report_ownership(user: models.User, report_id: int, db: Session) -> bo
     Check if user can modify specified report
     - Administrator: Can modify any report
     - Auditor: Can modify any report (like Administrator)
-    - User: Can only modify their own reports (op_name == username)
+    - User: Cannot delete reports (can only edit their own)
     - Guest: Cannot modify any reports
     """
     if user.role in ["Administrator", "Auditor"]:
         return True
     
-    if user.role == "Guest":
-        return False
+    # ==================================================
+    # Backup logic for User role (can delete reports)
+    # if user.role == "Guest":
+    #     return False
     
-    if user.role == "User":
-        from .crud import get_report_by_id
-        report = get_report_by_id(db, report_id)
-        if not report:
-            return False
-        return report.op_name == user.username
-    
+    # if user.role == "User":
+    #     from .crud import get_report_by_id
+    #     report = get_report_by_id(db, report_id)
+    #     if not report:
+    #         return False
+    #     return report.op_name == user.username
+    # ==================================================
+    # User and Guest cannot delete reports
     return False
 
 def require_report_ownership(func):

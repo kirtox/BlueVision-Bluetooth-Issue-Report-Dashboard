@@ -191,14 +191,14 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
       <Table responsive className="text-nowrap">
         <thead className="table-light">
           <tr>
-            <th onClick={() => handleSort('op_name')} style={{ cursor: 'pointer' }}>
+            {/* <th onClick={() => handleSort('op_name')} style={{ cursor: 'pointer' }}>
               Operator {sortField === 'op_name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
+            </th> */}
             <th onClick={() => handleSort('date')} style={{ cursor: 'pointer' }}>
               Date {sortField === 'date' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
             </th>
             <th onClick={() => handleSort('platform_brand')} style={{ cursor: 'pointer' }}>
-              Platform {sortField === 'platform_brand' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              Platform_brand {sortField === 'platform_brand' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
             </th>
             <th onClick={() => handleSort('platform')} style={{ cursor: 'pointer' }}>
               Platform {sortField === 'platform' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
@@ -210,10 +210,7 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
               WLAN {sortField === 'wlan' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
             </th>
             <th onClick={() => handleSort('wifi_name')} style={{ cursor: 'pointer' }}>
-              WiFi Name {sortField === 'wifi_name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('wifi_band')} style={{ cursor: 'pointer' }}>
-              WiFi Band {sortField === 'wifi_band' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              WiFi AP Name {sortField === 'wifi_name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
             </th>
             <th onClick={() => handleSort('scenario')} style={{ cursor: 'pointer' }}>
               Scenario {sortField === 'scenario' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
@@ -233,6 +230,12 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
             <th onClick={() => handleSort('comment')} style={{ cursor: 'pointer' }}>
               Comment {sortField === 'comment' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
             </th>
+            <th onClick={() => handleSort('jira_id')} style={{ cursor: 'pointer' }}>
+              Jira ID {sortField === 'jira_id' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+            </th>
+            <th onClick={() => handleSort('hsd_id')} style={{ cursor: 'pointer' }}>
+              HSD ID {sortField === 'hsd_id' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+            </th>
             <th></th>
           </tr>
         </thead>
@@ -240,14 +243,13 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
           {currentReports.map((item) => {
             return (
               <tr key={item.id}>
-                <td className="align-middle">{item.op_name}</td>
+                {/* <td className="align-middle">{item.op_name}</td> */}
                 <td className="align-middle">{new Date(item.date).toLocaleString()}</td>
                 <td className="align-middle">{item.platform_brand}</td>
                 <td className="align-middle">{item.platform}</td>
                 <td className="align-middle">{item.cpu_codename || item.cpu}</td>
                 <td className="align-middle">{item.wlan}</td>
                 <td className="align-middle">{item.wifi_name || ''}</td>
-                <td className="align-middle">{item.wifi_band || ''}</td>
                 <td className="align-middle">{item.scenario}</td>
                 <td className="align-middle">{item.bt_driver}</td>
                 <td className="align-middle">{item.wifi_driver}</td>
@@ -291,6 +293,8 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
                     {item.comment || ''}
                   </div>
                 </td>
+                <td className="align-middle">{item.jira_id || ''}</td>
+                <td className="align-middle">{item.hsd_id || ''}</td>
                 <td className="align-middle">
                   {/* <ActionMenu /> */}
                   <ReportActions
