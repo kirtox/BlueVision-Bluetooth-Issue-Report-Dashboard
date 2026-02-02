@@ -93,6 +93,40 @@ services:
       done'
     restart: unless-stopped
 
+  # Avatar backup service - runs weekly automated backups
+  avatar-backup:
+    image: postgres:15
+    depends_on:
+      - backend
+    volumes:
+      - ./avatar_backups:/backups
+      - avatar_uploads:/source:ro
+    environment:
+      - TZ=Asia/Taipei
+    command: |
+      sh -c '
+      echo "Avatar backup service started at $$(date)"
+      while true; do
+        echo "Starting avatar backup at $$(date)"
+        BACKUP_FILE="/backups/avatars_$$(date +%Y%m%d_%H%M%S).tar.gz"
+        if [ -d /source/avatars ] && [ "$$(ls -A /source/avatars 2>/dev/null)" ]; then
+          tar -czf "$$BACKUP_FILE" -C /source avatars
+          if [ $$? -eq 0 ]; then
+            echo "Avatar backup completed successfully at $$(date)"
+            echo "Backup size: $$(du -h $$BACKUP_FILE | cut -f1)"
+          else
+            echo "Avatar backup failed at $$(date)"
+          fi
+        else
+          echo "No avatar files to backup at $$(date)"
+        fi
+        echo "Cleaning up old avatar backups (older than 30 days)"
+        find /backups -name "avatars_*.tar.gz" -mtime +30 -delete
+        echo "Next avatar backup scheduled in 7 days"
+        sleep 604800
+      done'
+    restart: unless-stopped
+
 volumes:
   pgdata_prod:
   avatar_uploads:
