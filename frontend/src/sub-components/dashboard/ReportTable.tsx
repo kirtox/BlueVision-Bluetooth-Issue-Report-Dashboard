@@ -1,6 +1,6 @@
 // import node module libraries
 import { useState } from "react";
-import { Card, Table, Spinner, Modal, Button } from "react-bootstrap";
+import { Card, Table, Spinner, Modal, Button, OverlayTrigger, Tooltip } from "react-bootstrap";
 
 import { ReportTableProps, Report } from "types";
 import ReportEditForm from "./ReportEditForm";
@@ -227,6 +227,9 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
             <th onClick={() => handleSort('fail_rate')} style={{ cursor: 'pointer' }}>
               Fail Rate {sortField === 'fail_rate' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
             </th>
+            <th onClick={() => handleSort('sys_event_log')} style={{ cursor: 'pointer' }}>
+              System Event Log {sortField === 'sys_event_log' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+            </th>
             <th onClick={() => handleSort('comment')} style={{ cursor: 'pointer' }}>
               Comment {sortField === 'comment' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
             </th>
@@ -289,9 +292,48 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
                   )}
                 </td>
                 <td className="align-middle">
-                  <div style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {item.comment || ''}
-                  </div>
+                  {item.sys_event_log && item.sys_event_log.length > 30 ? (
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip id={`tooltip-sys-event-${item.id}`}>
+                          <div style={{ maxWidth: '400px', whiteSpace: 'pre-line', wordWrap: 'break-word', textAlign: 'left' }}>
+                            {item.sys_event_log.replace(/\] \[/g, ']\n[')}
+                          </div>
+                        </Tooltip>
+                      }
+                    >
+                      <div style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}>
+                        {item.sys_event_log}
+                      </div>
+                    </OverlayTrigger>
+                  ) : (
+                    <div style={{ maxWidth: '200px' }}>
+                      {item.sys_event_log || ''}
+                    </div>
+                  )}
+                </td>
+                <td className="align-middle">
+                  {item.comment && item.comment.length > 30 ? (
+                    <OverlayTrigger
+                      placement="top"
+                      overlay={
+                        <Tooltip id={`tooltip-comment-${item.id}`}>
+                          <div style={{ maxWidth: '400px', whiteSpace: 'pre-line', wordWrap: 'break-word', textAlign: 'left' }}>
+                            {item.comment}
+                          </div>
+                        </Tooltip>
+                      }
+                    >
+                      <div style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}>
+                        {item.comment}
+                      </div>
+                    </OverlayTrigger>
+                  ) : (
+                    <div style={{ maxWidth: '200px' }}>
+                      {item.comment || ''}
+                    </div>
+                  )}
                 </td>
                 <td className="align-middle">{item.jira_id || ''}</td>
                 <td className="align-middle">{item.hsd_id || ''}</td>

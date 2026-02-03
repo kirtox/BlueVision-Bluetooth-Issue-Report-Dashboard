@@ -131,6 +131,7 @@ export interface Report {
   // current_status: string;
   log_path: string;
   comment?: string;
+  sys_event_log?: string;
   jira_id?: string;
   hsd_id?: string;
   [key: string]: any; // ← To accommodate extra fields

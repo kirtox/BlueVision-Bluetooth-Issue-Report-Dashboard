@@ -2,3 +2,9 @@
 // user.scss
 // Use this to write your custom SCSS
 //
+
+// Custom Tooltip width for long content
+.tooltip-inner {
+  max-width: 400px !important;
+  text-align: left;
+}
