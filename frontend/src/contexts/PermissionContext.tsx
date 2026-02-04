@@ -97,16 +97,16 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
         return ['Administrator', 'Auditor'].includes(user.role);
     };
 
-    const canDeleteReport = (report: Report): boolean => {
+    const canDeleteReport = (_report: Report): boolean => {
         if (!user) return false;
         // ==========================================================================
         // Backup logic for User role deletion permission
         // if (user.role === 'Administrator' || user.role === 'Auditor') return true;
         // if (user.role === 'User') {
         //     // Case-insensitive comparison
-        //     const canDelete = report.op_name?.toLowerCase() === user.username?.toLowerCase();
+        //     const canDelete = _report.op_name?.toLowerCase() === user.username?.toLowerCase();
         //     console.log('canDeleteReport:', {
-        //         reportOpName: report.op_name,
+        //         reportOpName: _report.op_name,
         //         username: user.username,
         //         canDelete
         //     });
