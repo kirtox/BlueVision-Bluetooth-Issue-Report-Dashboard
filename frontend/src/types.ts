@@ -134,6 +134,7 @@ export interface Report {
   sys_event_log?: string;
   jira_id?: string;
   hsd_id?: string;
+  music_type?: string;
   [key: string]: any; // ← To accommodate extra fields
 }
 

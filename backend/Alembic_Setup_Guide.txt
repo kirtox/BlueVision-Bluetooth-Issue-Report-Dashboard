@@ -20,6 +20,13 @@ Added alembic to requirements.txt
 
 ## Execution Steps
 
+### Note: For **Dev** environment, execute in local PowerShell or CMD
+```bash
+cd c:\BlueVision\backend
+$env:DATABASE_URL="postgresql://admin:password@localhost:5432/btird"
+alembic upgrade head
+```
+
 ### Step 1: Rebuild Container
 ```bash
 # Rebuild container (install alembic)

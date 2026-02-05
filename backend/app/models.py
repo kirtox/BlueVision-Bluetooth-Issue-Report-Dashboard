@@ -82,6 +82,8 @@ class Report(Base):
 
     opp = Column(String, nullable=False)
     swift_pair = Column(String, nullable=False)
+    
+    music_type = Column(String, nullable=True)
 
     power_type = Column(String, nullable=False)
     urgent_level = Column(String)

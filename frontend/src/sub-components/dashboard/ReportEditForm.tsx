@@ -251,6 +251,9 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
             {renderSelectField("OPP", "opp", ["Y", "N"])}
             {renderSelectField("Swift Pair", "swift_pair", ["Y", "N"])}
           </Row>
+          <Row>
+            {renderSelectField("Music Type", "music_type", ["None", "WAV", "MP3"])}
+          </Row>
         </Card.Body>
       </Card>
 

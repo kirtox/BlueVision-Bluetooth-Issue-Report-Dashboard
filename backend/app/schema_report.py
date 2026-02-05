@@ -75,6 +75,8 @@ class ReportBase(BaseModel):
     
     opp: Optional[str] = None
     swift_pair: Optional[str] = None
+    
+    music_type: Optional[str] = None
 
     power_type: Optional[str] = None
     urgent_level: Optional[str] = None
