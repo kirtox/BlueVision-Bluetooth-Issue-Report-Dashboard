@@ -164,12 +164,12 @@ podman-compose -p bluevision_dev -f podman-compose.dev.yml up db -d
 # Find Dev_db container ID
 $DB_CONTAINER = podman ps -q -f name=bluevision_dev_db
 # Restore database
-Get-Content .\db_backups\backup_20260127_163729.sql | podman exec -i $DB_CONTAINER psql -U admin -d btird
+Get-Content .\db_backups\manual_backup_20260205_162139.sql | podman exec -i $DB_CONTAINER psql -U admin -d btird
 ```
 - Test finished.
 ```bash
 # Stop container
-podman-compose -f podman-compose.dev.yml down
+podman-compose -p bluevision_dev -f podman-compose.dev.yml down
 ```
 
 This allows external devices on your LAN to access the dashboard services through the host machine.
