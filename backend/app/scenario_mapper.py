@@ -40,12 +40,19 @@ def get_short_scenario_name(scenario: str, microsoft_teams: str) -> str:
     """
     Return short scenario name based on scenario string and microsoft_teams field
     
+    Logic:
+    - Has Headset_Output_Check -> Always has Music
+      - If microsoft_teams = "Y" -> Add Teams
+      - Result: "MS + Music + Teams" or "MS + Music"
+    - No Headset_Output_Check -> No Music, No Teams
+      - Result: Just prefix like "MS", "S4", "WB", "CB"
+    
     Args:
         scenario: Full scenario string, e.g. "Modern_Standby,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore"
         microsoft_teams: "Y" or "N"
     
     Returns:
-        Short name, e.g. "MS+Teams" or "S4+Music", returns original scenario if no match found
+        Short name, e.g. "MS + Music + Teams", "S4 + Music", or "WB", returns original scenario if no match found
     """
     if not scenario:
         return scenario
@@ -58,18 +65,15 @@ def get_short_scenario_name(scenario: str, microsoft_teams: str) -> str:
         keywords_match = all(kw.lower() in scenario_lower for kw in pattern["keywords"])
         
         if keywords_match:
-            # Check variants
-            for variant_name, conditions in pattern["variants"].items():
-                # Check if output_check is required
-                if conditions.get("output_check", False) and not has_output_check:
-                    continue
-                
-                # Check microsoft_teams field
-                if conditions.get("teams") == microsoft_teams:
-                    return f"{prefix}+{variant_name}"
-            
-            # If no variant matched but basic pattern did, return prefix
-            return prefix
+            # If has output_check -> always has Music
+            if has_output_check:
+                if microsoft_teams == "Y":
+                    return f"{prefix} + Music + Teams"
+                else:
+                    return f"{prefix} + Music"
+            else:
+                # No output_check -> no Music, no Teams, just prefix
+                return prefix
     
     # If no pattern matched, return original scenario
     return scenario
@@ -80,17 +84,17 @@ def get_scenario_mapping() -> dict:
     Return complete scenario mapping dictionary (for frontend reference)
     
     Returns:
-        Dictionary format: {"MS+Teams": "Modern_Standby,Idle,...", ...}
+        Dictionary format: {"MS + Music + Teams": "Modern_Standby,Idle,...", ...}
     """
     mapping = {
-        "MS+Teams": "Modern_Standby,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
-        "MS+Music": "Modern_Standby,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
-        "S4+Teams": "Hibernation,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
-        "S4+Music": "Hibernation,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
-        "WB+Teams": "Warm_Boot,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
-        "WB+Music": "Warm_Boot,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
-        "CB+Teams": "Cold_Boot,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
-        "CB+Music": "Cold_Boot,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
+        "MS + Music + Teams": "Modern_Standby,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
+        "MS + Music": "Modern_Standby,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
+        "S4 + Music + Teams": "Hibernation,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
+        "S4 + Music": "Hibernation,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
+        "WB + Music + Teams": "Warm_Boot,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
+        "WB + Music": "Warm_Boot,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
+        "CB + Music + Teams": "Cold_Boot,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
+        "CB + Music": "Cold_Boot,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
     }
     return mapping
 
@@ -119,22 +123,22 @@ if __name__ == "__main__":
         {
             "scenario": "Modern_Standby,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
             "microsoft_teams": "Y",
-            "expected": "MS+Teams"
+            "expected": "MS + Music + Teams"
         },
         {
             "scenario": "Modern_Standby,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
             "microsoft_teams": "N",
-            "expected": "MS+Music"
+            "expected": "MS + Music"
         },
         {
             "scenario": "Hibernation,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
             "microsoft_teams": "Y",
-            "expected": "S4+Teams"
+            "expected": "S4 + Music + Teams"
         },
         {
             "scenario": "Hibernation,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore",
             "microsoft_teams": "N",
-            "expected": "S4+Music"
+            "expected": "S4 + Music"
         },
     ]
     
