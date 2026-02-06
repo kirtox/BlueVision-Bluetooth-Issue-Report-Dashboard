@@ -1,5 +1,6 @@
 # BlueVision
 ## Bluetooth Issue Report Dashboard
+`v1.0.0`
 
    {\_/}
 {\ (OwO)
