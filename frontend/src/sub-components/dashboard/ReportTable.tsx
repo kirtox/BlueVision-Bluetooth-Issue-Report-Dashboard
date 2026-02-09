@@ -164,290 +164,323 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
   };
 
   return (
-    <Card className="h-100">
+    <>
+      <style>{`
+        .tooltip-sys-event .tooltip-inner {
+          max-width: 1500px !important;
+          text-align: left;
+        }
+        .tooltip-sys-event {
+          max-width: 1500px !important;
+        }
+      `}</style>
+      <Card className="h-100">
 
-      {/* <Card.Header className="bg-white py-4 d-flex justify-content-between align-items-center">
-      <h4 className="mb-0">Daily Reports</h4>
-      <input
-        type="text"
-        placeholder="Search..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="form-control w-25"
-      />
-    </Card.Header> */}
+        {/* <Card.Header className="bg-white py-4 d-flex justify-content-between align-items-center">
+          <h4 className="mb-0">Daily Reports</h4>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="form-control w-25"
+          />
+        </Card.Header> */}
 
-      {/* Pie chart summary area */}
-      {/* <div className="mb-4">
-      <Card className="p-3">
-        <ReportSummary reports={filteredReports} />
-      </Card>
-    </div> */}
+        {/* Pie chart summary area */}
+        {/* <div className="mb-4">
+          <Card className="p-3">
+            <ReportSummary reports={filteredReports} />
+          </Card>
+        </div> */}
 
-      <Card.Header className="bg-white py-4">
-        <h4 className="mb-2">Reports</h4>
-      </Card.Header>
+        <Card.Header className="bg-white py-4">
+          <h4 className="mb-2">Reports</h4>
+        </Card.Header>
 
-      <Table responsive className="text-nowrap">
-        <thead className="table-light">
-          <tr>
-            {/* <th onClick={() => handleSort('op_name')} style={{ cursor: 'pointer' }}>
-              Operator {sortField === 'op_name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th> */}
-            <th onClick={() => handleSort('date')} style={{ cursor: 'pointer' }}>
-              Date {sortField === 'date' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('platform_brand')} style={{ cursor: 'pointer' }}>
-              Platform_brand {sortField === 'platform_brand' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('platform')} style={{ cursor: 'pointer' }}>
-              Platform {sortField === 'platform' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('cpu_codename')} style={{ cursor: 'pointer' }}>
-              CPU Codename {sortField === 'cpu_codename' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('wlan')} style={{ cursor: 'pointer' }}>
-              WLAN {sortField === 'wlan' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('wifi_name')} style={{ cursor: 'pointer' }}>
-              WiFi AP Name {sortField === 'wifi_name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('scenario')} style={{ cursor: 'pointer' }}>
-              Scenario {sortField === 'scenario' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('bt_driver')} style={{ cursor: 'pointer' }}>
-              BT Driver {sortField === 'bt_driver' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('wifi_driver')} style={{ cursor: 'pointer' }}>
-              WiFi Driver {sortField === 'wifi_driver' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('result')} style={{ cursor: 'pointer' }}>
-              Result {sortField === 'result' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('fail_rate')} style={{ cursor: 'pointer' }}>
-              Fail Rate {sortField === 'fail_rate' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('sys_event_log')} style={{ cursor: 'pointer' }}>
-              System Event Log {sortField === 'sys_event_log' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('comment')} style={{ cursor: 'pointer' }}>
-              Comment {sortField === 'comment' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('jira_id')} style={{ cursor: 'pointer' }}>
-              Jira ID {sortField === 'jira_id' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th onClick={() => handleSort('hsd_id')} style={{ cursor: 'pointer' }}>
-              HSD ID {sortField === 'hsd_id' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-            </th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentReports.map((item) => {
-            return (
-              <tr key={item.id}>
-                {/* <td className="align-middle">{item.op_name}</td> */}
-                <td className="align-middle">{new Date(item.date).toLocaleString()}</td>
-                <td className="align-middle">{item.platform_brand}</td>
-                <td className="align-middle">{item.platform}</td>
-                <td className="align-middle">{item.cpu_codename || item.cpu}</td>
-                <td className="align-middle">{item.wlan}</td>
-                <td className="align-middle">{item.wifi_name || ''}</td>
-                <td className="align-middle">{item.scenario}</td>
-                <td className="align-middle">{item.bt_driver}</td>
-                <td className="align-middle">{item.wifi_driver}</td>
-                <td className="align-middle">
-                  {item.result?.toUpperCase() === 'PASS' ? (
-                    <span className="badge bg-success d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
-                      {item.result}
-                    </span>
-                  ) : item.result?.toUpperCase() === 'FAIL' ? (
-                    <span className="badge bg-danger d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
-                      {item.result}
-                    </span>
-                  ) : item.result?.toUpperCase() === 'ON-GOING' ? (
-                    <span className="badge bg-warning d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
-                      <Spinner
-                        as="span"
-                        animation="grow"
-                        size="sm"
-                        role="status"
-                        aria-hidden="true"
-                        className="me-1"
-                      />
-                      {item.result}
-                    </span>
-                  ) : (
-                    <span className="badge bg-secondary d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
-                      {item.result || ''}
-                    </span>
-                  )}
-                </td>
-                {/* <td className="align-middle">{item.fail_rate}</td> */}
-                <td className="align-middle">
-                  {item.result?.toUpperCase() === 'ON-GOING' ? (
-                    ""
-                  ) : (
-                    item.fail_cycles + "/" + item.cycles
-                  )}
-                </td>
-                <td className="align-middle">
-                  {item.sys_event_log && item.sys_event_log.length > 30 ? (
-                    <OverlayTrigger
-                      placement="top"
-                      overlay={
-                        <Tooltip id={`tooltip-sys-event-${item.id}`}>
-                          <div style={{ maxWidth: '400px', whiteSpace: 'pre-line', wordWrap: 'break-word', textAlign: 'left' }}>
-                            {item.sys_event_log.replace(/\] \[/g, ']\n[')}
-                          </div>
-                        </Tooltip>
-                      }
-                    >
-                      <div style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}>
-                        {item.sys_event_log}
+        <Table responsive className="text-nowrap">
+          <thead className="table-light">
+            <tr>
+              {/* <th onClick={() => handleSort('op_name')} style={{ cursor: 'pointer' }}>
+                Operator {sortField === 'op_name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th> */}
+              <th onClick={() => handleSort('date')} style={{ cursor: 'pointer' }}>
+                Date {sortField === 'date' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('platform_brand')} style={{ cursor: 'pointer' }}>
+                Platform_brand {sortField === 'platform_brand' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('platform')} style={{ cursor: 'pointer' }}>
+                Platform {sortField === 'platform' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('cpu_codename')} style={{ cursor: 'pointer' }}>
+                CPU Codename {sortField === 'cpu_codename' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('wlan')} style={{ cursor: 'pointer' }}>
+                WLAN {sortField === 'wlan' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('wifi_name')} style={{ cursor: 'pointer' }}>
+                WiFi AP Name {sortField === 'wifi_name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('scenario')} style={{ cursor: 'pointer' }}>
+                Scenario {sortField === 'scenario' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('bt_driver')} style={{ cursor: 'pointer' }}>
+                BT Driver {sortField === 'bt_driver' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('wifi_driver')} style={{ cursor: 'pointer' }}>
+                WiFi Driver {sortField === 'wifi_driver' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('result')} style={{ cursor: 'pointer' }}>
+                Result {sortField === 'result' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('fail_rate')} style={{ cursor: 'pointer' }}>
+                Fail Rate {sortField === 'fail_rate' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('sys_event_log')} style={{ cursor: 'pointer' }}>
+                System Event Log {sortField === 'sys_event_log' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('comment')} style={{ cursor: 'pointer' }}>
+                Comment {sortField === 'comment' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('jira_id')} style={{ cursor: 'pointer' }}>
+                Jira ID {sortField === 'jira_id' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th onClick={() => handleSort('hsd_id')} style={{ cursor: 'pointer' }}>
+                HSD ID {sortField === 'hsd_id' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              </th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentReports.map((item) => {
+              return (
+                <tr key={item.id}>
+                  {/* <td className="align-middle">{item.op_name}</td> */}
+                  <td className="align-middle">{new Date(item.date).toLocaleString()}</td>
+                  {/* <td className="align-middle">{item.platform_brand}</td> */}
+                  <td className="align-middle">
+                    {item.platform_brand && item.platform_brand.length > 15 ? (
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={
+                          <Tooltip id={`tooltip-platform_brand-${item.id}`}>
+                            <div style={{ maxWidth: '400px', whiteSpace: 'pre-line', wordWrap: 'break-word', textAlign: 'left' }}>
+                              {item.platform_brand.replace(/\] \[/g, ']\n[')}
+                            </div>
+                          </Tooltip>
+                        }
+                      >
+                        <div style={{ cursor: 'pointer' }}>
+                          {item.platform_brand.substring(0, 12)}...
+                        </div>
+                      </OverlayTrigger>
+                    ) : (
+                      <div>
+                        {item.platform_brand || ''}
                       </div>
-                    </OverlayTrigger>
-                  ) : (
-                    <div style={{ maxWidth: '200px' }}>
-                      {item.sys_event_log || ''}
-                    </div>
-                  )}
-                </td>
-                <td className="align-middle">
-                  {item.comment && item.comment.length > 30 ? (
-                    <OverlayTrigger
-                      placement="top"
-                      overlay={
-                        <Tooltip id={`tooltip-comment-${item.id}`}>
-                          <div style={{ maxWidth: '400px', whiteSpace: 'pre-line', wordWrap: 'break-word', textAlign: 'left' }}>
-                            {item.comment}
-                          </div>
-                        </Tooltip>
-                      }
-                    >
-                      <div style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', cursor: 'pointer' }}>
-                        {item.comment}
+                    )}
+                  </td>
+                  <td className="align-middle">{item.platform}</td>
+                  <td className="align-middle">{item.cpu_codename || item.cpu}</td>
+                  <td className="align-middle">{item.wlan}</td>
+                  <td className="align-middle">{item.wifi_name || ''}</td>
+                  <td className="align-middle">{item.scenario}</td>
+                  <td className="align-middle">{item.bt_driver}</td>
+                  <td className="align-middle">{item.wifi_driver}</td>
+                  <td className="align-middle">
+                    {item.result?.toUpperCase() === 'PASS' ? (
+                      <span className="badge bg-success d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
+                        {item.result}
+                      </span>
+                    ) : item.result?.toUpperCase() === 'FAIL' ? (
+                      <span className="badge bg-danger d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
+                        {item.result}
+                      </span>
+                    ) : item.result?.toUpperCase() === 'ON-GOING' ? (
+                      <span className="badge bg-warning d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
+                        <Spinner
+                          as="span"
+                          animation="grow"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                          className="me-1"
+                        />
+                        {item.result}
+                      </span>
+                    ) : (
+                      <span className="badge bg-secondary d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
+                        {item.result || ''}
+                      </span>
+                    )}
+                  </td>
+                  {/* <td className="align-middle">{item.fail_rate}</td> */}
+                  <td className="align-middle">
+                    {item.result?.toUpperCase() === 'ON-GOING' ? (
+                      ""
+                    ) : (
+                      item.fail_cycles + "/" + item.cycles
+                    )}
+                  </td>
+                  <td className="align-middle">
+                    {item.sys_event_log && item.sys_event_log.length > 20 ? (
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={
+                          <Tooltip id={`tooltip-sys-event-${item.id}`} className="tooltip-sys-event">
+                            <div style={{ maxWidth: '1500px', whiteSpace: 'pre-line', wordWrap: 'break-word', textAlign: 'left' }}>
+                              {item.sys_event_log.replace(/\] \[/g, ']\n[')}
+                            </div>
+                          </Tooltip>
+                        }
+                      >
+                        <div style={{ cursor: 'pointer' }}>
+                          {item.sys_event_log.substring(0, 20)}...
+                        </div>
+                      </OverlayTrigger>
+                    ) : (
+                      <div>
+                        {item.sys_event_log || ''}
                       </div>
-                    </OverlayTrigger>
-                  ) : (
-                    <div style={{ maxWidth: '200px' }}>
-                      {item.comment || ''}
-                    </div>
-                  )}
-                </td>
-                <td className="align-middle">{item.jira_id || ''}</td>
-                <td className="align-middle">{item.hsd_id || ''}</td>
-                <td className="align-middle">
-                  {/* <ActionMenu /> */}
-                  <ReportActions
-                    report={item}
-                    onEdit={() => handleEdit(item)}
-                    onDelete={() => handleDeleteClick(item)}
-                  />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </Table>
-      {/* Pagination controls */}
-      <div className="d-flex justify-content-between align-items-center mt-3">
-        <div>
-          <span>Rows per page </span>
-          <select
-            value={rowsPerPage}
-            onChange={e => {
-              setRowsPerPage(Number(e.target.value));
-              setCurrentPage(1);
-            }}
-            style={{ width: 70, display: 'inline-block' }}
-          >
-            {[5, 10, 20, 50].map(size => (
-              <option key={size} value={size}>{size}</option>
-            ))}
-          </select>
-          <span> , Total: {reports.length} data</span>
-        </div>
-        <nav>
-          <ul className="pagination mb-0">
-            <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
-              <button className="page-link" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>«</button>
-            </li>
-            <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
-              <button className="page-link" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>‹</button>
-            </li>
-            {Array.from({ length: totalPages }, (_, idx) => idx + 1).slice(
-              Math.max(0, currentPage - 3),
-              Math.min(totalPages, currentPage + 2)
-            ).map(pageNum => (
-              <li key={pageNum} className={`page-item${currentPage === pageNum ? ' active' : ''}`}>
-                <button className="page-link" onClick={() => setCurrentPage(pageNum)}>{pageNum}</button>
+                    )}
+                  </td>
+                  <td className="align-middle">
+                    {item.comment && item.comment.length > 20 ? (
+                      <OverlayTrigger
+                        placement="top"
+                        overlay={
+                          <Tooltip id={`tooltip-comment-${item.id}`}>
+                            <div style={{ maxWidth: '400px', whiteSpace: 'pre-line', wordWrap: 'break-word', textAlign: 'left' }}>
+                              {item.comment.replace(/\] \[/g, ']\n[')}
+                            </div>
+                          </Tooltip>
+                        }
+                      >
+                        <div style={{ cursor: 'pointer' }}>
+                          {item.comment.substring(0, 20)}...
+                        </div>
+                      </OverlayTrigger>
+                    ) : (
+                      <div>
+                        {item.comment || ''}
+                      </div>
+                    )}
+                  </td>
+                  <td className="align-middle">{item.jira_id || ''}</td>
+                  <td className="align-middle">{item.hsd_id || ''}</td>
+                  <td className="align-middle">
+                    {/* <ActionMenu /> */}
+                    <ReportActions
+                      report={item}
+                      onEdit={() => handleEdit(item)}
+                      onDelete={() => handleDeleteClick(item)}
+                    />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+        {/* Pagination controls */}
+        <div className="d-flex justify-content-between align-items-center mt-3">
+          <div>
+            <span>Rows per page </span>
+            <select
+              value={rowsPerPage}
+              onChange={e => {
+                setRowsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              style={{ width: 70, display: 'inline-block' }}
+            >
+              {[5, 10, 20, 50].map(size => (
+                <option key={size} value={size}>{size}</option>
+              ))}
+            </select>
+            <span> , Total: {reports.length} data</span>
+          </div>
+          <nav>
+            <ul className="pagination mb-0">
+              <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
+                <button className="page-link" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>«</button>
               </li>
-            ))}
-            <li className={`page-item${currentPage === totalPages || totalPages === 0 ? ' disabled' : ''}`}>
-              <button className="page-link" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages || totalPages === 0}>›</button>
-            </li>
-            <li className={`page-item${currentPage === totalPages || totalPages === 0 ? ' disabled' : ''}`}>
-              <button className="page-link" onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0}>»</button>
-            </li>
-          </ul>
-        </nav>
-      </div>
+              <li className={`page-item${currentPage === 1 ? ' disabled' : ''}`}>
+                <button className="page-link" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>‹</button>
+              </li>
+              {Array.from({ length: totalPages }, (_, idx) => idx + 1).slice(
+                Math.max(0, currentPage - 3),
+                Math.min(totalPages, currentPage + 2)
+              ).map(pageNum => (
+                <li key={pageNum} className={`page-item${currentPage === pageNum ? ' active' : ''}`}>
+                  <button className="page-link" onClick={() => setCurrentPage(pageNum)}>{pageNum}</button>
+                </li>
+              ))}
+              <li className={`page-item${currentPage === totalPages || totalPages === 0 ? ' disabled' : ''}`}>
+                <button className="page-link" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages || totalPages === 0}>›</button>
+              </li>
+              <li className={`page-item${currentPage === totalPages || totalPages === 0 ? ' disabled' : ''}`}>
+                <button className="page-link" onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages || totalPages === 0}>»</button>
+              </li>
+            </ul>
+          </nav>
+        </div>
 
-      <Modal show={showEditModal} onHide={handleCloseModal} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Report</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {editingReport && (
-            <ReportEditForm report={editForm} onChange={f => setEditForm(f)} />
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleSave}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        <Modal show={showEditModal} onHide={handleCloseModal} size="lg">
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Report</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {editingReport && (
+              <ReportEditForm report={editForm} onChange={f => setEditForm(f)} />
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseModal}>
+              Close
+            </Button>
+            <Button variant="primary" onClick={handleSave}>
+              Save Changes
+            </Button>
+          </Modal.Footer>
+        </Modal>
 
-      <Modal show={showDeleteModal} onHide={handleCancelDelete}>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Delete</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {deletingReport && (
-            <div>
-              <p>Are you sure you want to delete this report?</p>
-              <ul>
-                <li><b>Operator:</b> {deletingReport.op_name}</li>
-                <li><b>Date:</b> {new Date(deletingReport.date).toLocaleString()}</li>
-                <li><b>Platform Brand:</b> {deletingReport.platform_brand}</li>
-                <li><b>Platform:</b> {deletingReport.platform}</li>
-                <li><b>CPU:</b> {deletingReport.cpu_codename || deletingReport.cpu}</li>
-                <li><b>WLAN:</b> {deletingReport.wlan}</li>
-                <li><b>BT driver:</b> {deletingReport.bt_driver}</li>
-                <li><b>Wi-Fi driver:</b> {deletingReport.wifi_driver}</li>
-                <li><b>Scenario:</b> {deletingReport.scenario}</li>
-                <li><b>Fail Rate:</b> {deletingReport.fail_rate}</li>
-                <li><b>Result:</b> {deletingReport.result}</li>
-                {/* Add more columns */}
-              </ul>
-            </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCancelDelete}>
-            No
-          </Button>
-          <Button variant="danger" onClick={handleConfirmDelete}>
-            Yes, Delete
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Card>
+        <Modal show={showDeleteModal} onHide={handleCancelDelete}>
+          <Modal.Header closeButton>
+            <Modal.Title>Confirm Delete</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {deletingReport && (
+              <div>
+                <p>Are you sure you want to delete this report?</p>
+                <ul>
+                  <li><b>Operator:</b> {deletingReport.op_name}</li>
+                  <li><b>Date:</b> {new Date(deletingReport.date).toLocaleString()}</li>
+                  <li><b>Platform Brand:</b> {deletingReport.platform_brand}</li>
+                  <li><b>Platform:</b> {deletingReport.platform}</li>
+                  <li><b>CPU:</b> {deletingReport.cpu_codename || deletingReport.cpu}</li>
+                  <li><b>WLAN:</b> {deletingReport.wlan}</li>
+                  <li><b>BT driver:</b> {deletingReport.bt_driver}</li>
+                  <li><b>Wi-Fi driver:</b> {deletingReport.wifi_driver}</li>
+                  <li><b>Scenario:</b> {deletingReport.scenario}</li>
+                  <li><b>Fail Rate:</b> {deletingReport.fail_rate}</li>
+                  <li><b>Result:</b> {deletingReport.result}</li>
+                  {/* Add more columns */}
+                </ul>
+              </div>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCancelDelete}>
+              No
+            </Button>
+            <Button variant="danger" onClick={handleConfirmDelete}>
+              Yes, Delete
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      </Card>
+    </>
   );
 }
 

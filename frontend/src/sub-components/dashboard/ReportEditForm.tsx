@@ -286,6 +286,19 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
           </Row>
           <Row>
             <Form.Group as={Col} md={12} className="mb-3">
+              <Form.Label className="fw-bold">System Event Log</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={5}
+                value={report.sys_event_log || ""}
+                onChange={(e) => handleFieldChange("sys_event_log", e.target.value)}
+                readOnly={readonly}
+                placeholder="System event log information..."
+              />
+            </Form.Group>
+          </Row>
+          <Row>
+            <Form.Group as={Col} md={12} className="mb-3">
               <Form.Label className="fw-bold">Comment</Form.Label>
               <Form.Control
                 as="textarea"
