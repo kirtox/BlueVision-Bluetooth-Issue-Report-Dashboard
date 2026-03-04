@@ -79,14 +79,14 @@ podman ps
 
 ```bash
 # To stop all services
-podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml down
+podman-compose -p bluevision_prod -f .\podman-compose.prod.yml down
 
 # Build the services that need to be built
-podman build -t BlueVision_prod_backend -f backend/Dockerfile.prod backend/
-podman build -t BlueVision_prod_frontend -f frontend/Dockerfile.prod frontend/
+podman build -t bluevision_prod_backend -f backend/Dockerfile.prod backend/
+podman build -t bluevision_prod_frontend -f frontend/Dockerfile.prod frontend/
 
 # Restart all services (included db)
-podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d
+podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d
 ```
 
 **Migrating Container Data**
@@ -181,12 +181,12 @@ This allows external devices on your LAN to access the dashboard services throug
 
 ```
 # Start services in the correct order
-podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d db
-podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d db-backup
+podman-compose -p bluebision_prod -f .\podman-compose.prod.yml up -d db
+podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d db-backup
 # Wait for the database to become healthy
-podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d backend
+podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d backend
 # Wait for the backend to fully start
-podman-compose -p BlueVision_prod -f .\podman-compose.prod.yml up -d frontend
+podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d frontend
 ```
 
 ---

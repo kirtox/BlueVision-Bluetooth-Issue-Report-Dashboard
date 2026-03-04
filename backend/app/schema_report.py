@@ -27,6 +27,7 @@ class ReportBase(BaseModel):
     msft_teams_version: Optional[str] = None
 
     scenario: Optional[str] = None
+    short_scenario: Optional[str] = None
 
     mouse_bt: Optional[str] = None
     mouse_brand: Optional[str] = None

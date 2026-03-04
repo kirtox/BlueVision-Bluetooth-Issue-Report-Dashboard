@@ -222,8 +222,8 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
               <th onClick={() => handleSort('wifi_name')} style={{ cursor: 'pointer' }}>
                 WiFi AP Name {sortField === 'wifi_name' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
               </th>
-              <th onClick={() => handleSort('scenario')} style={{ cursor: 'pointer' }}>
-                Scenario {sortField === 'scenario' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              <th onClick={() => handleSort('short_scenario')} style={{ cursor: 'pointer' }}>
+                Scenario {sortField === 'short_scenario' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
               </th>
               <th onClick={() => handleSort('bt_driver')} style={{ cursor: 'pointer' }}>
                 BT Driver {sortField === 'bt_driver' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
@@ -285,7 +285,7 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
                   <td className="align-middle">{item.cpu_codename || item.cpu}</td>
                   <td className="align-middle">{item.wlan}</td>
                   <td className="align-middle">{item.wifi_name || ''}</td>
-                  <td className="align-middle">{item.scenario}</td>
+                  <td className="align-middle">{item.short_scenario || item.scenario}</td>
                   <td className="align-middle">{item.bt_driver}</td>
                   <td className="align-middle">{item.wifi_driver}</td>
                   <td className="align-middle">
@@ -462,7 +462,7 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
                   <li><b>WLAN:</b> {deletingReport.wlan}</li>
                   <li><b>BT driver:</b> {deletingReport.bt_driver}</li>
                   <li><b>Wi-Fi driver:</b> {deletingReport.wifi_driver}</li>
-                  <li><b>Scenario:</b> {deletingReport.scenario}</li>
+                  <li><b>Scenario:</b> {deletingReport.short_scenario || deletingReport.scenario}</li>
                   <li><b>Fail Rate:</b> {deletingReport.fail_rate}</li>
                   <li><b>Result:</b> {deletingReport.result}</li>
                   {/* Add more columns */}

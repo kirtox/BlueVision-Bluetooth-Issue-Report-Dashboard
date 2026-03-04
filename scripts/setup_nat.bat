@@ -23,8 +23,8 @@ echo.
 netsh interface portproxy delete v4tov4 listenaddress=192.168.70.122 listenport=5174
 netsh interface portproxy delete v4tov4 listenaddress=192.168.70.122 listenport=8001
 
-netsh interface portproxy delete v4tov4 listenaddress=10.225.74.155 listenport=5174
-netsh interface portproxy delete v4tov4 listenaddress=10.225.74.155 listenport=8001
+netsh interface portproxy delete v4tov4 listenaddress=10.225.74.134 listenport=5174
+netsh interface portproxy delete v4tov4 listenaddress=10.225.74.134 listenport=8001
 
 echo.
 echo [Step 2/3] Adding new NAT rules...
@@ -33,8 +33,8 @@ echo.
 netsh interface portproxy add v4tov4 listenaddress=192.168.70.122 listenport=5174 connectaddress=127.0.0.1 connectport=5174
 netsh interface portproxy add v4tov4 listenaddress=192.168.70.122 listenport=8001 connectaddress=127.0.0.1 connectport=8001
 
-netsh interface portproxy add v4tov4 listenaddress=10.225.74.155 listenport=5174 connectaddress=127.0.0.1 connectport=5174
-netsh interface portproxy add v4tov4 listenaddress=10.225.74.155 listenport=8001 connectaddress=127.0.0.1 connectport=8001
+netsh interface portproxy add v4tov4 listenaddress=10.225.74.134 listenport=5174 connectaddress=127.0.0.1 connectport=5174
+netsh interface portproxy add v4tov4 listenaddress=10.225.74.134 listenport=8001 connectaddress=127.0.0.1 connectport=8001
 
 echo.
 echo [Step 3/3] Current NAT table:

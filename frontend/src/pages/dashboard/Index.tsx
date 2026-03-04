@@ -260,6 +260,7 @@ const Dashboard = () => {
       (item.cpu_codename && item.cpu_codename.toLowerCase().includes(searchTerm.toLowerCase())) ||
       item.wlan.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.scenario.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.short_scenario && item.short_scenario.toLowerCase().includes(searchTerm.toLowerCase())) ||
       item.bt_driver.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.wifi_driver.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.result.toLowerCase().includes(searchTerm.toLowerCase());
@@ -273,7 +274,7 @@ const Dashboard = () => {
     const matchesWlan =
       selectedWlans.length === 0 || selectedWlans.includes(item.wlan);
     const matchesScenario =
-      selectedScenarios.length === 0 || selectedScenarios.includes(item.scenario);
+      selectedScenarios.length === 0 || selectedScenarios.includes(item.short_scenario || item.scenario);
     const matchesBTDriver =
       selectedBTDrivers.length === 0 || selectedBTDrivers.includes(item.bt_driver);
     const matchesResult =
@@ -398,7 +399,7 @@ const Dashboard = () => {
                 selectedWlans={selectedWlans}
                 setSelectedWlans={setSelectedWlans}
 
-                scenarioOptions={[...new Set(reports.map(r => r.scenario))]}
+                scenarioOptions={[...new Set(reports.map(r => r.short_scenario || r.scenario))]}
                 selectedScenarios={selectedScenarios}
                 setSelectedScenarios={setSelectedScenarios}
 
@@ -465,7 +466,7 @@ const Dashboard = () => {
                 <Col lg={12} md={12} xs={12}>
                   <ReportMultipleGaugeChart
                     reports={filteredReports}
-                    groupBy="scenario"
+                    groupBy="short_scenario"
                     calcField="duration"
                     calcType="sum"
                     max={720}
@@ -528,7 +529,7 @@ const Dashboard = () => {
                   <ReportDoughnutChart reports={filteredReports} field="bt_driver" title="Test by Bluetooth driver version" />
                 </Col>
                 <Col lg={12} md={12} xs={12} className="mt-4">
-                  <ReportDoughnutChart reports={filteredReports} field="scenario" title="Total test by scenario" />
+                  <ReportDoughnutChart reports={filteredReports} field="short_scenario" title="Total test by scenario" />
                 </Col>
               </Row>
             </Card>
@@ -563,7 +564,7 @@ const Dashboard = () => {
                   <ReportMultipleCrossBarChart
                     reports={filteredReports}
                     fieldX="bt_driver"
-                    fieldY="scenario"
+                    fieldY="short_scenario"
                     title="Integration Test"
                   />
                 </Col>
@@ -571,7 +572,7 @@ const Dashboard = () => {
                   <ReportMultipleCrossBarChart
                     reports={filteredReports}
                     fieldX="platform"
-                    fieldY="scenario"
+                    fieldY="short_scenario"
                     title="Platform Summary"
                   />
                 </Col>
@@ -611,7 +612,7 @@ const Dashboard = () => {
                     reports={filteredReports}
                     fieldX="bt_driver"
                     fieldY="duration"
-                    groupBy="scenario"
+                    groupBy="short_scenario"
                     title="Integration Test"
                   />
                 </Col>
@@ -620,7 +621,7 @@ const Dashboard = () => {
                     reports={filteredReports}
                     fieldX="platform"
                     fieldY="duration"
-                    groupBy="scenario"
+                    groupBy="short_scenario"
                     title="Platform Summary"
                   />
                 </Col>

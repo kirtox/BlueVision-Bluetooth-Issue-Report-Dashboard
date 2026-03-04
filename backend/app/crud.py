@@ -8,6 +8,7 @@ from .utils import get_password_hash, verify_password
 from sqlalchemy import func, or_, String
 from datetime import datetime
 from datetime import datetime, timezone, timedelta
+from .scenario_mapper import get_short_scenario_name
 
 tz_taipei = timezone(timedelta(hours=8))
 
@@ -111,6 +112,16 @@ def update_report(db: Session, report_id: int, report: ReportUpdate):
         return None
     for key, value in report.dict(exclude_unset=True).items():
         setattr(db_report, key, value)
+    
+    # Recalculate short_scenario if scenario or microsoft_teams changed
+    update_dict = report.dict(exclude_unset=True)
+    if 'scenario' in update_dict or 'microsoft_teams' in update_dict:
+        if db_report.scenario and db_report.microsoft_teams:
+            db_report.short_scenario = get_short_scenario_name(
+                db_report.scenario,
+                db_report.microsoft_teams
+            )
+    
     db.commit()
     db.refresh(db_report)
     return db_report
@@ -235,6 +246,8 @@ def create_user(db: Session, user: UserCreate):
 
 def get_users(db: Session):
     """Get all users list"""
+
+    
     return db.query(models.User).all()
 
 def authenticate_user(db: Session, username: str, password: str):

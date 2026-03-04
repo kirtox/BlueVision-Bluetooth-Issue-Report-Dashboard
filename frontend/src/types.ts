@@ -122,6 +122,7 @@ export interface Report {
   wifi_name?: string;
   wifi_band?: string;
   scenario: string;
+  short_scenario?: string;
   bt_driver: string;
   wifi_driver: string;
   // power_type: string;

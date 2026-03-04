@@ -34,6 +34,7 @@ class Report(Base):
     msft_teams_version = Column(String)
 
     scenario = Column(String, nullable=False)
+    short_scenario = Column(String, nullable=True)
 
     mouse_bt = Column(String)
     mouse_brand = Column(String)
