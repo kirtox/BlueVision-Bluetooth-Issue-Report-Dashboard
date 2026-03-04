@@ -209,6 +209,7 @@ __marimo__/
 # Database backups
 # Exclude database backup files to prevent sensitive data from being committed
 db_backups/
+avatar_backups/
 *.sql
 *.sql.gz
 *.dump
