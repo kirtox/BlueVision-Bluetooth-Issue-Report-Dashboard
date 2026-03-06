@@ -100,6 +100,13 @@ def create_report(db: Session, report: ReportCreate):
         cpu_codename = identify_intel_cpu(report_dict['cpu'])
         report_dict['cpu_codename'] = cpu_codename
     
+    # Calculate short_scenario
+    if report_dict.get('scenario') and report_dict.get('microsoft_teams'):
+        report_dict['short_scenario'] = get_short_scenario_name(
+            report_dict['scenario'],
+            report_dict['microsoft_teams']
+        )
+    
     db_report = models.Report(**report_dict)
     db.add(db_report)
     db.commit()
