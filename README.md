@@ -1,10 +1,12 @@
 # BlueVision
 ## Bluetooth Issue Report Dashboard
-`v1.0.0`
+`v1.1.0`
 
+```
    {\_/}
 {\ (OwO)
 { \/>  )>
+```
 
 A dashboard for collecting, visualizing, and reporting Bluetooth issue data.
 The project provides both backend and frontend components, supports containerized deployment, and is designed to streamline Bluetooth testing and debugging workflows.
@@ -13,12 +15,11 @@ The project provides both backend and frontend components, supports containerize
 
 ## ✨ Key Features
 
-- **Issue Tracking & Logging**Store and organize Bluetooth-related test results and logs.
-- **Manage logs**Once the logs are updated to the database, we can manage the log in this dashboard.
-- **Data Visualization**Frontend dashboards to plot **Bluetooth Driver Reliability**, **Integration Test**, **Platform Summary**, **WLAN Reliability**, and other metrices.
-- **Excel & Report Export**Generate structured reports for further analysis or sharing.
-- **Containerized Deployment**
-  Podman Compose files are included for running services consistently across environments.
+- **Issue Tracking & Logging**: Store and organize Bluetooth-related test results and logs.
+- **Manage logs**: Once the logs are updated to the database, we can manage the log in this dashboard.
+- **Data Visualization**: Frontend dashboards to plot **Bluetooth Driver Reliability**, **Integration Test**, **Platform Summary**, **WLAN Reliability**, and other metrices.
+- **Excel & Report Export**: Generate structured reports for further analysis or sharing.
+- **Containerized Deployment**: Podman Compose files are included for running services consistently across environments.
 
 ---
 
@@ -29,7 +30,7 @@ BlueVision-Bluetooth-Issue-Report-Dashboard/
 ├── backend/                 # Backend services and APIs
 ├── frontend/                # Frontend dashboard (UI)
 ├── db_backups/              # Database backup files
-├── scripts/                 # Helper scripts (Not yet)
+├── scripts/                 # Helper, Backup, Restore scripts
 ├── .github/workflows/       # CI/CD configurations (Not yet)
 ├── podman-compose.dev.yml   # Development environment config
 ├── podman-compose.prod.yml  # Production environment config
@@ -40,6 +41,9 @@ BlueVision-Bluetooth-Issue-Report-Dashboard/
 
 ## 🚀 Getting Started
 
+### 1. Install Apps
+- Install dbeaver, Nodejs(v22.17.0), podman desktop in Apps folder
+
 ### 1. Clone the repository
 
 ```bash
@@ -48,36 +52,26 @@ cd BlueVision-Bluetooth-Issue-Report-Dashboard
 ```
 
 ### 2. Podman Compose Commands by PowerShell
+#### Fast build process:
+- For development:
+    ```bash
+    # Run in PowerShell window
+    podman-compose -p BlueVision_dev -f podman-compose.dev.yml up --build
 
-For development:
+    # Stop
+    podman-compose -p BlueVision_dev -f podman-compose.dev.yml down
+    ```
+- For production:
+    ```bash
+    # Run in background
+    podman-compose -p BlueVision_prod -f podman-compose.prod.yml up --build -d
 
-```bash
-# Run in PowerShell window
-podman-compose -p BlueVision_dev -f podman-compose.dev.yml up --build
+    # Stop
+    podman-compose -p BlueVision_prod -f podman-compose.prod.yml down
+    ```
 
-# Stop
-podman-compose -p BlueVision_dev -f podman-compose.dev.yml down
-```
-
-For production:
-
-```bash
-# Run in background
-podman-compose -p BlueVision_prod -f podman-compose.prod.yml up --build -d
-
-# Stop
-podman-compose -p BlueVision_prod -f podman-compose.prod.yml down
-```
-
-For checking current status of each podman container:
-
-```podman list
-podman ps
-```
-
-**Alternative build process:**
-
-```bash
+#### Another build process:
+```bash=
 # To stop all services
 podman-compose -p bluevision_prod -f .\podman-compose.prod.yml down
 
@@ -89,8 +83,29 @@ podman build -t bluevision_prod_frontend -f frontend/Dockerfile.prod frontend/
 podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d
 ```
 
-**Migrating Container Data**
-```bash
+> If the podman compose did not work successfully, try the steps below.
+>
+
+
+```
+# Start services in the correct order
+podman-compose -p bluebision_prod -f .\podman-compose.prod.yml up -d db
+podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d db-backup
+# Wait for the database to become healthy
+podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d backend
+# Wait for the backend to fully start
+podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d frontend
+```
+
+
+#### Check current status of each podman container:
+
+```podman list
+podman ps
+```
+
+#### Migrating Container Data
+```bash=
 # 1. Check current volumes
 podman volume ls
 
@@ -122,19 +137,22 @@ podman system prune -a
 podman system prune -a --volumes
 ```
 
-### 3. Production Environment Setup
+---
+
+## Production Environment Setup
 
 In production, make sure to configure firewall rules and port forwarding:
 
-#### 🔥 Firewall Configuration
+### 🔥 Firewall Configuration
 
 Allow inbound traffic on ports **8001** and **5174**.
 
-#### 🔀 Port Proxy Configuration (Windows)
+### 🔀 Port Proxy Configuration (Windows)
 
 Run the following commands in **PowerShell** or **Command Prompt** (Administrator):
-
-```bash
+> Note: Sometimes after a PC reboot, services may not start automatically. Remove NAT rules if needed and retry.
+> There is a script (***setup_nat.bat***) to reset the NAT.
+```bash=
 # Add NAT
 netsh interface portproxy add v4tov4 listenaddress=192.168.70.122 listenport=5174 connectaddress=127.0.0.1 connectport=5174
 netsh interface portproxy add v4tov4 listenaddress=192.168.70.122 listenport=8001 connectaddress=127.0.0.1 connectport=8001
@@ -153,41 +171,30 @@ netsh interface portproxy delete v4tov4 listenaddress=10.225.74.155 listenport=8
 netsh interface portproxy show all
 ```
 
-**For development**
+---
+
+## Development Environment Setup
 - VScode debugging mode
-- Need to setup Dev_db for testing
-- Build a container for Dev_db
-```bash
-podman-compose -p bluevision_dev -f podman-compose.dev.yml up db -d
-```
+- Build a container bluevision_dev_db
+    ```bash
+    # PowerShell
+    podman-compose -p bluevision_dev -f podman-compose.dev.yml up db -d
+    ```
 - Load latest db_backups sql file to container
-```bash
-# Find Dev_db container ID
-$DB_CONTAINER = podman ps -q -f name=bluevision_dev_db
-# Restore database
-Get-Content .\db_backups\manual_backup_20260205_162139.sql | podman exec -i $DB_CONTAINER psql -U admin -d btird
-```
+    ```bash
+    # PowerShell
+    # Find Dev_db container ID
+    $DB_CONTAINER = podman ps -q -f name=bluevision_dev_db
+    
+    # Restore database
+    Get-Content .\db_backups\manual_backup_20260205_162139.sql | podman exec -i $DB_CONTAINER psql -U admin -d btird
+    ```
 - Test finished.
-```bash
-# Stop container
-podman-compose -p bluevision_dev -f podman-compose.dev.yml down
-```
-
-This allows external devices on your LAN to access the dashboard services through the host machine.
-
-> If the podman compose did not work successfully, try the steps below.
->
-> Note: Sometimes after a PC reboot, services may not start automatically. Remove NAT rules if needed and retry.
-
-```
-# Start services in the correct order
-podman-compose -p bluebision_prod -f .\podman-compose.prod.yml up -d db
-podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d db-backup
-# Wait for the database to become healthy
-podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d backend
-# Wait for the backend to fully start
-podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d frontend
-```
+    ```bash
+    # PowerShell
+    # Stop container
+    podman-compose -p bluevision_dev -f podman-compose.dev.yml down
+    ```
 
 ---
 
@@ -201,49 +208,64 @@ podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d frontend
 
 ---
 
-## 📊 Example Use Cases
-
-- Collect trace logs and visualize dynamic charts over time.
-- Generate **Excel reports** for test results.
-
----
-
 ## 🔐 User Roles & Permissions
 
-The dashboard implements a role-based access control system with three user roles:
+The dashboard implements a role-based access control system with four user roles:
 
-> To create the administrator account, enter the backend container:
->
+To create the administrator account for the first time, enter the backend container:
 > ```
 > podman exec -it <container_name_or_id> bash
 > ```
 >
 > Then run ``python create_admin.py`` to create the first administrator account.
 
-### Administrator
+### 🔴 Administrator
+**Full system access with all privileges**
 
-- Full access to all features
-- Can create, edit, and delete any report
-- Can manage user accounts
-- Can view API access logs
-- Can manage platform configurations
-- Can export reports
+| Feature | Access Level |
+|---------|-------------|
+| Dashboard | ✅ Full Access |
+| Reports | ✅ View/Create/Edit/Delete All |
+| User Management | ✅ Full CRUD Operations |
+| Platform Management | ✅ Full CRUD Operations |
+| API Access Logs | ✅ View All Logs |
+| Profile Management | ✅ Edit Own Profile |
 
-### User
+### 🟡 Auditor
+**Report management with audit capabilities**
 
-- Can view all reports
-- Can create new reports (operator name automatically set to username)
-- Can edit and delete only their own reports (where `op_name` matches their username)
-- Can export reports
-- Can edit their own profile
+| Feature | Access Level |
+|---------|-------------|
+| Dashboard | ✅ Full Access |
+| Reports | ✅ View/Create/Edit/Delete All |
+| User Management | ❌ No Access |
+| Platform Management | ❌ Read Only |
+| API Access Logs | ❌ No Access |
+| Profile Management | ✅ Edit Own Profile |
 
-### Guest
+### 🟢 User
+**Standard user with limited permissions**
 
-- Read-only access
-- Can view reports and dashboards
-- Cannot create, edit, or delete reports
-- Cannot export reports
-- Cannot access user management or logs
+| Feature | Access Level |
+|---------|-------------|
+| Dashboard | ✅ Full Access |
+| Reports | ✅ View All, Create/Edit/Delete Own Only |
+| User Management | ❌ No Access |
+| Platform Management | ❌ Read Only |
+| API Access Logs | ❌ No Access |
+| Profile Management | ✅ Edit Own Profile |
+
+### 🔵 Guest
+**Read-only access for viewing**
+
+| Feature | Access Level |
+|---------|-------------|
+| Dashboard | ✅ View Only |
+| Reports | ✅ View Only |
+| User Management | ❌ No Access |
+| Platform Management | ❌ Read Only |
+| API Access Logs | ❌ No Access |
+| Profile Management | ❌ No Access |
 
 ### 🖼️ User Interface Screenshots
 
