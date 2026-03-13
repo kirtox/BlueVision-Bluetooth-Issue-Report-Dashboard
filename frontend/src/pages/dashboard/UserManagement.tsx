@@ -104,7 +104,7 @@ const UserManagement: React.FC = () => {
       const updateData = {
         email: formData.email,
         role: formData.role,
-        is_active: "Y"
+        is_active: true
       };
 
       const response = await fetch(`${API_BASE_URL}/users/${selectedUser.id}`, {
