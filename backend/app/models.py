@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Text
+from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 import datetime
 from datetime import timezone, timedelta
@@ -119,7 +119,7 @@ class User(Base):
     role = Column(String, default="User", nullable=False)  # "Administrator" or "User"
     avatar = Column(String, nullable=True)  # Avatar file path
     created_at = Column(DateTime, default=lambda: datetime.datetime.now(timezone(timedelta(hours=8))).replace(tzinfo=None))
-    is_active = Column(String, default="Y", nullable=False)  # "Y" or "N"
+    is_active = Column(Boolean, default=True, nullable=False)  # True or False
 
 class APIAccessLog(Base):
     __tablename__ = "api_access_log"

@@ -31,7 +31,7 @@ import { useCallback } from "react";
 // import ReportBarChart from "sub-components/dashboard/ReportBarChart";
 
 // Need to fix
-import PlatformStatusDashboard from "sub-components/dashboard/PlatformStatusDashboard";
+// import PlatformStatusDashboard from "sub-components/dashboard/PlatformStatusDashboard";
 
 
 import ReportMultipleCrossBarChart from "sub-components/dashboard/ReportMultipleCrossBarChart";
@@ -361,7 +361,7 @@ const Dashboard = () => {
         </Row>
 
         {/* Platform Status Area */}
-        <Row className="my-6 scroll-section">
+        {/* <Row className="my-6 scroll-section">
           <Col lg={12} md={12} xs={12}>
             <Card className="p-3 mb-4">
               <h3 className="mb-2">Platform Status Dashboard</h3>
@@ -370,7 +370,7 @@ const Dashboard = () => {
               </Row>
             </Card>
           </Col>
-        </Row>
+        </Row> */}
 
 
         {/* Filter area */}

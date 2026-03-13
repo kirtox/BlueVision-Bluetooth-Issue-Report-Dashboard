@@ -33,7 +33,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
             print(f"get_current_user: User not found for username: {username}")
             raise HTTPException(status_code=401, detail="User not found")
         
-        if user.is_active != "Y":
+        if not user.is_active:
             print(f"get_current_user: User {username} is inactive: {user.is_active}")
             raise HTTPException(status_code=401, detail="User account is inactive")
         
@@ -70,7 +70,7 @@ def get_current_user_optional(credentials: Optional[HTTPAuthorizationCredentials
             print(f"get_current_user_optional: User not found for username: {username}")
             return None
         
-        if user.is_active != "Y":
+        if not user.is_active:
             print(f"get_current_user_optional: User {username} is inactive: {user.is_active}")
             return None
         

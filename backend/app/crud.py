@@ -270,7 +270,7 @@ def authenticate_user(db: Session, username: str, password: str):
     
     print(f"User found: {user.username}, active: {user.is_active}")
     
-    if user.is_active != "Y":
+    if not user.is_active:
         print(f"User not active: {user.is_active}")
         return False
     
@@ -295,8 +295,12 @@ def update_user(db: Session, user_id: int, user):
     else:
         update_data = user
 
-    if "password" in update_data:
+    # Only hash password if it's provided and not empty
+    if "password" in update_data and update_data["password"]:
         update_data["hashed_password"] = get_password_hash(update_data.pop("password"))
+    elif "password" in update_data:
+        # Remove password key if it's empty/None to avoid issues
+        update_data.pop("password")
 
     for key, value in update_data.items():
         setattr(db_user, key, value)

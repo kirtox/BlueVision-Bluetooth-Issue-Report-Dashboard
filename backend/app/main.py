@@ -162,7 +162,7 @@ def create_report_script(
         )
     
     # Check if user is active
-    if user.is_active != "Y":
+    if not user.is_active:
         raise HTTPException(
             status_code=400, 
             detail=f"User '{report.op_name}' is not active"
