@@ -25,6 +25,14 @@ const SignIn = () => {
     }
   }, [isAuthenticated, navigate]);
 
+  useEffect(() => {
+    // Load saved username from localStorage and auto-fill on page load
+    const savedUsername = localStorage.getItem('savedUsername');
+    if (savedUsername) {
+      setFormData({ username: savedUsername, password: '' });
+    }
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
@@ -41,12 +49,32 @@ const SignIn = () => {
     try {
       const success = await login(formData.username, formData.password);
       if (success) {
+        // Save username to localStorage after successful login
+        localStorage.setItem('savedUsername', formData.username);
         navigate('/');
       } else {
         setError('Login failed, please check your username and password');
       }
     } catch (err) {
       setError('An error occurred while logging in. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGuestLogin = async () => {
+    setError('');
+    setIsSubmitting(true);
+
+    try {
+      const success = await login('guest', 'guest123');
+      if (success) {
+        navigate('/');
+      } else {
+        setError('Guest login failed. Please try again.');
+      }
+    } catch (err) {
+      setError('An error occurred while logging in as guest. Please try again later.');
     } finally {
       setIsSubmitting(false);
     }
@@ -112,12 +140,6 @@ const SignIn = () => {
                   />
                 </Form.Group>
 
-                <div className="d-lg-flex justify-content-between align-items-center mb-4">
-                  <Form.Check type="checkbox" id="rememberme">
-                    <Form.Check.Input type="checkbox" />
-                    <Form.Check.Label>Remember me</Form.Check.Label>
-                  </Form.Check>
-                </div>
                 <div>
                   <div className="d-grid">
                     <Button
@@ -126,6 +148,16 @@ const SignIn = () => {
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? 'Logging...' : 'Login'}
+                    </Button>
+                  </div>
+                  <div className="d-grid mt-3">
+                    <Button
+                      variant="outline-secondary"
+                      type="button"
+                      onClick={handleGuestLogin}
+                      disabled={isSubmitting}
+                    >
+                      Guest Login
                     </Button>
                   </div>
                   <div className="d-md-flex justify-content-between mt-4">
