@@ -5,7 +5,7 @@ import { Card, Table, Dropdown, Image } from "react-bootstrap";
 import { MoreVertical } from "react-feather";
 
 // import required data files
-import { TeamsData } from "data/dashboard/TeamsData";
+import { TeamsData } from "@/data/dashboard/TeamsData";
 
 interface TeamsProps {
   children: React.ReactNode;

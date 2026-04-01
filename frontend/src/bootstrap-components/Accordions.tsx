@@ -10,13 +10,13 @@ import {
 } from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from "widgets";
+import { HighlightCode } from "@/widgets";
 
 // import react code data file
 import {
   AccordionBasicCode,
   AccordionFlushCode,
-} from "data/code/AccordionCode";
+} from "@/data/code/AccordionCode";
 
 const Accordions = () => {
   return (

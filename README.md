@@ -97,6 +97,21 @@ podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d backend
 podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d frontend
 ```
 
+```
+# Start services in the correct order
+podman-compose -p bluebision_dev -f .\podman-compose.dev.yml up -d db
+podman-compose -p bluevision_dev -f .\podman-compose.dev.yml up -d db-backup
+# Wait for the database to become healthy
+podman-compose -p bluevision_dev -f .\podman-compose.dev.yml up -d backend
+# Wait for the backend to fully start
+podman-compose -p bluevision_dev -f .\podman-compose.dev.yml up -d frontend
+
+podman build -t bluevision_dev_backend -f backend/Dockerfile.dev backend/
+podman build -t bluevision_dev_frontend -f frontend/Dockerfile.dev frontend/
+
+podman-compose -p bluevision_dev -f .\podman-compose.dev.yml up -d
+```
+
 
 #### Check current status of each podman container:
 
@@ -168,7 +183,7 @@ netsh interface portproxy delete v4tov4 listenaddress=10.225.74.155 listenport=5
 netsh interface portproxy delete v4tov4 listenaddress=10.225.74.155 listenport=8001
 
 # Check NAT table
-netsh interface portproxy show all
+netsh interface portproxy show allㄛ
 ```
 
 ---
@@ -188,6 +203,7 @@ netsh interface portproxy show all
     
     # Restore database
     Get-Content .\db_backups\manual_backup_20260205_162139.sql | podman exec -i $DB_CONTAINER psql -U admin -d btird
+    Get-Content .\db_backups\backup_20260310_104306.sql | podman exec -i $DB_CONTAINER psql -U admin -d btird
     ```
 - Test finished.
     ```bash

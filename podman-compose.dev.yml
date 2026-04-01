@@ -27,6 +27,12 @@ services:
         condition: service_healthy
     environment:
       - DATABASE_URL=postgresql://admin:password@db:5432/btird
+      - HTTP_PROXY=http://proxy-dmz.intel.com:912
+      - HTTPS_PROXY=http://proxy-dmz.intel.com:912
+      - http_proxy=http://proxy-dmz.intel.com:912
+      - https_proxy=http://proxy-dmz.intel.com:912
+      - NO_PROXY=localhost,127.0.0.1,db,expertgpt.intel.com
+      - no_proxy=localhost,127.0.0.1,db,expertgpt.intel.com
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U admin -d btird"]
       interval: 5s

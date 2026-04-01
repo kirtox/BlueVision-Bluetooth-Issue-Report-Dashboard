@@ -2,10 +2,10 @@
 import { Row, Col, Container } from "react-bootstrap";
 
 // import widget as custom components
-import { PageHeading } from "widgets";
+import { PageHeading } from "@/widgets";
 
 // import sub components
-import { BillingAddress, CurrentPlan } from "sub-components";
+import { BillingAddress, CurrentPlan } from "@/sub-components";
 
 const Billing = () => {
   return (

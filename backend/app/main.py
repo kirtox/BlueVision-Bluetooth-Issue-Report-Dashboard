@@ -16,6 +16,8 @@ from app.schema_report import ReportCreate, ReportUpdate, ReportInDB
 from app.schema_platform import PlatformCreate, PlatformUpdate, PlatformInDB
 from app.schema_platform_latest_report import PlatformWithLatestReportInDB
 from app.schema_api_log import APIAccessLogInDB
+from app.schema_chat import ChatAskRequest, ChatAskResponse
+from app.chat_service import handle_chat_ask
 from app.schema_user import UserResponse
 from app.middleware import APIAccessLogMiddleware
 from sqlalchemy.orm import Session
@@ -88,6 +90,15 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.post("/chat/ask", response_model=ChatAskResponse)
+def chat_ask(
+    payload: ChatAskRequest,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    return handle_chat_ask(payload=payload, db=db, current_user=current_user)
 
 # Read all reports
 @app.get("/reports", response_model=list[ReportInDB])

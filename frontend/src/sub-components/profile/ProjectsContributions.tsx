@@ -6,7 +6,7 @@ import { MoreVertical } from "react-feather";
 import { CustomToggleProps } from "types";
 
 // import required data files
-import { ProjectsContributionsData } from "data/profile/ProjectsContributionsData";
+import { ProjectsContributionsData } from "@/data/profile/ProjectsContributionsData";
 
 const ProjectsContributions = () => {
   const CustomToggle = React.forwardRef<HTMLAnchorElement, CustomToggleProps>(

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Row, Col, Card, Modal, Button, Form } from "react-bootstrap";
 
 // import widget as custom components
-import { FormSelect } from "widgets";
+import { FormSelect } from "@/widgets";
 
 const BillingAddress = () => {
   const [modalShow, setModalShow] = useState(false);

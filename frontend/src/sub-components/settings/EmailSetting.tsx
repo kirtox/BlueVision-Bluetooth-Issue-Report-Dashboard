@@ -2,7 +2,7 @@
 import { Col, Row, Form, Card, Button } from "react-bootstrap";
 
 // import hooks
-import { useMounted } from "hooks/useMounted";
+import { useMounted } from "@/hooks/useMounted";
 
 const EmailSetting = () => {
   const hasMounted = useMounted();

@@ -13,14 +13,14 @@ import {
 } from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from "widgets";
+import { HighlightCode } from "@/widgets";
 
 // import react code data file
 import {
   OffcanvasBasicCode,
   OffCanvasPlacementCode,
   OffCanvasBackdropCode,
-} from "data/code/OffcanvasCode";
+} from "@/data/code/OffcanvasCode";
 import { OffcanvasPlacement as PlacemntProps } from "react-bootstrap/esm/Offcanvas";
 
 interface OffCanvasBackdropProps {

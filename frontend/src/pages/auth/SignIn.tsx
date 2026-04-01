@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
 //import custom hook
-import { useMounted } from "hooks/useMounted";
+import { useMounted } from "@/hooks/useMounted";
 import { useAuth } from "../../contexts/AuthContext";
 import { formatUsernameForStorage } from "../../utils/formatUtils";
 

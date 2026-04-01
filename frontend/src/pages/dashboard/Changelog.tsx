@@ -2,7 +2,7 @@
 import { Col, Row, Container } from "react-bootstrap";
 
 // import sub components
-import Version_01_00_00 from "sub-components/changelog/Version_01_00_00";
+import Version_01_00_00 from "@/sub-components/changelog/Version_01_00_00";
 
 const ChangeLog = () => {
   return (

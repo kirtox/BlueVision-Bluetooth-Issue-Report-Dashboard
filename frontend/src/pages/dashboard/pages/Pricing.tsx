@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import { Col, Row, Container } from "react-bootstrap";
 
 // import sub components
-import { PricingCard, PageHeading, FeatureLeftTopIcon } from "widgets";
+import { PricingCard, PageHeading, FeatureLeftTopIcon } from "@/widgets";
 
 // import data files
-import { standard, multisite, extended } from "data/pricing/PricingPlansData";
-import { FAQsData } from "data/pricing/FAQsData";
-import { FeaturesData } from "data/pricing/FeaturesData";
+import { standard, multisite, extended } from "@/data/pricing/PricingPlansData";
+import { FAQsData } from "@/data/pricing/FAQsData";
+import { FeaturesData } from "@/data/pricing/FeaturesData";
 
 const Pricing = () => {
   return (

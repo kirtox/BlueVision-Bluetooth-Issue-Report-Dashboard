@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 // import custom hook
-import { useMounted } from "hooks/useMounted";
+import { useMounted } from "@/hooks/useMounted";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 

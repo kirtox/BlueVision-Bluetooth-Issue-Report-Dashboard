@@ -10,10 +10,10 @@ import {
 } from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from "widgets";
+import { HighlightCode } from "@/widgets";
 
 // import react code data file
-import { BasicBreadcrumb } from "data/code/BreadcrumbCode";
+import { BasicBreadcrumb } from "@/data/code/BreadcrumbCode";
 
 const Breadcrumbs = () => {
   return (

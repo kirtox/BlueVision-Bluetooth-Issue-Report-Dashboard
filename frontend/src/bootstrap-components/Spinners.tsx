@@ -11,7 +11,7 @@ import {
 } from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from "widgets";
+import { HighlightCode } from "@/widgets";
 
 // import react code data file
 import {
@@ -28,7 +28,7 @@ import {
   StyleCSSCode,
   ButtonsCode,
   Buttons2Code,
-} from "data/code/SpinnersCode";
+} from "@/data/code/SpinnersCode";
 
 const Spinners = () => {
   return (

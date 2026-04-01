@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from "widgets";
+import { HighlightCode } from "@/widgets";
 
 // import react code data file
 import {
@@ -22,7 +22,7 @@ import {
   ScrollableModalCode,
   VerticallyCenteredCode,
   OptionalSizesCode,
-} from "data/code/ModalsCode";
+} from "@/data/code/ModalsCode";
 
 const Modals = () => {
   const [show, setShow] = useState(false);

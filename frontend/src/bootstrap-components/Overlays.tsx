@@ -15,14 +15,14 @@ import {
 } from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from "widgets";
+import { HighlightCode } from "@/widgets";
 
 // import react code data file
 import {
   OverlayBasicCode,
   OverlayTriggerCode,
   TriggerBehaviorCode,
-} from "data/code/OverlaysCode";
+} from "@/data/code/OverlaysCode";
 
 const Overlays = () => {
   const [show, setShow] = useState(false);

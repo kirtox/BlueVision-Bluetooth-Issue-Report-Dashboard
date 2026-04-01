@@ -2,7 +2,7 @@
 import { Col, Row, Form, Card, Button } from "react-bootstrap";
 
 // import widget as custom components
-import { FormSelect } from "widgets";
+import { FormSelect } from "@/widgets";
 
 const Preferences = () => {
   const langaugeOptions = [

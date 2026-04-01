@@ -10,14 +10,14 @@ import {
 } from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from "widgets";
+import { HighlightCode } from "@/widgets";
 
 // import react code data file
 import {
   GenericCloseButtonCode,
   DisabledStateCode,
   WhiteVariantCode,
-} from "data/code/CloseCode";
+} from "@/data/code/CloseCode";
 
 const CloseButtons = () => {
   return (

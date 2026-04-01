@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ProgressBar, Col, Row, Card, Table, Image } from "react-bootstrap";
 
 // import required data files
-import ActiveProjectsData from "data/dashboard/ActiveProjectsData";
+import ActiveProjectsData from "@/data/dashboard/ActiveProjectsData";
 import { ActiveProjectsDataProps } from "types";
 
 const ActiveProjects = () => {

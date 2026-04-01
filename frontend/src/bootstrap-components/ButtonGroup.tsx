@@ -16,7 +16,7 @@ import {
 } from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from "widgets";
+import { HighlightCode } from "@/widgets";
 
 // import react code data file
 import {
@@ -30,7 +30,7 @@ import {
   ButtonSizingCode,
   ButtonNestingCode,
   VerticalButtonCode,
-} from "data/code/ButtonGroupCode";
+} from "@/data/code/ButtonGroupCode";
 
 const ButtonGroups = () => {
   return (

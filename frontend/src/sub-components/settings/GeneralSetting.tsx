@@ -2,10 +2,10 @@
 import { Col, Row, Form, Card, Button, Image } from "react-bootstrap";
 
 // import widget as custom components
-import { FormSelect, DropFiles } from "widgets";
+import { FormSelect, DropFiles } from "@/widgets";
 
 // import hooks
-import { useMounted } from "hooks/useMounted";
+import { useMounted } from "@/hooks/useMounted";
 
 const GeneralSetting = () => {
   const hasMounted = useMounted();

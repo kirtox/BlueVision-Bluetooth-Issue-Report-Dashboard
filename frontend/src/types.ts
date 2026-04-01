@@ -221,3 +221,28 @@ export interface APIAccessLogTableProps {
   logs: APIAccessLog[];
   onReload: () => void;
 }
+
+export interface ChatHistoryItem {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface ChatAskRequest {
+  question: string;
+  history: ChatHistoryItem[];
+}
+
+export interface ChatAskResponse {
+  answer: string;
+  sql: string;
+  rows: any[];
+  trace_id?: string;
+}
+
+export interface ChatMessage extends ChatHistoryItem {
+  id: string;
+  createdAt: string;
+  sql?: string;
+  rows?: any[];
+  trace_id?: string;
+}

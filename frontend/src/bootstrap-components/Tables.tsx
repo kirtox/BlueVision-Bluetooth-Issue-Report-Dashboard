@@ -2,7 +2,7 @@
 import { Col, Row, Card, Table, Nav, Tab, Container } from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from "widgets";
+import { HighlightCode } from "@/widgets";
 
 // import react code data file
 import {
@@ -17,7 +17,7 @@ import {
   SmallTableCode,
   ContextualClassesCode,
   ResponsiveTableCode,
-} from "data/code/TablesCode";
+} from "@/data/code/TablesCode";
 
 const Tables = () => {
   return (

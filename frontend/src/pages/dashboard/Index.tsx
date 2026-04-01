@@ -4,41 +4,41 @@ import { Fragment } from "react";
 import { Container, Col, Row, Card } from "react-bootstrap";
 
 // import widget/custom components
-import { StatRightTopIcon } from "widgets";
+import { StatRightTopIcon } from "@/widgets";
 
 // import sub components
-// import { ActiveProjects, Teams, TasksPerformance } from "sub-components";
+// import { ActiveProjects, Teams, TasksPerformance } from "@/sub-components";
 
 // import cpu icon selection
 import { getCpuIcon } from "../../data/dashboard/CPUIcon";
 
 // import required data files
-// import ProjectsStatsData from "data/dashboard/ProjectsStatsData";
+// import ProjectsStatsData from "@/data/dashboard/ProjectsStatsData";
 import { useCPUStats } from "../../data/dashboard/CPUStats";
-import ReportTable from "sub-components/dashboard/ReportTable";
+import ReportTable from "@/sub-components/dashboard/ReportTable";
 import { useState, useEffect } from "react";
 
-import ReportFilters from "sub-components/filters/ReportFilters";
+import ReportFilters from "@/sub-components/filters/ReportFilters";
 import { Report } from "types";
 import { usePermissions } from "../../contexts/PermissionContext";
 import { Button, Modal } from "react-bootstrap";
-import ReportEditForm from "sub-components/dashboard/ReportEditForm";
+import ReportEditForm from "@/sub-components/dashboard/ReportEditForm";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCallback } from "react";
 
-// import ReportPieChart from "sub-components/dashboard/ReportPieChart";
-// import ReportDoughnutChart from "sub-components/dashboard/ReportDoughnutChart";
-// import ReportBarChart from "sub-components/dashboard/ReportBarChart";
+// import ReportPieChart from "@/sub-components/dashboard/ReportPieChart";
+// import ReportDoughnutChart from "@/sub-components/dashboard/ReportDoughnutChart";
+// import ReportBarChart from "@/sub-components/dashboard/ReportBarChart";
 
 // Need to fix
-import PlatformStatusDashboard from "sub-components/dashboard/PlatformStatusDashboard";
+import PlatformStatusDashboard from "@/sub-components/dashboard/PlatformStatusDashboard";
 
 
-import ReportMultipleCrossBarChart from "sub-components/dashboard/ReportMultipleCrossBarChart";
-// import ReportDurationChart from "sub-components/dashboard/ReportDurationChart";
-import ReportMultipleDurationCrossBarChart from "sub-components/dashboard/ReportMultipleDurationCrossBarChart";
-// import ReportGaugeChart from "sub-components/dashboard/ReportGaugeChart";
-import ReportMultipleGaugeChart from "sub-components/dashboard/ReportMultipleGaugeChart";
+import ReportMultipleCrossBarChart from "@/sub-components/dashboard/ReportMultipleCrossBarChart";
+// import ReportDurationChart from "@/sub-components/dashboard/ReportDurationChart";
+import ReportMultipleDurationCrossBarChart from "@/sub-components/dashboard/ReportMultipleDurationCrossBarChart";
+// import ReportGaugeChart from "@/sub-components/dashboard/ReportGaugeChart";
+import ReportMultipleGaugeChart from "@/sub-components/dashboard/ReportMultipleGaugeChart";
 
 const Dashboard = () => {
   const { stats, loading } = useCPUStats();

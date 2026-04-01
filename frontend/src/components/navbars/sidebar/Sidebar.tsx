@@ -12,7 +12,7 @@ import { CustomToggleLevelTwo } from "./CustomToggleLevelTwo";
 import SimpleBar from "simplebar-react";
 
 // import routes file
-import { getDashboardMenuByRole } from "routes/DashboardRoutes";
+import { getDashboardMenuByRole } from "@/routes/DashboardRoutes";
 import { DashboardMenuProps } from "types";
 import { useAuth } from "../../../contexts/AuthContext";
 

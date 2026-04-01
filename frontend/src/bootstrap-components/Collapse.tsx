@@ -13,10 +13,10 @@ import {
 } from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from "widgets";
+import { HighlightCode } from "@/widgets";
 
 // import react code data file
-import { FadeCollapses, BasicCollapsesCode } from "data/code/CollapsesCode";
+import { FadeCollapses, BasicCollapsesCode } from "@/data/code/CollapsesCode";
 
 const Collapses = () => {
   const [open, setOpen] = useState(false);

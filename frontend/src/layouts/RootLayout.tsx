@@ -1,13 +1,13 @@
 //import node module libraries
 import { Outlet } from "react-router";
 // import { Link } from "react-router-dom";
-import Sidebar from "components/navbars/sidebar/Sidebar";
-import Header from "components/navbars/topbar/Header";
+import Sidebar from "@/components/navbars/sidebar/Sidebar";
+import Header from "@/components/navbars/topbar/Header";
 // import { Image } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { ProtectedRoute } from "../components/ProtectedRoute";
 
-// import ScrollButton from "sub-components/dashboard/ScrollButton";
+// import ScrollButton from "@/sub-components/dashboard/ScrollButton";
 
 const RootLayout = () => {
   const [showMenu, setShowMenu] = useState(true);

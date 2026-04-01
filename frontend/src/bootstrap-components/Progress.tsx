@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 
 // import widget/custom components
-import { HighlightCode } from "widgets";
+import { HighlightCode } from "@/widgets";
 
 // import react code data file
 import {
@@ -21,7 +21,7 @@ import {
   MultipleBarsCode,
   StripedCode,
   AnimatedCode,
-} from "data/code/ProgressCode";
+} from "@/data/code/ProgressCode";
 
 const Progress = () => {
   return (
