@@ -407,7 +407,7 @@ const Dashboard = () => {
                 selectedBTDrivers={selectedBTDrivers}
                 setSelectedBTDrivers={setSelectedBTDrivers}
 
-                resultOptions={['PASS', 'FAIL', '']}
+                resultOptions={['PASS', 'FAIL', 'Warning', '']}
                 selectedResults={selectedResults}
                 setSelectedResults={setSelectedResults}
 

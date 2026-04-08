@@ -1,13 +1,22 @@
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import { Button, Form, Spinner, Table } from "react-bootstrap";
-import { chatService } from "@/services/chatService";
-import { ChatMessage } from "@/types";
+import { chatServiceNew } from "@/services/chatService";
+import { ChatMessageNew, ChatHistoryItem, ORMQueryParams } from "@/types";
 
-const createMessage = (role: "user" | "assistant", content: string): ChatMessage => ({
+const createMessage = (
+  role: "user" | "assistant",
+  content: string,
+  has_database_query: boolean = false,
+  query_params?: ORMQueryParams,
+  query_results?: any[]
+): ChatMessageNew => ({
   id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
   role,
   content,
   createdAt: new Date().toISOString(),
+  has_database_query,
+  query_params,
+  query_results,
 });
 
 const formatCellValue = (value: unknown) => {
@@ -22,11 +31,57 @@ const formatCellValue = (value: unknown) => {
   return String(value);
 };
 
-const ChatAssistant = () => {
+const formatQueryParamsForDisplay = (params: ORMQueryParams): string => {
+  const parts: string[] = [];
+
+  if (params.select_columns && params.select_columns.length > 0) {
+    parts.push(`Columns: ${params.select_columns.join(", ")}`);
+  }
+
+  if (params.filters && params.filters.length > 0) {
+    const filterStrs = params.filters.map((f) => {
+      if (f.operator === "in" && f.values) {
+        return `${f.column} IN [${f.values.join(", ")}]`;
+      } else if (f.operator === "between" && f.values) {
+        return `${f.column} BETWEEN ${f.values[0]} AND ${f.values[1]}`;
+      } else if (f.value !== undefined) {
+        return `${f.column} ${f.operator} ${f.value}`;
+      }
+      return `${f.column} ${f.operator}`;
+    });
+    parts.push(`Filters: ${filterStrs.join(" AND ")}`);
+  }
+
+  if (params.aggregations && params.aggregations.length > 0) {
+    const aggregationStrs = params.aggregations.map((aggregation) => {
+      const distinctPrefix = aggregation.distinct ? "DISTINCT " : "";
+      const aliasSuffix = aggregation.alias ? ` AS ${aggregation.alias}` : "";
+      return `${aggregation.function.toUpperCase()}(${distinctPrefix}${aggregation.column})${aliasSuffix}`;
+    });
+    parts.push(`Aggregations: ${aggregationStrs.join(", ")}`);
+  }
+
+  if (params.group_by && params.group_by.length > 0) {
+    parts.push(`Group By: ${params.group_by.join(", ")}`);
+  }
+
+  if (params.order_by && params.order_by.length > 0) {
+    const orderStrs = params.order_by.map((o) => `${o[0]} ${o[1].toUpperCase()}`);
+    parts.push(`Order: ${orderStrs.join(", ")}`);
+  }
+
+  if (params.limit) {
+    parts.push(`Limit: ${params.limit}`);
+  }
+
+  return parts.join("\n");
+};
+
+const ChatAssistantNew = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessageNew[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const hasMessages = useMemo(() => messages.length > 0, [messages]);
@@ -38,7 +93,7 @@ const ChatAssistant = () => {
     }
 
     const userMessage = createMessage("user", question);
-    const nextHistory = [...messages, userMessage].map((m) => ({
+    const nextHistory: ChatHistoryItem[] = [...messages, userMessage].map((m) => ({
       role: m.role,
       content: m.content,
     }));
@@ -50,18 +105,26 @@ const ChatAssistant = () => {
 
     try {
       const token = localStorage.getItem("authToken") || undefined;
-      const response = await chatService.askQuestion({
-        question,
-        history: nextHistory,
-      }, token);
+      const response = await chatServiceNew.askQuestion(
+        {
+          question,
+          history: nextHistory,
+        },
+        token
+      );
 
-      const assistantText = response.answer || "no response currently, please try again later.";
+      const assistantText =
+        response.answer || "No response currently, please try again later.";
       setMessages((prev) => [
         ...prev,
         {
-          ...createMessage("assistant", assistantText),
-          sql: response.sql,
-          rows: response.rows,
+          ...createMessage(
+            "assistant",
+            assistantText,
+            response.has_database_query,
+            response.query_params,
+            response.query_results
+          ),
           trace_id: response.trace_id,
         },
       ]);
@@ -70,7 +133,10 @@ const ChatAssistant = () => {
       setError(message);
       setMessages((prev) => [
         ...prev,
-        createMessage("assistant", `System is temporarily unable to respond: ${message}`),
+        createMessage(
+          "assistant",
+          `System is temporarily unable to respond: ${message}`
+        ),
       ]);
     } finally {
       setIsLoading(false);
@@ -83,7 +149,7 @@ const ChatAssistant = () => {
         variant="light"
         className="btn-icon rounded-circle text-muted me-2"
         onClick={() => setIsOpen(true)}
-        aria-label="Open chat assistant"
+        aria-label="Open advanced chat assistant"
       >
         <i className="fe fe-message-square"></i>
       </Button>
@@ -102,8 +168,8 @@ const ChatAssistant = () => {
           >
             <div className="d-flex align-items-center justify-content-between p-3 border-bottom">
               <div>
-                <h5 className="mb-0">Chat Assistant</h5>
-                <small className="text-muted">Ask data questions in natural language</small>
+                <h5 className="mb-0">Chat Assistant (Advanced)</h5>
+                <small className="text-muted">AI with database access</small>
               </div>
               <Button
                 variant="outline-secondary"
@@ -118,17 +184,23 @@ const ChatAssistant = () => {
             <div className="flex-grow-1 overflow-auto p-3 bg-light">
               {!hasMessages && (
                 <div className="text-muted small">
-                  Try asking me: "What platform had the highest failure rate in the last 7 days?"
+                  Ask me questions about the dashboard data and I'll use database queries to find the
+                  answers. Try: "Which platform had the most failures?"
                 </div>
               )}
 
               {messages.map((message) => {
-                const rowKeys = message.rows && message.rows.length > 0 ? Object.keys(message.rows[0]) : [];
+                const rowKeys =
+                  message.query_results && message.query_results.length > 0
+                    ? Object.keys(message.query_results[0])
+                    : [];
 
                 return (
                   <div
                     key={message.id}
-                    className={`mb-3 d-flex ${message.role === "user" ? "justify-content-end" : "justify-content-start"}`}
+                    className={`mb-3 d-flex ${
+                      message.role === "user" ? "justify-content-end" : "justify-content-start"
+                    }`}
                   >
                     <div
                       className={`px-3 py-2 rounded-3 ${
@@ -138,40 +210,49 @@ const ChatAssistant = () => {
                     >
                       <div>{message.content}</div>
 
-                      {message.role === "assistant" && message.sql && (
+                      {message.role === "assistant" && message.has_database_query && message.query_params && (
                         <div className="mt-3">
-                          <div className="small text-muted mb-1">SQL</div>
+                          <div className="small text-muted mb-1">Query Parameters</div>
                           <pre className="small bg-light border rounded p-2 mb-0" style={{ whiteSpace: "pre-wrap" }}>
-                            {message.sql}
+                            {formatQueryParamsForDisplay(message.query_params)}
                           </pre>
                         </div>
                       )}
 
-                      {message.role === "assistant" && message.rows && message.rows.length > 0 && rowKeys.length > 0 && (
-                        <div className="mt-3">
-                          <div className="small text-muted mb-1">Rows</div>
-                          <div className="border rounded bg-white overflow-auto">
-                            <Table responsive size="sm" className="mb-0 align-middle">
-                              <thead>
-                                <tr>
-                                  {rowKeys.map((key) => (
-                                    <th key={key}>{key}</th>
-                                  ))}
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {message.rows.map((row, index) => (
-                                  <tr key={`${message.id}-${index}`}>
+                      {message.role === "assistant" &&
+                        message.query_results &&
+                        message.query_results.length > 0 &&
+                        rowKeys.length > 0 && (
+                          <div className="mt-3">
+                            <div className="small text-muted mb-1">
+                              Results ({message.query_results.length} rows)
+                            </div>
+                            <div className="border rounded bg-white overflow-auto" style={{ maxHeight: "300px" }}>
+                              <Table responsive size="sm" className="mb-0 align-middle">
+                                <thead>
+                                  <tr>
                                     {rowKeys.map((key) => (
-                                      <td key={key}>{formatCellValue(row[key])}</td>
+                                      <th key={key} style={{ fontSize: "12px" }}>
+                                        {key}
+                                      </th>
                                     ))}
                                   </tr>
-                                ))}
-                              </tbody>
-                            </Table>
+                                </thead>
+                                <tbody>
+                                  {message.query_results.map((row, index) => (
+                                    <tr key={`${message.id}-${index}`}>
+                                      {rowKeys.map((key) => (
+                                        <td key={key} style={{ fontSize: "12px" }}>
+                                          {formatCellValue(row[key])}
+                                        </td>
+                                      ))}
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </Table>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
                       {message.role === "assistant" && message.trace_id && (
                         <div className="small text-muted mt-2">Trace ID: {message.trace_id}</div>
@@ -184,7 +265,7 @@ const ChatAssistant = () => {
               {isLoading && (
                 <div className="d-flex align-items-center text-muted small">
                   <Spinner animation="border" size="sm" className="me-2" />
-                  Thinking...
+                  Thinking and querying database...
                 </div>
               )}
 
@@ -222,4 +303,4 @@ const ChatAssistant = () => {
   );
 };
 
-export default ChatAssistant;
+export default ChatAssistantNew;

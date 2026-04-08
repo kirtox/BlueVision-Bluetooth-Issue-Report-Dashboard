@@ -246,3 +246,44 @@ export interface ChatMessage extends ChatHistoryItem {
   rows?: any[];
   trace_id?: string;
 }
+
+// Enhanced Chat Types with Function Calling
+export interface ORMFilterCondition {
+  column: string;
+  operator: "eq" | "ne" | "gt" | "gte" | "lt" | "lte" | "in" | "like" | "between";
+  value?: any;
+  values?: any[];
+}
+
+export interface ORMAggregationSpec {
+  function: "count" | "sum" | "avg" | "min" | "max";
+  column: string;
+  alias?: string;
+  distinct?: boolean;
+}
+
+export interface ORMQueryParams {
+  select_columns?: string[] | null;
+  filters?: ORMFilterCondition[] | null;
+  aggregations?: ORMAggregationSpec[] | null;
+  group_by?: string[] | null;
+  order_by?: [string, "asc" | "desc"][] | null;
+  limit?: number;
+}
+
+export interface ChatAskResponse {
+  answer: string;
+  has_database_query: boolean;
+  query_params?: ORMQueryParams;
+  query_results?: any[];
+  trace_id?: string;
+}
+
+export interface ChatMessageNew extends ChatHistoryItem {
+  id: string;
+  createdAt: string;
+  has_database_query?: boolean;
+  query_params?: ORMQueryParams;
+  query_results?: any[];
+  trace_id?: string;
+}

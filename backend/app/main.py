@@ -92,12 +92,22 @@ def health():
     return {"status": "ok"}
 
 
+# @app.post("/chat/ask", response_model=ChatAskResponse)
+# def chat_ask(
+#     payload: ChatAskRequest,
+#     db: Session = Depends(get_db),
+#     current_user: models.User = Depends(get_current_user),
+# ):
+#     return handle_chat_ask(payload=payload, db=db, current_user=current_user)
+
+
 @app.post("/chat/ask", response_model=ChatAskResponse)
 def chat_ask(
     payload: ChatAskRequest,
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
+    """Enhanced chat endpoint with LLM function calling for database queries"""
     return handle_chat_ask(payload=payload, db=db, current_user=current_user)
 
 # Read all reports

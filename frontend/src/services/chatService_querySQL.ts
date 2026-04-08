@@ -1,12 +1,9 @@
-import { ChatAskRequest as ChatAskRequestNew, ChatAskResponse } from "@/types";
+import { ChatAskRequest, ChatAskResponse } from "@/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
-export const chatServiceNew = {
-  async askQuestion(
-    payload: ChatAskRequestNew,
-    token?: string
-  ): Promise<ChatAskResponse> {
+export const chatService = {
+  async askQuestion(payload: ChatAskRequest, token?: string): Promise<ChatAskResponse> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
@@ -41,9 +38,8 @@ export const chatServiceNew = {
 
     return {
       answer: data.answer || "",
-      has_database_query: data.has_database_query || false,
-      query_params: data.query_params,
-      query_results: Array.isArray(data.query_results) ? data.query_results : undefined,
+      sql: data.sql || "",
+      rows: Array.isArray(data.rows) ? data.rows : [],
       trace_id: data.trace_id,
     };
   },

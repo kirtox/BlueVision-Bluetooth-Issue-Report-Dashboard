@@ -11,3 +11,5 @@ python-multipart
 openpyxl
 alembic
 requests
+httpx
+openai
