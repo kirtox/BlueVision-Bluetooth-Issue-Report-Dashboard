@@ -3,6 +3,7 @@ import { Outlet } from "react-router";
 // import { Link } from "react-router-dom";
 import Sidebar from "@/components/navbars/sidebar/Sidebar";
 import Header from "@/components/navbars/topbar/Header";
+import ChatAssistant from "@/components/navbars/topbar/ChatAssistant";
 // import { Image } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { ProtectedRoute } from "../components/ProtectedRoute";
@@ -74,8 +75,8 @@ const RootLayout = () => {
         style={{
           position: 'fixed',
           bottom: '30px',
-          right: '110px',
-          zIndex: 1000,
+          right: '190px',
+          zIndex: 999,
           borderRadius: '50%',
           width: '56px',
           height: '56px',
@@ -121,8 +122,8 @@ const RootLayout = () => {
         style={{
           position: 'fixed',
           bottom: '30px',
-          right: '30px',
-          zIndex: 1000,
+          right: '110px',
+          zIndex: 999,
           borderRadius: '50%',
           width: '56px',
           height: '56px',
@@ -158,6 +159,9 @@ const RootLayout = () => {
           <path d="M6 9l6 6 6-6"/>
         </svg>
       </button>
+
+      {/* Chat Assistant Floating Window */}
+      <ChatAssistant />
       </section>
     </ProtectedRoute>
   );
