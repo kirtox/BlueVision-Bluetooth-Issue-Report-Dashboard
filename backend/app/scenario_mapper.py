@@ -22,24 +22,28 @@ def get_short_scenario_name(scenario: str, microsoft_teams: str) -> str:
     
     Logic:
     1. S3 + Mouse + Music
-       - Scenario中有Modern_Standby就有"S3 + Mouse"
-       - Scenario中有Headset_output_check才去检查是否为microsoft_teams='N'
+       - If scenario contains Modern_Standby, it has "S3 + Mouse"
+       - If scenario contains Headset_output_check, check if microsoft_teams='N'
     2. S3 + Mouse + Teams
-       - Scenario中有Modern_Standby就有"S3 + Mouse"
-       - Scenario中有Headset_output_check才去检查是否为microsoft_teams='Y'
+       - If scenario contains Modern_Standby, it has "S3 + Mouse"
+       - If scenario contains Headset_output_check, check if microsoft_teams='Y'
     3. S4 + Music
-       - Scenario中有Hibernation就有"S4"
-       - Scenario中有Headset_output_check才去检查是否为microsoft_teams='N'
+       - If scenario contains Hibernation, it has "S4"
+       - If scenario contains Headset_output_check, check if microsoft_teams='N'
     4. S4 + Teams
-       - Scenario中有Hibernation就有"S4"
-       - Scenario中有Headset_output_check才去检查是否为microsoft_teams='Y'
+       - If scenario contains Hibernation, it has "S4"
+       - If scenario contains Headset_output_check, check if microsoft_teams='Y'
+    5. Mouse
+       - If scenario doesn't contain Modern_Standby or Hibernation
+       - But contains Mouse_Random_Click or Mouse_Function_Check
+       - Returns "Mouse" (only once even if both keywords are present)
     
     Args:
         scenario: Full scenario string, e.g. "Modern_Standby,Idle,Environment_Initialization,Headset_Output_Check,Environment_Restore"
         microsoft_teams: "Y" or "N"
     
     Returns:
-        Short name, e.g. "S3 + Mouse + Teams", "S4 + Music", "S3 + Mouse", "S4", returns original scenario if no match found
+        Short name, e.g. "S3 + Mouse + Teams", "S4 + Music", "Mouse", returns original scenario if no match found
     """
     if not scenario:
         return scenario
@@ -70,6 +74,11 @@ def get_short_scenario_name(scenario: str, microsoft_teams: str) -> str:
                         return "S4 + Music"
                 else:
                     return "S4"
+    
+    # Check for Mouse scenario (if not S3 or S4)
+    has_mouse_check = "mouse_random_click" in scenario_lower or "mouse_function_check" in scenario_lower
+    if has_mouse_check:
+        return "Mouse"
     
     # If no pattern matched, return original scenario
     return scenario
@@ -112,6 +121,21 @@ if __name__ == "__main__":
             "scenario": "Hibernation,Idle,Environment_Initialization",
             "microsoft_teams": "Y",
             "expected": "S4"
+        },
+        {
+            "scenario": "Idle,Mouse_Random_Click",
+            "microsoft_teams": "N",
+            "expected": "Mouse"
+        },
+        {
+            "scenario": "Mouse_Function_Check,Idle",
+            "microsoft_teams": "Y",
+            "expected": "Mouse"
+        },
+        {
+            "scenario": "Mouse_Random_Click,Mouse_Function_Check",
+            "microsoft_teams": "N",
+            "expected": "Mouse"
         },
     ]
     
