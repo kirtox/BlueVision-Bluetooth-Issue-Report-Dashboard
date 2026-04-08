@@ -5,7 +5,6 @@ import { Nav, Navbar} from "react-bootstrap";
 
 // import sub components
 import Notifications from "./Notifications";
-import ChatAssistantNew from "./ChatAssistant";
 import { UserMenu } from "./UserMenu";
 
 interface HeaderProps {
@@ -34,7 +33,6 @@ const Header: React.FC<HeaderProps> = ({ toggleMenu }) => {
         </div>
         {/* Quick Menu */}
         <Nav className="navbar-right-wrap ms-2 d-flex nav-top-wrap">
-          <ChatAssistantNew />
           <Notifications />
           <UserMenu />
         </Nav>
