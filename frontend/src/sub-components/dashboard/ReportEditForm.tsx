@@ -277,7 +277,7 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
         <Card.Body>
           <Card.Title className="fw-bold">Summary</Card.Title>
           <Row>
-            {renderSelectField("Result", "result", ["Pass", "Fail", "On-Going"])}
+            {renderSelectField("Result", "result", ["Pass", "Fail", "Warning", "Blocked State", "Triaged State"])}
             {renderField("Cycles", "cycles")}
             {renderField("Fail Cycles", "fail_cycles")}
             {renderField("Duration (seconds)", "duration")}

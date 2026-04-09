@@ -252,6 +252,37 @@ const Dashboard = () => {
     setNewReport(null);
   };
 
+  const normalizeFilterValue = (value: string | null | undefined) =>
+    (value || '').trim().toLowerCase();
+
+  const normalizedSelectedPlatformBrands = new Set(
+    selectedPlatformBrands.map(normalizeFilterValue)
+  );
+
+  const normalizedSelectedPlatforms = new Set(
+    selectedPlatforms.map(normalizeFilterValue)
+  );
+
+  const normalizedSelectedCPUs = new Set(
+    selectedCPUs.map(normalizeFilterValue)
+  );
+
+  const normalizedSelectedWlans = new Set(
+    selectedWlans.map(normalizeFilterValue)
+  );
+
+  const normalizedSelectedScenarios = new Set(
+    selectedScenarios.map(normalizeFilterValue)
+  );
+
+  const normalizedSelectedBTDrivers = new Set(
+    selectedBTDrivers.map(normalizeFilterValue)
+  );
+
+  const normalizedSelectedResults = new Set(
+    selectedResults.map(normalizeFilterValue)
+  );
+
   const filteredReports = reports.filter((item) => {
     const matchesSearch =
       item.op_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -264,21 +295,26 @@ const Dashboard = () => {
       item.bt_driver.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.wifi_driver.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.result.toLowerCase().includes(searchTerm.toLowerCase());
-      // item.current_status.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPlatformBrand =
-      selectedPlatformBrands.length === 0 || selectedPlatformBrands.includes(item.platform_brand);
+      normalizedSelectedPlatformBrands.size === 0 ||
+      normalizedSelectedPlatformBrands.has(normalizeFilterValue(item.platform_brand));
     const matchesPlatform =
-      selectedPlatforms.length === 0 || selectedPlatforms.includes(item.platform);
+      normalizedSelectedPlatforms.size === 0 ||
+      normalizedSelectedPlatforms.has(normalizeFilterValue(item.platform));
     const matchesCPU =
-      selectedCPUs.length === 0 || selectedCPUs.includes(item.cpu_codename || item.cpu);
+      normalizedSelectedCPUs.size === 0 ||
+      normalizedSelectedCPUs.has(normalizeFilterValue(item.cpu_codename || item.cpu));
     const matchesWlan =
-      selectedWlans.length === 0 || selectedWlans.includes(item.wlan);
+      normalizedSelectedWlans.size === 0 ||
+      normalizedSelectedWlans.has(normalizeFilterValue(item.wlan));
     const matchesScenario =
-      selectedScenarios.length === 0 || selectedScenarios.includes(item.short_scenario || item.scenario);
+      normalizedSelectedScenarios.size === 0 ||
+      normalizedSelectedScenarios.has(normalizeFilterValue(item.short_scenario || item.scenario));
     const matchesBTDriver =
-      selectedBTDrivers.length === 0 || selectedBTDrivers.includes(item.bt_driver);
+      normalizedSelectedBTDrivers.size === 0 ||
+      normalizedSelectedBTDrivers.has(normalizeFilterValue(item.bt_driver));
     const matchesResult =
-      selectedResults.length === 0 || selectedResults.includes(item.result?.toUpperCase() || '');
+      normalizedSelectedResults.size === 0 || normalizedSelectedResults.has(normalizeFilterValue(item.result));
     const reportDate = new Date(item.date);
     const start = dateRange.startDate;
     const end = dateRange.endDate ? new Date(new Date(dateRange.endDate).setHours(23, 59, 59, 999)) : null;
@@ -383,9 +419,9 @@ const Dashboard = () => {
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 
-                // platformBrandOptions={[...new Set(reports.map(r => r.platform_brand))]}
-                // selectedPlatformBrands={selectedPlatformBrands}
-                // setSelectedPlatformBrands={setSelectedPlatformBrands}
+                platformBrandOptions={[...new Set(reports.map(r => r.platform_brand))]}
+                selectedPlatformBrands={selectedPlatformBrands}
+                setSelectedPlatformBrands={setSelectedPlatformBrands}
 
                 platformOptions={[...new Set(reports.map(r => r.platform))]}
                 selectedPlatforms={selectedPlatforms}
@@ -407,7 +443,7 @@ const Dashboard = () => {
                 selectedBTDrivers={selectedBTDrivers}
                 setSelectedBTDrivers={setSelectedBTDrivers}
 
-                resultOptions={['PASS', 'FAIL', '']}
+                resultOptions={['Pass', 'Fail', 'Warning', 'Blocked State', 'Triaged State']}
                 selectedResults={selectedResults}
                 setSelectedResults={setSelectedResults}
 

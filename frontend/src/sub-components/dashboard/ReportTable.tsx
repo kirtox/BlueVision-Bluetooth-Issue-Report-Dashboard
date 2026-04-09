@@ -297,7 +297,7 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
                       <span className="badge bg-danger d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
                         {item.result}
                       </span>
-                    ) : item.result?.toUpperCase() === 'ON-GOING' ? (
+                    ) : item.result?.toUpperCase() === 'TRIAGED STATE' ? (
                       <span className="badge bg-warning d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
                         <Spinner
                           as="span"
@@ -309,8 +309,16 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
                         />
                         {item.result}
                       </span>
-                    ) : (
+                    ) : item.result?.toUpperCase() === 'BLOCKED STATE' ? (
+                      <span className="badge bg-dark d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
+                        {item.result}
+                      </span>
+                    ) : item.result?.toUpperCase() === 'WARNING' ? (
                       <span className="badge bg-secondary d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
+                        {item.result}
+                      </span>
+                    ) : (
+                      <span className="badge bg-info d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
                         {item.result || ''}
                       </span>
                     )}
