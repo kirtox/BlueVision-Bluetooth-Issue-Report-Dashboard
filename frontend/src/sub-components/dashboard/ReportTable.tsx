@@ -99,8 +99,18 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
 
   // Sort
   const sortedReports = [...reports].sort((a, b) => {
-    const fieldA = a[sortField];
-    const fieldB = b[sortField];
+    const fieldA =
+      sortField === 'short_platform_brand'
+        ? (a.short_platform_brand || a.platform_brand)
+        : sortField === 'short_platform'
+          ? (a.short_platform || a.platform)
+          : a[sortField];
+    const fieldB =
+      sortField === 'short_platform_brand'
+        ? (b.short_platform_brand || b.platform_brand)
+        : sortField === 'short_platform'
+          ? (b.short_platform || b.platform)
+          : b[sortField];
 
     if (fieldA == null && fieldB == null) return 0;
     if (fieldA == null) return 1;
@@ -207,11 +217,11 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
               <th onClick={() => handleSort('date')} style={{ cursor: 'pointer' }}>
                 Date {sortField === 'date' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
               </th>
-              <th onClick={() => handleSort('platform_brand')} style={{ cursor: 'pointer' }}>
-                Platform_brand {sortField === 'platform_brand' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              <th onClick={() => handleSort('short_platform_brand')} style={{ cursor: 'pointer' }}>
+                Platform Brand {sortField === 'short_platform_brand' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
               </th>
-              <th onClick={() => handleSort('platform')} style={{ cursor: 'pointer' }}>
-                Platform {sortField === 'platform' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
+              <th onClick={() => handleSort('short_platform')} style={{ cursor: 'pointer' }}>
+                Platform {sortField === 'short_platform' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
               </th>
               <th onClick={() => handleSort('cpu_codename')} style={{ cursor: 'pointer' }}>
                 CPU Codename {sortField === 'cpu_codename' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
@@ -254,34 +264,37 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
           </thead>
           <tbody>
             {currentReports.map((item) => {
+              const displayPlatformBrand = item.short_platform_brand || item.platform_brand || '';
+              const displayPlatform = item.short_platform || item.platform || '';
+
               return (
                 <tr key={item.id}>
                   {/* <td className="align-middle">{item.op_name}</td> */}
                   <td className="align-middle">{new Date(item.date).toLocaleString()}</td>
                   {/* <td className="align-middle">{item.platform_brand}</td> */}
                   <td className="align-middle">
-                    {item.platform_brand && item.platform_brand.length > 15 ? (
+                    {displayPlatformBrand && displayPlatformBrand.length > 15 ? (
                       <OverlayTrigger
                         placement="top"
                         overlay={
                           <Tooltip id={`tooltip-platform_brand-${item.id}`}>
                             <div style={{ maxWidth: '400px', whiteSpace: 'pre-line', wordWrap: 'break-word', textAlign: 'left' }}>
-                              {item.platform_brand.replace(/\] \[/g, ']\n[')}
+                              {displayPlatformBrand.replace(/\] \[/g, ']\n[')}
                             </div>
                           </Tooltip>
                         }
                       >
                         <div style={{ cursor: 'pointer' }}>
-                          {item.platform_brand.substring(0, 12)}...
+                          {displayPlatformBrand.substring(0, 12)}...
                         </div>
                       </OverlayTrigger>
                     ) : (
                       <div>
-                        {item.platform_brand || ''}
+                        {displayPlatformBrand}
                       </div>
                     )}
                   </td>
-                  <td className="align-middle">{item.platform}</td>
+                  <td className="align-middle">{displayPlatform}</td>
                   <td className="align-middle">{item.cpu_codename || item.cpu}</td>
                   <td className="align-middle">{item.wlan}</td>
                   <td className="align-middle">{item.wifi_name || ''}</td>
@@ -297,7 +310,7 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
                       <span className="badge bg-danger d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
                         {item.result}
                       </span>
-                    ) : item.result?.toUpperCase() === 'TRIAGED STATE' ? (
+                    ) : item.result?.toUpperCase() === 'TRIAGED' ? (
                       <span className="badge bg-warning d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
                         <Spinner
                           as="span"
@@ -309,7 +322,7 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
                         />
                         {item.result}
                       </span>
-                    ) : item.result?.toUpperCase() === 'BLOCKED STATE' ? (
+                    ) : item.result?.toUpperCase() === 'BLOCK' ? (
                       <span className="badge bg-dark d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
                         {item.result}
                       </span>
@@ -464,8 +477,8 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
                 <ul>
                   <li><b>Operator:</b> {deletingReport.op_name}</li>
                   <li><b>Date:</b> {new Date(deletingReport.date).toLocaleString()}</li>
-                  <li><b>Platform Brand:</b> {deletingReport.platform_brand}</li>
-                  <li><b>Platform:</b> {deletingReport.platform}</li>
+                  <li><b>Platform Brand:</b> {deletingReport.short_platform_brand || deletingReport.platform_brand}</li>
+                  <li><b>Platform:</b> {deletingReport.short_platform || deletingReport.platform}</li>
                   <li><b>CPU:</b> {deletingReport.cpu_codename || deletingReport.cpu}</li>
                   <li><b>WLAN:</b> {deletingReport.wlan}</li>
                   <li><b>BT driver:</b> {deletingReport.bt_driver}</li>

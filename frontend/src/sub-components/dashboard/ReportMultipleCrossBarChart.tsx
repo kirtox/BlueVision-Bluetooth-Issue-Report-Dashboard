@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
   Legend,
-  LabelList,
+  // LabelList,
 } from "recharts";
 import { useReports } from "../../hooks/useReports";
 import { ReportMultipleCrossBarChartProps } from "types";
@@ -91,12 +91,11 @@ const ReportMultipleCrossBarChart: React.FC<ReportMultipleCrossBarChartProps> = 
           <XAxis type="number" allowDecimals={false} />
           <YAxis type="category" dataKey="name" width={120} />
           <Tooltip wrapperStyle={{ zIndex: 1000 }} />
-          {/* Because current legend is too long, it will influence layout. */}
-          {/* Thus, it was commented out. */}
+          {/* If the current legend is too long, consider adding legendType="none" in <Legend /> */}
           <Legend verticalAlign="bottom" align="center" wrapperStyle={{ paddingTop: 8 }} />
           {yCategories.map((y, idx) => (
-            <Bar key={y} dataKey={y} stackId="a" fill={COLORS[idx % COLORS.length]} legendType="none">
-              <LabelList
+            <Bar key={y} dataKey={y} stackId="a" fill={COLORS[idx % COLORS.length]} >
+              {/* <LabelList
                 dataKey={y}
                 content={({ x, y: yCoord, width, height, value }) => {
                   if (!value || value === 0) return null;
@@ -114,7 +113,7 @@ const ReportMultipleCrossBarChart: React.FC<ReportMultipleCrossBarChartProps> = 
                     </text>
                   );
                 }}
-              />
+              /> */}
             </Bar>
           ))}
           

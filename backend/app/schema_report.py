@@ -9,7 +9,9 @@ class ReportBase(BaseModel):
 
     os_version: Optional[str] = None
     platform_brand: Optional[str] = None
+    short_platform_brand: Optional[str] = None
     platform: Optional[str] = None
+    short_platform: Optional[str] = None
     platform_phase: Optional[str] = None
     platform_bios: Optional[str] = None
     cpu: Optional[str] = None

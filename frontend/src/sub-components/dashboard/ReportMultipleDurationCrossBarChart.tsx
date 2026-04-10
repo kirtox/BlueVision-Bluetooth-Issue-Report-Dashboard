@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
   Legend,
-  LabelList,
+  // LabelList,
 } from "recharts";
 import { useReports } from "../../hooks/useReports";
 import { ReportMultipleDurationCrossBarChartProps } from "types";
@@ -95,13 +95,12 @@ const ReportMultipleDurationCrossBarChart: React.FC<ReportMultipleDurationCrossB
           <XAxis type="number" allowDecimals={false} label={{ value: "(hr)", position: "insideBottomRight", offset: -5 }} />
           <YAxis type="category" dataKey="name" width={120} />
           <Tooltip wrapperStyle={{ zIndex: 1000 }} formatter={(value, name) => [`${Number(value).toFixed(2)} hrs`, name]} />
-          {/* Because current legend is too long, it will influence layout. */}
-          {/* Thus, it was commented out. */}
+          {/* If the current legend is too long, consider adding legendType="none" in <Legend /> */}
           <Legend verticalAlign="bottom" align="center" wrapperStyle={{ paddingTop: 8 }} />
           {groups.map((g, idx) => (
-            <Bar key={g} dataKey={g} stackId="a" fill={COLORS[idx % COLORS.length]} legendType="none">
+            <Bar key={g} dataKey={g} stackId="a" fill={COLORS[idx % COLORS.length]}>
               {/* Single bar value */}
-              <LabelList
+              {/* <LabelList
                 dataKey={g}
                 content={({ x, y, width, height, value }) => {
                   if (!value || value === 0) return null;
@@ -119,7 +118,7 @@ const ReportMultipleDurationCrossBarChart: React.FC<ReportMultipleDurationCrossB
                     </text>
                   );
                 }}
-              />
+              /> */}
 
               {/* The column total */}
               {/* <LabelList

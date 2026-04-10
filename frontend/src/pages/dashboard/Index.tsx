@@ -284,10 +284,13 @@ const Dashboard = () => {
   );
 
   const filteredReports = reports.filter((item) => {
+    const displayPlatformBrand = item.short_platform_brand || item.platform_brand;
+    const displayPlatform = item.short_platform || item.platform;
+
     const matchesSearch =
       item.op_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.platform_brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.platform.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      displayPlatformBrand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      displayPlatform.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.cpu_codename && item.cpu_codename.toLowerCase().includes(searchTerm.toLowerCase())) ||
       item.wlan.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.scenario.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -297,10 +300,10 @@ const Dashboard = () => {
       item.result.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesPlatformBrand =
       normalizedSelectedPlatformBrands.size === 0 ||
-      normalizedSelectedPlatformBrands.has(normalizeFilterValue(item.platform_brand));
+      normalizedSelectedPlatformBrands.has(normalizeFilterValue(displayPlatformBrand));
     const matchesPlatform =
       normalizedSelectedPlatforms.size === 0 ||
-      normalizedSelectedPlatforms.has(normalizeFilterValue(item.platform));
+      normalizedSelectedPlatforms.has(normalizeFilterValue(displayPlatform));
     const matchesCPU =
       normalizedSelectedCPUs.size === 0 ||
       normalizedSelectedCPUs.has(normalizeFilterValue(item.cpu_codename || item.cpu));
@@ -419,11 +422,11 @@ const Dashboard = () => {
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
                 
-                platformBrandOptions={[...new Set(reports.map(r => r.platform_brand))]}
+                platformBrandOptions={[...new Set(reports.map(r => r.short_platform_brand || r.platform_brand))]}
                 selectedPlatformBrands={selectedPlatformBrands}
                 setSelectedPlatformBrands={setSelectedPlatformBrands}
 
-                platformOptions={[...new Set(reports.map(r => r.platform))]}
+                platformOptions={[...new Set(reports.map(r => r.short_platform || r.platform))]}
                 selectedPlatforms={selectedPlatforms}
                 setSelectedPlatforms={setSelectedPlatforms}
 
@@ -443,7 +446,7 @@ const Dashboard = () => {
                 selectedBTDrivers={selectedBTDrivers}
                 setSelectedBTDrivers={setSelectedBTDrivers}
 
-                resultOptions={['Pass', 'Fail', 'Warning', 'Blocked State', 'Triaged State']}
+                resultOptions={['Pass', 'Fail', 'Warning', 'Block', 'Triaged']}
                 selectedResults={selectedResults}
                 setSelectedResults={setSelectedResults}
 
@@ -519,7 +522,7 @@ const Dashboard = () => {
                 <Col lg={12} md={12} xs={12}>
                   <ReportMultipleGaugeChart
                     reports={filteredReports}
-                    groupBy="platform"
+                    groupBy="short_platform"
                     calcField="duration"
                     calcType="sum"
                     max={720}
@@ -607,7 +610,7 @@ const Dashboard = () => {
                 <Col lg={6} md={12} xs={12}>
                   <ReportMultipleCrossBarChart
                     reports={filteredReports}
-                    fieldX="platform"
+                    fieldX="short_platform"
                     fieldY="short_scenario"
                     title="Platform Summary"
                   />
@@ -627,7 +630,7 @@ const Dashboard = () => {
                   <ReportMultipleCrossBarChart
                     reports={filteredReports}
                     fieldX="wlan"
-                    fieldY="platform"
+                    fieldY="short_platform"
                     title="WLAN Reliability"
                   />
                 </Col>
@@ -655,7 +658,7 @@ const Dashboard = () => {
                 <Col lg={6} md={12} xs={12}>
                   <ReportMultipleDurationCrossBarChart
                     reports={filteredReports}
-                    fieldX="platform"
+                    fieldX="short_platform"
                     fieldY="duration"
                     groupBy="short_scenario"
                     title="Platform Summary"
@@ -677,7 +680,7 @@ const Dashboard = () => {
                     reports={filteredReports}
                     fieldX="wlan"
                     fieldY="duration"
-                    groupBy="platform"
+                    groupBy="short_platform"
                     title="WLAN Durability"
                   />
                 </Col>

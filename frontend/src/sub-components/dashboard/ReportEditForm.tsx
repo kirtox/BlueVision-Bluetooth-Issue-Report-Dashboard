@@ -262,7 +262,7 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
         <Card.Body>
           <Card.Title className="fw-bold">Issue Info.</Card.Title>
           <Row>
-            {renderSelectField("Urgent Level", "urgent_level", ["None", "Fireball", "P1", "P2", "P3"])}
+            {renderSelectField("Urgent Level", "urgent_level", ["None", "P1", "P2", "P3"])}
             {renderField("Fix in ? WW", "fix_work_week")}
             {renderField("Fix in ? BT driver", "fix_bt_driver")}
             {renderField("Jira ID", "jira_id")}
@@ -277,7 +277,7 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
         <Card.Body>
           <Card.Title className="fw-bold">Summary</Card.Title>
           <Row>
-            {renderSelectField("Result", "result", ["Pass", "Fail", "Warning", "Blocked State", "Triaged State"])}
+            {renderSelectField("Result", "result", ["Pass", "Fail", "Warning", "Block", "Triaged"])}
             {renderField("Cycles", "cycles")}
             {renderField("Fail Cycles", "fail_cycles")}
             {renderField("Duration (seconds)", "duration")}

@@ -115,7 +115,9 @@ export interface Report {
   op_name: string;
   date: string;
   platform_brand: string;
+  short_platform_brand?: string;
   platform: string;
+  short_platform?: string;
   cpu: string;
   cpu_codename?: string;
   wlan: string;

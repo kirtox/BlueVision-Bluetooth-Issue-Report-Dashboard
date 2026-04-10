@@ -23,3 +23,39 @@ def verify_token(token):
         return username
     except jwt.JWTError:
         return None
+
+
+def normalize_platform_brand(brand: str | None) -> str | None:
+    """Normalize platform_brand to standard values (case-insensitive).
+    
+    Maps raw values to standardized names:
+    HP -> HP
+    LENOVO (any case) -> Lenovo
+    LG Electronics -> LG
+    Samsung -> Samsung
+    Panasonic Connect Co., Ltd. -> Panasonic
+    ASUS -> ASUS
+    900_MAA -> Microsoft
+    Acer -> Acer
+    
+    Returns original value if no match found.
+    """
+    if not brand:
+        return brand
+    
+    # Normalize input: trim and lowercase for case-insensitive matching
+    normalized_input = brand.strip().lower()
+    
+    # Mapping: lowercase key -> standard value
+    brand_mapping = {
+        "hp": "HP",
+        "lenovo": "Lenovo",
+        "lg electronics": "LG",
+        "samsung": "Samsung",
+        "panasonic connect co., ltd.": "Panasonic",
+        "asus": "ASUS",
+        "900_maa": "Microsoft",
+        "acer": "Acer",
+    }
+    
+    return brand_mapping.get(normalized_input, brand)

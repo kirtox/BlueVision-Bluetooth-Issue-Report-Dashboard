@@ -4,7 +4,7 @@ from .schema_platform import PlatformCreate, PlatformUpdate
 from .schema_platform_latest_report import PlatformWithLatestReportInDB
 from .schema_user import UserCreate, UserUpdate
 from sqlalchemy.orm import Session, aliased
-from .utils import get_password_hash, verify_password
+from .utils import get_password_hash, verify_password, normalize_platform_brand
 from sqlalchemy import func, or_, String
 from datetime import datetime
 from datetime import datetime, timezone, timedelta
@@ -95,6 +95,10 @@ def create_report(db: Session, report: ReportCreate):
     # Convert report to dict
     report_dict = report.dict()
     
+    # Keep raw platform_brand and store mapped value in short_platform_brand
+    if report_dict.get('platform_brand'):
+        report_dict['short_platform_brand'] = normalize_platform_brand(report_dict['platform_brand'])
+    
     # Generate CPU codename if CPU data is provided
     if report_dict.get('cpu'):
         cpu_codename = identify_intel_cpu(report_dict['cpu'])
@@ -117,11 +121,17 @@ def update_report(db: Session, report_id: int, report: ReportUpdate):
     db_report = db.query(models.Report).filter(models.Report.id == report_id).first()
     if not db_report:
         return None
-    for key, value in report.dict(exclude_unset=True).items():
+    
+    update_dict = report.dict(exclude_unset=True)
+    
+    # Keep raw platform_brand and refresh short_platform_brand when platform_brand changes
+    if 'platform_brand' in update_dict and update_dict['platform_brand']:
+        update_dict['short_platform_brand'] = normalize_platform_brand(update_dict['platform_brand'])
+    
+    for key, value in update_dict.items():
         setattr(db_report, key, value)
     
     # Recalculate short_scenario if scenario or microsoft_teams changed
-    update_dict = report.dict(exclude_unset=True)
     if 'scenario' in update_dict or 'microsoft_teams' in update_dict:
         if db_report.scenario and db_report.microsoft_teams:
             db_report.short_scenario = get_short_scenario_name(

@@ -16,7 +16,9 @@ class Report(Base):
 
     os_version = Column(String, nullable=False)
     platform_brand = Column(String, nullable=False)
+    short_platform_brand = Column(String, nullable=True)
     platform = Column(String, nullable=False)
+    short_platform = Column(String, nullable=True)
     platform_phase = Column(String, nullable=False)
     platform_bios = Column(String, nullable=False)
     cpu = Column(String, nullable=False)
