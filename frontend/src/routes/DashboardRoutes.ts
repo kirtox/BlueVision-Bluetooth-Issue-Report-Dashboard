@@ -39,15 +39,7 @@ export const DashboardMenu: DashboardMenuProps[] = [
       { id: uuid(), link: "/logs/api-access", name: "API Access Logs" },
     ],
   },
-  {
-    id: uuid(),
-    title: "Development",
-    icon: "settings",
-    children: [
-      { id: uuid(), link: "/pages/auth-test", name: "Auth Test" },
-      { id: uuid(), link: "/pages/permission-test", name: "Permission Test" },
-    ],
-  },
+
   // {
   //   id: uuid(),
   //   title: "LAYOUTS & PAGES",
@@ -184,10 +176,7 @@ const MENU_IDS = {
   DASHBOARD: 'dashboard-menu',
   USER_MANAGEMENT: 'user-management-menu',
   LOGS: 'logs-menu',
-  DEVELOPMENT: 'development-menu',
-  API_ACCESS_LOGS: 'api-access-logs',
-  AUTH_TEST: 'auth-test',
-  PERMISSION_TEST: 'permission-test'
+  API_ACCESS_LOGS: 'api-access-logs'
 };
 
 // Generate menu based on user role
@@ -220,25 +209,10 @@ export const getDashboardMenuByRole = (userRole?: string): DashboardMenuProps[] 
     },
   ];
 
-  // Development test menu items
-  const developmentMenuItems: DashboardMenuProps[] = [
-    {
-      id: MENU_IDS.DEVELOPMENT,
-      title: "Development",
-      icon: "settings",
-      children: [
-        { id: MENU_IDS.AUTH_TEST, link: "/pages/auth-test", name: "Auth Test" },
-        { id: MENU_IDS.PERMISSION_TEST, link: "/pages/permission-test", name: "Permission Test" },
-      ],
-    },
-  ];
-
   let menuItems = [...baseMenuItems];
 
   if (userRole === 'Administrator') {
-    menuItems = [...menuItems, ...adminMenuItems, ...developmentMenuItems];
-  } else if (userRole === 'User') {
-    menuItems = [...menuItems, ...developmentMenuItems];
+    menuItems = [...menuItems, ...adminMenuItems];
   }
   // Guest users can only see base menu
 

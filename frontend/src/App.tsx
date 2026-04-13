@@ -18,8 +18,6 @@ import LayoutVertical from "pages/dashboard/LayoutVertical";
 import Documentation from "pages/dashboard/Documentation";
 import ChangeLog from "pages/dashboard/Changelog";
 import ApiDemo from "./pages/dashboard/pages/ApiDemo";
-import AuthTest from "./pages/dashboard/AuthTest";
-import PermissionTest from "./pages/dashboard/PermissionTest";
 import UserManagement from "./pages/dashboard/UserManagement";
 import APIAccessLogs from "./pages/logs/APIAccessLogs";
 
@@ -97,14 +95,6 @@ const App = () => {
             {
               path: "api-demo",
               Component: ApiDemo,
-            },
-            {
-              path: "auth-test",
-              Component: AuthTest,
-            },
-            {
-              path: "permission-test",
-              Component: PermissionTest,
             },
           ],
         },
