@@ -1,5 +1,6 @@
 //import node module libraries
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { lazy, Suspense } from "react";
 
 //import routes files
 import { AuthProvider } from "./contexts/AuthContext";
@@ -18,8 +19,9 @@ import LayoutVertical from "pages/dashboard/LayoutVertical";
 import Documentation from "pages/dashboard/Documentation";
 import ChangeLog from "pages/dashboard/Changelog";
 import ApiDemo from "./pages/dashboard/pages/ApiDemo";
-import UserManagement from "./pages/dashboard/UserManagement";
-import APIAccessLogs from "./pages/logs/APIAccessLogs";
+
+const UserManagement = lazy(() => import("./pages/dashboard/UserManagement"));
+const APIAccessLogs = lazy(() => import("./pages/logs/APIAccessLogs"));
 
 // import bootstrap components
 import Accordion from "bootstrap-components/Accordions";
@@ -116,7 +118,7 @@ const App = () => {
         {
           id: "users",
           path: "/users",
-          Component: UserManagement,
+          element: <UserManagement />,
         },
         {
           id: "logs",
@@ -124,7 +126,7 @@ const App = () => {
           children: [
             {
               path: "api-access",
-              Component: APIAccessLogs,
+              element: <APIAccessLogs />,
             },
           ],
         },
@@ -165,7 +167,9 @@ const App = () => {
   return (
     <AuthProvider>
       <PermissionProvider>
-        <RouterProvider router={router} />
+        <Suspense fallback={<div className="p-4">Loading...</div>}>
+          <RouterProvider router={router} />
+        </Suspense>
       </PermissionProvider>
     </AuthProvider>
   );

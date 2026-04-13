@@ -26,7 +26,7 @@ MAPPINGS = [
     ("123456789", "16Z90U-NDV21KB", "Gram16"),
     ("123490EN400015", "Galaxy Book6 Pro - PRHK", "Venus 14"),
     ("5KKSA00058", "CFSC-2", "BM241mk2"),
-    ("BK34HPQ25453PY", "900_MAA Product", "Vietnam"),
+    ("BK34HPQ25453PY", "900_MAA Product", "N74030-012"),
     ("C1L54400F9", "HP OmniBook Ultra Laptop 14-kd0xxxC1L54400F9", "Graham"),
     ("GOU64C11AX", "HP", "Gouda14"),
     ("PF51H6WD", "21NSSIT019", "Thames - 2"),
