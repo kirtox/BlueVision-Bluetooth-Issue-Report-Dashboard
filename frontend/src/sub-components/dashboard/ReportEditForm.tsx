@@ -133,8 +133,8 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
           <Card.Title className="fw-bold">System Information</Card.Title>
           <Row>
             {renderField("OS Version", "os_version")}
-            {renderField("Platform Brand", "platform_brand")}
-            {renderField("Platform", "platform")}
+            {renderField("Platform Brand", "short_platform_brand")}
+            {renderField("Platform", "short_platform")}
             {renderField("Platform Phase", "platform_phase")}
             {renderField("Platform BIOS", "platform_bios")}
             {renderField("CPU", "cpu")}
@@ -182,7 +182,10 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
         <Card.Body>
           <Card.Title className="fw-bold">Test Scenario</Card.Title>
           <Row>
-            {renderField("Scenario", "scenario")}
+            {renderField("Scenario", "short_scenario")}
+          </Row>
+          <Row>
+            {renderField("Detailed scenario", "scenario")}
           </Row>
           <hr></hr>
           <Card.Title className="fw-bold">Test Accessories</Card.Title>
@@ -205,8 +208,8 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
           </Row>
           <Row>
             {renderField("Speaker Brand", "speaker_brand")}
-            {renderField("Speaker BT", "Speaker_bt")}
-            {renderField("Speaker", "Speaker")}
+            {renderField("Speaker BT", "speaker_bt")}
+            {renderField("Speaker", "speaker")}
           </Row>
           <Row>
             {renderField("Phone Brand", "phone_brand")}
