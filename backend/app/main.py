@@ -181,10 +181,10 @@ def update_report(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    from .permissions import check_report_ownership
+    from .permissions import check_report_edit_permission
     
     # Check report ownership
-    if not check_report_ownership(current_user, report_id, db):
+    if not check_report_edit_permission(current_user, report_id, db):
         raise HTTPException(
             status_code=403, 
             detail="Permission denied: You can only edit your own reports"
@@ -199,10 +199,10 @@ def delete_report(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    from .permissions import check_report_ownership
+    from .permissions import check_report_delete_permission
     
     # Check report ownership
-    if not check_report_ownership(current_user, report_id, db):
+    if not check_report_delete_permission(current_user, report_id, db):
         raise HTTPException(
             status_code=403, 
             detail="Permission denied: You can only delete your own reports"

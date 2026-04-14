@@ -57,31 +57,44 @@ def authenticated_only(func):
         return func(*args, **kwargs)
     return wrapper
 
-def check_report_ownership(user: models.User, report_id: int, db: Session) -> bool:
+def check_report_edit_permission(user: models.User, report_id: int, db: Session) -> bool:
     """
-    Check if user can modify specified report
-    - Administrator: Can modify any report
-    - Auditor: Can modify any report (like Administrator)
-    - User: Cannot delete reports (can only edit their own)
-    - Guest: Cannot modify any reports
+    Check if user can edit specified report.
+    - Administrator/Auditor: Can edit any report
+    - User: Can edit only their own report
+    - Guest: Cannot edit reports
     """
     if user.role in ["Administrator", "Auditor"]:
         return True
-    
-    # ==================================================
-    # Backup logic for User role (can delete reports)
-    # if user.role == "Guest":
-    #     return False
-    
-    # if user.role == "User":
-    #     from .crud import get_report_by_id
-    #     report = get_report_by_id(db, report_id)
-    #     if not report:
-    #         return False
-    #     return report.op_name == user.username
-    # ==================================================
-    # User and Guest cannot delete reports
+
+    if user.role == "User":
+        from .crud import get_report_by_id
+        report = get_report_by_id(db, report_id)
+        if not report:
+            return False
+        return (report.op_name or "").lower() == (user.username or "").lower()
+
     return False
+
+
+def check_report_delete_permission(user: models.User, report_id: int, db: Session) -> bool:
+    """
+    Check if user can delete specified report.
+    - Administrator/Auditor: Can delete any report
+    - User/Guest: Cannot delete reports
+    """
+    if user.role in ["Administrator", "Auditor"]:
+        return True
+
+    return False
+
+
+def check_report_ownership(user: models.User, report_id: int, db: Session) -> bool:
+    """
+    Backward-compatible alias for ownership check.
+    Uses edit permission semantics.
+    """
+    return check_report_edit_permission(user, report_id, db)
 
 def require_report_ownership(func):
     """
