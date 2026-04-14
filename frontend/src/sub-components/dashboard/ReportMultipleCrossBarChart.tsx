@@ -48,10 +48,21 @@ const ReportMultipleCrossBarChart: React.FC<ReportMultipleCrossBarChartProps> = 
   if (loading && !externalReports) return <div>Loading...</div>;
   if (!reports || !reports.length) return <div>No data</div>;
 
+  const getDisplayXKey = (r: any): string => {
+    if (fieldX === "short_platform") {
+      const brand = (r.short_platform_brand || r.platform_brand || "").toString().trim();
+      const platform = (r.short_platform || r.platform || "").toString().trim();
+      const combined = `${brand} ${platform}`.trim();
+      return combined || "(Empty)";
+    }
+
+    return (r[fieldX] || "(Empty)").toString();
+  };
+
   // Step 1: Create two-dimensional statistics
   const dataMap: Record<string, Record<string, number>> = {};
   reports.forEach((r) => {
-    const xKey = (r[fieldX] || "(Empty)").toString();
+    const xKey = getDisplayXKey(r);
     const yKey = (r[fieldY] || "(Empty)").toString();
 
     if (!dataMap[xKey]) dataMap[xKey] = {};
@@ -76,8 +87,10 @@ const ReportMultipleCrossBarChart: React.FC<ReportMultipleCrossBarChartProps> = 
     return row;
   });
 
+  const chartHeight = Math.max(400, data.length * 36);
+
   return (
-    <div style={{ width: "100%", height: 400 }}>
+    <div style={{ width: "100%", height: chartHeight }}>
       <h5 className="text-center fw-bold mb-3" style={{ fontSize: "1.5rem" }}>
         {title}
       </h5>
@@ -89,7 +102,7 @@ const ReportMultipleCrossBarChart: React.FC<ReportMultipleCrossBarChartProps> = 
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis type="number" allowDecimals={false} />
-          <YAxis type="category" dataKey="name" width={120} />
+          <YAxis type="category" dataKey="name" width={220} interval={0} />
           <Tooltip wrapperStyle={{ zIndex: 1000 }} />
           {/* If the current legend is too long, consider adding legendType="none" in <Legend /> */}
           <Legend verticalAlign="bottom" align="center" wrapperStyle={{ paddingTop: 8 }} />

@@ -50,12 +50,23 @@ const ReportMultipleDurationCrossBarChart: React.FC<ReportMultipleDurationCrossB
   if (loading && !externalReports) return <div>Loading...</div>;
   if (!reports || !reports.length) return <div>No data</div>;
 
+  const getDisplayXKey = (r: any): string => {
+    if (fieldX === "short_platform") {
+      const brand = (r.short_platform_brand || r.platform_brand || "").toString().trim();
+      const platform = (r.short_platform || r.platform || "").toString().trim();
+      const combined = `${brand} ${platform}`.trim();
+      return combined || "(Empty)";
+    }
+
+    return (r[fieldX] || "(Empty)").toString();
+  };
+
   // Step 1: Create a two-dimensional cumulative map (convert seconds to hours)
   const dataMap: Record<string, Record<string, number>> = {};
   const groupSet = new Set<string>();
 
   reports.forEach((r) => {
-    const xKey = (r[fieldX] || "(Empty)").toString();
+    const xKey = getDisplayXKey(r);
     const groupKey = (r[groupBy] || "(Empty)").toString();
     const valueInSeconds = Number(r[fieldY]) || 0;
     const valueInHours = valueInSeconds / 3600; // Convert seconds to hours
@@ -80,8 +91,10 @@ const ReportMultipleDurationCrossBarChart: React.FC<ReportMultipleDurationCrossB
     return row;
   });
 
+  const chartHeight = Math.max(400, data.length * 36);
+
   return (
-    <div style={{ width: "100%", height: 400 }}>
+    <div style={{ width: "100%", height: chartHeight }}>
       <h5 className="text-center fw-bold mb-3" style={{ fontSize: "1.5rem" }}>
         {title}
       </h5>
@@ -93,7 +106,7 @@ const ReportMultipleDurationCrossBarChart: React.FC<ReportMultipleDurationCrossB
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis type="number" allowDecimals={false} label={{ value: "(hr)", position: "insideBottomRight", offset: -5 }} />
-          <YAxis type="category" dataKey="name" width={120} />
+          <YAxis type="category" dataKey="name" width={220} interval={0} />
           <Tooltip wrapperStyle={{ zIndex: 1000 }} formatter={(value, name) => [`${Number(value).toFixed(2)} hrs`, name]} />
           {/* If the current legend is too long, consider adding legendType="none" in <Legend /> */}
           <Legend verticalAlign="bottom" align="center" wrapperStyle={{ paddingTop: 8 }} />

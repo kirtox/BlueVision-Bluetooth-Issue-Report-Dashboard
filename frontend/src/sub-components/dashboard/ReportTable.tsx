@@ -311,15 +311,7 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
                         {item.result}
                       </span>
                     ) : item.result?.toUpperCase() === 'TRIAGED' ? (
-                      <span className="badge bg-warning d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
-                        <Spinner
-                          as="span"
-                          animation="grow"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                          className="me-1"
-                        />
+                      <span className="badge d-flex align-items-center justify-content-center" style={{ backgroundColor: "#8f8c8c", height: "2em" }}>
                         {item.result}
                       </span>
                     ) : item.result?.toUpperCase() === 'BLOCK' ? (
@@ -332,6 +324,14 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
                       </span>
                     ) : (
                       <span className="badge bg-info d-flex align-items-center justify-content-center" style={{ height: "2em" }}>
+                        <Spinner
+                          as="span"
+                          animation="grow"
+                          size="sm"
+                          role="status"
+                          aria-hidden="true"
+                          className="me-1"
+                        />
                         {item.result || ''}
                       </span>
                     )}
