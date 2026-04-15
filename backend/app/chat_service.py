@@ -1,13 +1,14 @@
 """Enhanced chat service with LLM function calling for database queries."""
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any, Optional
 from urllib.parse import urlparse
 from uuid import uuid4
 
 import httpx
-import openai
+from anthropic import Anthropic
 from dotenv import load_dotenv
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -21,14 +22,14 @@ load_dotenv(dotenv_path=LOCAL_ENV_PATH, override=False)
 
 MAX_QUERY_ROWS = 100
 SUMMARY_ROW_LIMIT = 20
-DEFAULT_EXPERTGPT_MODEL = os.getenv("EXPERTGPT_MODEL", "gpt-4o")
+DEFAULT_EXPERTGPT_MODEL = os.getenv("EXPERTGPT_MODEL", "claude-sonnet-4-5")
 EXPERTGPT_TOKEN = os.getenv("EXPERTGPT_TOKEN", "")
 EXPERTGPT_API_URL = os.getenv("EXPERTGPT_API_URL", "https://expertgpt.intel.com/v1")
-INTERNAL_EXPERTGPT_HOST = "expertgpt.intel.com"
+INTERNAL_EXPERTGPT_HOSTS = {"expertgpt.intel.com", "gnai.intel.com"}
 
 
 def get_expertgpt_base_url() -> str:
-    """Normalize configured URL into an OpenAI-compatible base URL."""
+    """Normalize configured URL into a base URL for the Anthropic client."""
     configured_url = EXPERTGPT_API_URL.strip().rstrip("/")
     if not configured_url:
         return configured_url
@@ -46,127 +47,117 @@ def has_expertgpt_config() -> bool:
 
 
 def is_internal_expertgpt_url(url: str) -> bool:
-    return urlparse(url).hostname == INTERNAL_EXPERTGPT_HOST
+    return (urlparse(url).hostname or "") in INTERNAL_EXPERTGPT_HOSTS
 
 
-def create_expertgpt_client() -> openai.OpenAI:
-    """Create ExpertGPT client via the OpenAI SDK."""
+def create_anthropic_client() -> Anthropic:
+    """Create Anthropic client with optional custom base URL."""
     base_url = get_expertgpt_base_url()
     use_internal_settings = is_internal_expertgpt_url(base_url)
+
+    # For internal Intel gateways, disable TLS verification to avoid cert chain issues.
+    # Do not force proxy=None, so non-internal gateways can still use env proxy settings.
     http_client = httpx.Client(
-        proxy=None,
-        verify=not use_internal_settings,
-        trust_env=not use_internal_settings,
-        timeout=30.0,
+        verify=False,
+        trust_env=False,
+        proxy=None
     )
-    return openai.OpenAI(
-        api_key=EXPERTGPT_TOKEN,
+    return Anthropic(
+        auth_token=EXPERTGPT_TOKEN,
         http_client=http_client,
-        base_url=base_url,
+        base_url=base_url or None,
     )
 
 
 def get_database_query_tool_definition() -> dict[str, Any]:
     return {
-        "type": "function",
-        "function": {
-            "name": "database_query",
-            "description": (
-                "Query the Bluetooth test report database using ORM parameters. "
-                "Use this function only when database information is required to answer the user. "
-                "Critical rule: when user intent mentions failures/failed/失敗, filters MUST include "
-                "{column:'result', operator:'eq', value:'Fail'}. "
-                "When user intent mentions pass/passed/passes/通過/success, filters MUST include "
-                "{column:'result', operator:'eq', value:'Pass'}. "
-                "Do not use aliases like failure_count unless the Fail filter is present. "
-                "Do not use aliases like pass_count unless the Pass filter is present."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "select_columns": {
-                        "type": "array",
-                        "items": {"type": "string"},
-                        "description": "Columns to select from the report table. Null means all columns.",
-                        "nullable": True,
-                    },
-                    "filters": {
-                        "type": "array",
-                        "nullable": True,
-                        "description": (
-                            "Filter rows before aggregation. For result column, use exact values 'Fail' or 'Pass'. "
-                            "If the question mentions failures, include result='Fail'. "
-                            "If the question mentions passes/success, include result='Pass'."
-                        ),
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "column": {"type": "string"},
-                                "operator": {
-                                    "type": "string",
-                                    "enum": ["eq", "ne", "gt", "gte", "lt", "lte", "in", "like", "between"],
-                                },
-                                "value": {"nullable": True},
-                                "values": {
-                                    "type": "array",
-                                    "nullable": True,
-                                },
+        "name": "database_query",
+        "description": (
+            "Query the Bluetooth test report database using ORM parameters. "
+            "Use this function only when database information is required to answer the user. "
+            "Critical rule: when user intent mentions failures/failed/失敗, filters MUST include "
+            "{column:'result', operator:'eq', value:'Fail'}. "
+            "When user intent mentions pass/passed/passes/通過/success, filters MUST include "
+            "{column:'result', operator:'eq', value:'Pass'}. "
+            "Do not use aliases like failure_count unless the Fail filter is present. "
+            "Do not use aliases like pass_count unless the Pass filter is present."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "select_columns": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Columns to select from the report table. Null means all columns.",
+                },
+                "filters": {
+                    "type": "array",
+                    "description": (
+                        "Filter rows before aggregation. For result column, use exact values 'Fail' or 'Pass'. "
+                        "If the question mentions failures, include result='Fail'. "
+                        "If the question mentions passes/success, include result='Pass'."
+                    ),
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "column": {"type": "string"},
+                            "operator": {
+                                "type": "string",
+                                "enum": ["eq", "ne", "gt", "gte", "lt", "lte", "in", "like", "between"],
                             },
-                            "required": ["column", "operator"],
-                        },
-                    },
-                    "aggregations": {
-                        "type": "array",
-                        "nullable": True,
-                        "description": "Aggregate functions for reporting, such as count, sum, avg, min, and max.",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "function": {
-                                    "type": "string",
-                                    "enum": ["count", "sum", "avg", "min", "max"],
-                                },
-                                "column": {
-                                    "type": "string",
-                                    "description": "Target column name, or * for count over all rows.",
-                                },
-                                "alias": {
-                                    "type": "string",
-                                    "nullable": True,
-                                },
-                                "distinct": {
-                                    "type": "boolean",
-                                    "default": False,
-                                },
+                            "value": {},
+                            "values": {
+                                "type": "array",
                             },
-                            "required": ["function", "column"],
                         },
-                    },
-                    "group_by": {
-                        "type": "array",
-                        "nullable": True,
-                        "description": "Column names to group aggregated results by.",
-                        "items": {"type": "string"},
-                    },
-                    "order_by": {
-                        "type": "array",
-                        "nullable": True,
-                        "description": "Sort pairs like [['date', 'desc'], ['platform', 'asc']]. Can also sort by aggregation alias.",
-                        "items": {
-                            "type": "array",
-                            "minItems": 2,
-                            "maxItems": 2,
-                            "items": {"type": "string"},
-                        },
-                    },
-                    "limit": {
-                        "type": "integer",
-                        "default": 100,
-                        "description": "Maximum rows to return. Must be 100 or below.",
+                        "required": ["column", "operator"],
                     },
                 },
-                "required": [],
+                "aggregations": {
+                    "type": "array",
+                    "description": "Aggregate functions for reporting, such as count, sum, avg, min, and max.",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "function": {
+                                "type": "string",
+                                "enum": ["count", "sum", "avg", "min", "max"],
+                            },
+                            "column": {
+                                "type": "string",
+                                "description": "Target column name, or * for count over all rows.",
+                            },
+                            "alias": {
+                                "type": "string",
+                            },
+                            "distinct": {
+                                "type": "boolean",
+                            },
+                        },
+                        "required": ["function", "column"],
+                    },
+                },
+                "group_by": {
+                    "type": "array",
+                    "description": "Column names to group aggregated results by.",
+                    "items": {"type": "string"},
+                },
+                "order_by": {
+                    "type": "array",
+                    "description": "Sort pairs like [['date', 'desc'], ['platform', 'asc']]. Can also sort by aggregation alias.",
+                    "items": {
+                        "type": "array",
+                        "minItems": 2,
+                        "maxItems": 2,
+                        "items": {"type": "string"},
+                    },
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Maximum rows to return. Must be 100 or below.",
+                },
             },
+            "required": [],
         },
     }
 
@@ -204,7 +195,39 @@ Rules:
     - "Which platform had the most cases since 2026?" => no result filter unless user explicitly asks Pass/Fail.
 - Never invent database results.
 - Keep answers concise and actionable.
+- Do not render markdown tables. The frontend will render tables from structured query_results.
+- For ranking outputs, provide concise plain-text bullets only.
 """
+
+
+def strip_markdown_tables(text: str) -> str:
+    """Remove markdown table blocks from model output.
+
+    We keep plain-text narrative and rely on query_results for UI table rendering.
+    """
+    if not text:
+        return text
+
+    lines = text.splitlines()
+    cleaned_lines: list[str] = []
+    i = 0
+
+    while i < len(lines):
+        line = lines[i]
+        if "|" in line and i + 1 < len(lines):
+            separator = lines[i + 1].strip().replace(" ", "")
+            if re.fullmatch(r"\|?[-:|]+\|?", separator):
+                i += 2
+                while i < len(lines) and "|" in lines[i]:
+                    i += 1
+                continue
+
+        cleaned_lines.append(line)
+        i += 1
+
+    cleaned_text = "\n".join(cleaned_lines)
+    cleaned_text = re.sub(r"\n{3,}", "\n\n", cleaned_text).strip()
+    return cleaned_text
 
 
 def extract_text_from_response_content(content: Any) -> str:
@@ -228,45 +251,56 @@ def call_expertgpt_with_tools(
     tools: Optional[list[dict[str, Any]]] = None,
     temperature: float = 0,
     tool_choice: Any = None,
-) -> tuple[str, Optional[dict[str, Any]]]:
-    """Call ExpertGPT via OpenAI SDK and return either text or tool-call args."""
+) -> tuple[str, Optional[dict[str, Any]], Optional[str]]:
+    """Call Anthropic API and return (text, tool_args, tool_use_id)."""
     if not has_expertgpt_config():
-        return "", None
+        return "", None, None
 
-    client = create_expertgpt_client()
+    # Separate system message from conversation messages (Anthropic requires system as a top-level param)
+    system_content = ""
+    conv_messages: list[dict[str, Any]] = []
+    for msg in messages:
+        if msg["role"] == "system":
+            system_content = msg["content"]
+        else:
+            conv_messages.append(msg)
+
+    client = create_anthropic_client()
     try:
         request_payload: dict[str, Any] = {
             "model": DEFAULT_EXPERTGPT_MODEL,
-            "messages": messages,
+            "messages": conv_messages,
             "temperature": temperature,
             "max_tokens": 1200,
         }
+        if system_content:
+            request_payload["system"] = system_content
         if tools:
             request_payload["tools"] = tools
-            request_payload["tool_choice"] = tool_choice or "auto"
+            request_payload["tool_choice"] = (
+                {"type": tool_choice} if isinstance(tool_choice, str) else (tool_choice or {"type": "auto"})
+            )
 
-        response = client.chat.completions.create(**request_payload)
-        choices = response.choices or []
-        if not choices:
-            return "", None
+        response = client.messages.create(**request_payload)
 
-        message = choices[0].message
-        if message.tool_calls:
-            tool_call = message.tool_calls[0]
-            arguments_text = tool_call.function.arguments or "{}"
-            try:
-                return "", json.loads(arguments_text)
-            except json.JSONDecodeError:
-                print(f"Failed to parse tool call arguments: {arguments_text}")
-                return "", None
+        tool_use_block = None
+        text_parts: list[str] = []
+        for block in response.content:
+            if block.type == "tool_use":
+                tool_use_block = block
+            elif block.type == "text":
+                text_parts.append(block.text)
 
-        return extract_text_from_response_content(message.content), None
+        if tool_use_block:
+            return "", tool_use_block.input, tool_use_block.id
+
+        return "\n".join(text_parts).strip(), None, None
     except Exception as error:
         print(
-            "ExpertGPT SDK error "
+            "Anthropic API error "
             f"base_url={get_expertgpt_base_url()} model={DEFAULT_EXPERTGPT_MODEL}: {error}"
         )
-        return "", None
+        return "", None, None
     finally:
         client.close()
 
@@ -417,7 +451,7 @@ def handle_chat_ask(
         messages.append({"role": item.role, "content": item.content})
     messages.append({"role": "user", "content": payload.question})
 
-    response_text, tool_params = call_expertgpt_with_tools(
+    response_text, tool_params, tool_use_id = call_expertgpt_with_tools(
         messages=messages,
         tools=[get_database_query_tool_definition()],
         temperature=0,
@@ -456,20 +490,35 @@ def handle_chat_ask(
     messages.append(
         {
             "role": "assistant",
-            "content": (
-                "I called the database_query tool and received the following results:\n"
-                f"{formatted_results}"
-            ),
+            "content": [
+                {
+                    "type": "tool_use",
+                    "id": tool_use_id,
+                    "name": "database_query",
+                    "input": tool_params,
+                }
+            ],
         }
     )
     messages.append(
         {
             "role": "user",
-            "content": "Based on the tool results, answer my original question accurately.",
+            "content": [
+                {
+                    "type": "tool_result",
+                    "tool_use_id": tool_use_id,
+                    "content": (
+                        "Use the tool result to answer in plain text. "
+                        "Do not output markdown tables because frontend renders tables separately.\n\n"
+                        f"{formatted_results}"
+                    ),
+                }
+            ],
         }
     )
 
-    final_answer, _ = call_expertgpt_with_tools(messages=messages, temperature=0)
+    final_answer, _, _ = call_expertgpt_with_tools(messages=messages, temperature=0)
+    final_answer = strip_markdown_tables(final_answer)
 
     return ChatAskResponse(
         answer=final_answer or "Unable to generate answer from the retrieved data.",

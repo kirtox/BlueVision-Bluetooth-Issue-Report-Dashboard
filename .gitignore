@@ -217,3 +217,5 @@ avatar_backups/
 # Excel files
 *.xlsx
 *.xlsm
+
+common_cli.txt

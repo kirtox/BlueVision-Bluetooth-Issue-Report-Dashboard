@@ -13,3 +13,4 @@ alembic
 requests
 httpx
 openai
+anthropic

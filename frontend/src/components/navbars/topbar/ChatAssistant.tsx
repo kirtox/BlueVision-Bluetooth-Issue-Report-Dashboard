@@ -100,6 +100,13 @@ const ChatAssistantNew = () => {
     }
   }, [messages, isOpen]);
 
+  // Auto-scroll to bottom when messages change or scroll down opens
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isOpen]);
+
   const handleSend = async () => {
     const question = input.trim();
     if (!question || isLoading) {
@@ -192,7 +199,68 @@ const ChatAssistantNew = () => {
       </div>
 
       {/* Floating Chat Button - Bottom Right (above Scroll Down button) */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: `${floatingButtonBottom + 12}px`,
+          right: `${floatingButtonRight + 74}px`,
+          zIndex: 1003,
+          padding: "6px 12px",
+          borderRadius: "999px",
+          background: "rgba(28, 37, 65, 0.88)",
+          color: "#fff",
+          fontSize: "12px",
+          fontWeight: 600,
+          letterSpacing: "0.02em",
+          whiteSpace: "nowrap",
+          pointerEvents: "none",
+          opacity: isButtonHovered ? 1 : 0,
+          transform: isButtonHovered ? "translateX(0) scale(1)" : "translateX(8px) scale(0.96)",
+          transformOrigin: "right center",
+          boxShadow: "0 10px 24px rgba(28, 37, 65, 0.24)",
+          transition: "opacity 0.18s ease, transform 0.22s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
+      >
+        {isOpen ? "Close Chatbot" : "Open Chatbot"}
+      </div>
+
+      {/* Floating Chat Button - Bottom Right (above Scroll Down button) */}
       <Button
+        variant="primary"
+        className="rounded-circle"
+        onClick={() => setIsOpen(!isOpen)}
+        onMouseEnter={(e) => {
+          setIsButtonHovered(true);
+          e.currentTarget.style.transform = "translateY(-2px) scale(1.1)";
+          e.currentTarget.style.boxShadow = "0 12px 35px rgba(250, 160, 180, 0.6)";
+        }}
+        onMouseLeave={(e) => {
+          setIsButtonHovered(false);
+          e.currentTarget.style.transform = "translateY(0) scale(1)";
+          e.currentTarget.style.boxShadow = "0 8px 25px rgba(250, 160, 180, 0.4)";
+        }}
+        aria-label="Toggle chat assistant"
+        aria-expanded={isOpen}
+        title={isOpen ? "Close Chatbot" : "Open Chatbot"}
+        style={{
+          position: "fixed",
+          bottom: `${floatingButtonBottom}px`,
+          right: `${floatingButtonRight}px`,
+          width: "56px",
+          height: "56px",
+          zIndex: 1002,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "24px",
+          fontWeight: "bold",
+          padding: "0",
+          background: "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)",
+          boxShadow: "0 8px 25px rgba(250, 160, 180, 0.4)",
+          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          border: "2px solid rgba(255, 255, 255, 0.2)",
+          backdropFilter: "blur(10px)",
+        }}
         variant="primary"
         className="rounded-circle"
         onClick={() => setIsOpen(!isOpen)}
@@ -443,7 +511,6 @@ const ChatAssistantNew = () => {
                           </div>
                         </div>
                       )}
-
                     {/* Trace ID Display */}
                     {message.role === "assistant" && message.trace_id && (
                       <div className="small text-muted mt-2" style={{ fontSize: "10px" }}>
@@ -465,11 +532,9 @@ const ChatAssistantNew = () => {
 
             {/* Error Display */}
             {error && <div className="text-danger small mt-2">{error}</div>}
-
             {/* Auto-scroll anchor */}
-            <div ref={messagesEndRef} />
+            <div ref={messagesEndRef}></div>
           </div>
-
           {/* Input Area */}
           <div className="border-top p-3">
             <Form
