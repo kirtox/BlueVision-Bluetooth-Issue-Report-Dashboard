@@ -262,10 +262,27 @@ export interface ORMAggregationSpec {
   distinct?: boolean;
 }
 
+export interface ORMConditionalAggregationSpec {
+  function: "count" | "sum" | "avg" | "min" | "max";
+  column: string;
+  condition: ORMFilterCondition;
+  alias?: string;
+  distinct?: boolean;
+}
+
+export interface ORMDerivedMetricSpec {
+  alias: string;
+  operation: "add" | "subtract" | "multiply" | "divide";
+  left_operand: string;
+  right_operand: string;
+}
+
 export interface ORMQueryParams {
   select_columns?: string[] | null;
   filters?: ORMFilterCondition[] | null;
   aggregations?: ORMAggregationSpec[] | null;
+  conditional_aggregations?: ORMConditionalAggregationSpec[] | null;
+  derived_metrics?: ORMDerivedMetricSpec[] | null;
   group_by?: string[] | null;
   order_by?: [string, "asc" | "desc"][] | null;
   limit?: number;

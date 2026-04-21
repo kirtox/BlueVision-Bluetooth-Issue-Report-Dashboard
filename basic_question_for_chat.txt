@@ -1,0 +1,34 @@
+Difficulty 1 - Easy (One-line, everyday wording)
+1) How many test records do we have in total?
+2) Since 2026, which platform has failed the most?
+3) Show me the top 5 platforms with the most failures in 2026
+
+Difficulty 2 - Still simple (One-line)
+4) In 2026, which HP platform had the most failures?
+6) Can you show failure counts month by month for 2026?
+
+Difficulty 3 - Comparison (One-line, user-friendly)
+7) Between 2025 and 2026, which platform's failures increased the most?
+9) For HP only, how did failures change from 2025 to 2026?
+
+Difficulty 4 - Multi-turn follow-up (2 turns)
+11) Q1: Show me the top 10 platforms by failures in 2026.
+    Q2: Out of those 10, which one increased the most compared with 2025?
+
+12) Q1: Which CPU family had the most failures in 2026?
+    Q2: How different is that from 2025?
+
+Difficulty 5 - More complex follow-up (3 turns)
+13) Q1: Compare platform failures between 2025 and 2026.
+    Q2: Keep only platforms where the increase is more than 3.
+    Q3: Now show just the top 5 biggest increases.
+
+14) Q1: Show top 10 platforms with the largest failure increase from 2025 to 2026.
+    Q2: Ignore the #1 platform and show the next top 5.
+    Q3: For those 5, also break down by CPU family.
+
+Difficulty 6 - Boundary check conversation (4 turns)
+15) Q1: How many failures were there in 2025?
+    Q2: Please run that again carefully for the full year of 2025.
+    Q3: If the number changes, tell me why.
+    Q4: Then compare 2025 vs 2026 again with the corrected date range.

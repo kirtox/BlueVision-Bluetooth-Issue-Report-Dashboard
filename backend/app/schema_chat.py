@@ -30,11 +30,30 @@ class ORMAggregationSpec(BaseModel):
     distinct: bool = False
 
 
+class ORMConditionalAggregationSpec(BaseModel):
+    """Represents a conditional aggregation using a CASE-like filter."""
+    function: Literal["count", "sum", "avg", "min", "max"]
+    column: str
+    condition: ORMFilterCondition
+    alias: Optional[str] = None
+    distinct: bool = False
+
+
+class ORMDerivedMetricSpec(BaseModel):
+    """Represents a derived metric from existing aggregation aliases."""
+    alias: str
+    operation: Literal["add", "subtract", "multiply", "divide"]
+    left_operand: str
+    right_operand: str
+
+
 class ORMQueryParams(BaseModel):
     """Parameters for database query via ORM function calling"""
     select_columns: Optional[list[str]] = None  # None means all columns
     filters: Optional[list[ORMFilterCondition]] = None
     aggregations: Optional[list[ORMAggregationSpec]] = None
+    conditional_aggregations: Optional[list[ORMConditionalAggregationSpec]] = None
+    derived_metrics: Optional[list[ORMDerivedMetricSpec]] = None
     group_by: Optional[list[str]] = None
     order_by: Optional[list[tuple[str, Literal["asc", "desc"]]]] = None
     limit: int = 100

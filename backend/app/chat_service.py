@@ -10,7 +10,7 @@ from uuid import uuid4
 import httpx
 from anthropic import Anthropic
 from dotenv import load_dotenv
-from sqlalchemy import func
+from sqlalchemy import case, func
 from sqlalchemy.orm import Session
 
 from app import models
@@ -79,6 +79,8 @@ def get_database_query_tool_definition() -> dict[str, Any]:
             "{column:'result', operator:'eq', value:'Fail'}. "
             "When user intent mentions pass/passed/passes/通過/success, filters MUST include "
             "{column:'result', operator:'eq', value:'Pass'}. "
+            "For date/time filtering, use half-open intervals: date >= start and date < next boundary. "
+            "Avoid end timestamps like <= '2025-12-31 00:00:00' because they miss records later that day. "
             "Do not use aliases like failure_count unless the Fail filter is present. "
             "Do not use aliases like pass_count unless the Pass filter is present."
         ),
@@ -95,7 +97,9 @@ def get_database_query_tool_definition() -> dict[str, Any]:
                     "description": (
                         "Filter rows before aggregation. For result column, use exact values 'Fail' or 'Pass'. "
                         "If the question mentions failures, include result='Fail'. "
-                        "If the question mentions passes/success, include result='Pass'."
+                        "If the question mentions passes/success, include result='Pass'. "
+                        "For date ranges, prefer half-open bounds: gte start + lt next boundary. "
+                        "Example for year 2025: date >= '2025-01-01' and date < '2026-01-01'."
                     ),
                     "items": {
                         "type": "object",
@@ -135,6 +139,68 @@ def get_database_query_tool_definition() -> dict[str, Any]:
                             },
                         },
                         "required": ["function", "column"],
+                    },
+                },
+                "conditional_aggregations": {
+                    "type": "array",
+                    "description": (
+                        "CASE-style conditional aggregates. "
+                        "Use this for period comparisons in a single query, such as year_2026 and year_2025 side by side."
+                    ),
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "function": {
+                                "type": "string",
+                                "enum": ["count", "sum", "avg", "min", "max"],
+                            },
+                            "column": {
+                                "type": "string",
+                                "description": "Target column name, or * for count over matching rows.",
+                            },
+                            "condition": {
+                                "type": "object",
+                                "properties": {
+                                    "column": {"type": "string"},
+                                    "operator": {
+                                        "type": "string",
+                                        "enum": ["eq", "ne", "gt", "gte", "lt", "lte", "in", "like", "between"],
+                                    },
+                                    "value": {},
+                                    "values": {
+                                        "type": "array",
+                                    },
+                                },
+                                "required": ["column", "operator"],
+                            },
+                            "alias": {
+                                "type": "string",
+                            },
+                            "distinct": {
+                                "type": "boolean",
+                            },
+                        },
+                        "required": ["function", "column", "condition"],
+                    },
+                },
+                "derived_metrics": {
+                    "type": "array",
+                    "description": (
+                        "Derived metrics from previously defined aliases. "
+                        "Useful for comparison deltas, e.g. diff = year_2026 - year_2025."
+                    ),
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "alias": {"type": "string"},
+                            "operation": {
+                                "type": "string",
+                                "enum": ["add", "subtract", "multiply", "divide"],
+                            },
+                            "left_operand": {"type": "string"},
+                            "right_operand": {"type": "string"},
+                        },
+                        "required": ["alias", "operation", "left_operand", "right_operand"],
                     },
                 },
                 "group_by": {
@@ -180,6 +246,9 @@ Rules:
 - If you use the tool, return valid JSON function arguments only through the tool call.
 - For reporting questions, prefer aggregations and group_by instead of fetching raw rows and counting in your head.
 - Use count for questions about totals, frequencies, rankings, and top-N summaries.
+- For comparisons (year-over-year, month-over-month), prefer one query with conditional_aggregations and derived_metrics.
+- Date boundary rule: always use half-open intervals [start, end), i.e. date >= start and date < next boundary.
+- Do not use year-end midnight as inclusive upper bound (for example, avoid <= '2025-12-31 00:00:00').
 - Intent binding is mandatory:
     - If question asks about failures/failed/failing/失敗, include filter result = 'Fail'.
     - If question asks about pass/passed/passes/success/通過, include filter result = 'Pass'.
@@ -193,6 +262,9 @@ Rules:
     - "Which platform had the most failures since 2026?" => filters must include result='Fail' and date >= '2026-01-01'.
     - "Which platform had the most passes since 2026?" => filters must include result='Pass' and date >= '2026-01-01'.
     - "Which platform had the most cases since 2026?" => no result filter unless user explicitly asks Pass/Fail.
+    - "Compared to 2025, which platform increased the most failure?" => use ONE query with group_by=['platform'], conditional_aggregations for year_2025/year_2026 using half-open year bounds (2025: date >= '2025-01-01' and date < '2026-01-01'; 2026: date >= '2026-01-01' and date < '2027-01-01'), derived_metrics diff=year_2026-year_2025, order_by=[['diff','desc']].
+    - "Show top 3 platforms with the largest fail increase from 2025 to 2026." => same pattern, include result='Fail', limit=3.
+    - "Compare 2026 vs 2025 fail counts by platform." => return both year_2025 and year_2026 columns plus diff in one tool call.
 - Never invent database results.
 - Keep answers concise and actionable.
 - Do not render markdown tables. The frontend will render tables from structured query_results.
@@ -251,6 +323,7 @@ def call_expertgpt_with_tools(
     tools: Optional[list[dict[str, Any]]] = None,
     temperature: float = 0,
     tool_choice: Any = None,
+    max_tokens: int = 1200,
 ) -> tuple[str, Optional[dict[str, Any]], Optional[str]]:
     """Call Anthropic API and return (text, tool_args, tool_use_id)."""
     if not has_expertgpt_config():
@@ -271,7 +344,7 @@ def call_expertgpt_with_tools(
             "model": DEFAULT_EXPERTGPT_MODEL,
             "messages": conv_messages,
             "temperature": temperature,
-            "max_tokens": 1200,
+            "max_tokens": max_tokens,
         }
         if system_content:
             request_payload["system"] = system_content
@@ -308,6 +381,31 @@ def call_expertgpt_with_tools(
 def build_orm_query(db: Session, params: ORMQueryParams) -> list[dict[str, Any]]:
     selected_entities: list[Any] = []
     named_expressions: dict[str, Any] = {}
+
+    def build_filter_expression(filter_cond: Any) -> Any:
+        column = getattr(models.Report, filter_cond.column, None)
+        if column is None:
+            return None
+
+        if filter_cond.operator == "eq":
+            return column == filter_cond.value
+        if filter_cond.operator == "ne":
+            return column != filter_cond.value
+        if filter_cond.operator == "gt":
+            return column > filter_cond.value
+        if filter_cond.operator == "gte":
+            return column >= filter_cond.value
+        if filter_cond.operator == "lt":
+            return column < filter_cond.value
+        if filter_cond.operator == "lte":
+            return column <= filter_cond.value
+        if filter_cond.operator == "in" and filter_cond.values:
+            return column.in_(filter_cond.values)
+        if filter_cond.operator == "like" and filter_cond.value is not None:
+            return column.ilike(f"%{filter_cond.value}%")
+        if filter_cond.operator == "between" and filter_cond.values and len(filter_cond.values) >= 2:
+            return column.between(filter_cond.values[0], filter_cond.values[1])
+        return None
 
     def add_named_expression(name: str, expression: Any) -> None:
         if name not in named_expressions:
@@ -358,33 +456,70 @@ def build_orm_query(db: Session, params: ORMQueryParams) -> list[dict[str, Any]]
 
             add_named_expression(alias, expression.label(alias))
 
+    if params.conditional_aggregations:
+        for index, aggregation in enumerate(params.conditional_aggregations, start=1):
+            alias = aggregation.alias or f"conditional_{aggregation.function}_{aggregation.column}_{index}"
+            condition_expression = build_filter_expression(aggregation.condition)
+            if condition_expression is None:
+                continue
+
+            if aggregation.function == "count":
+                if aggregation.column == "*":
+                    expression = func.sum(case((condition_expression, 1), else_=0))
+                else:
+                    target_column = getattr(models.Report, aggregation.column, None)
+                    if target_column is None:
+                        continue
+                    if aggregation.distinct:
+                        expression = func.count(func.distinct(case((condition_expression, target_column), else_=None)))
+                    else:
+                        expression = func.count(case((condition_expression, target_column), else_=None))
+            else:
+                target_column = getattr(models.Report, aggregation.column, None)
+                if target_column is None:
+                    continue
+                conditional_target = case((condition_expression, target_column), else_=None)
+                if aggregation.function == "sum":
+                    expression = func.sum(conditional_target)
+                elif aggregation.function == "avg":
+                    expression = func.avg(conditional_target)
+                elif aggregation.function == "min":
+                    expression = func.min(conditional_target)
+                elif aggregation.function == "max":
+                    expression = func.max(conditional_target)
+                else:
+                    continue
+
+            add_named_expression(alias, expression.label(alias))
+
+    if params.derived_metrics:
+        for metric in params.derived_metrics:
+            left_expression = named_expressions.get(metric.left_operand)
+            right_expression = named_expressions.get(metric.right_operand)
+            if left_expression is None or right_expression is None:
+                continue
+
+            if metric.operation == "add":
+                expression = left_expression + right_expression
+            elif metric.operation == "subtract":
+                expression = left_expression - right_expression
+            elif metric.operation == "multiply":
+                expression = left_expression * right_expression
+            elif metric.operation == "divide":
+                expression = left_expression / func.nullif(right_expression, 0)
+            else:
+                continue
+
+            add_named_expression(metric.alias, expression.label(metric.alias))
+
     uses_custom_projection = bool(selected_entities)
     query = db.query(*selected_entities) if uses_custom_projection else db.query(models.Report)
 
     if params.filters:
         for filter_cond in params.filters:
-            column = getattr(models.Report, filter_cond.column, None)
-            if column is None:
-                continue
-
-            if filter_cond.operator == "eq":
-                query = query.filter(column == filter_cond.value)
-            elif filter_cond.operator == "ne":
-                query = query.filter(column != filter_cond.value)
-            elif filter_cond.operator == "gt":
-                query = query.filter(column > filter_cond.value)
-            elif filter_cond.operator == "gte":
-                query = query.filter(column >= filter_cond.value)
-            elif filter_cond.operator == "lt":
-                query = query.filter(column < filter_cond.value)
-            elif filter_cond.operator == "lte":
-                query = query.filter(column <= filter_cond.value)
-            elif filter_cond.operator == "in" and filter_cond.values:
-                query = query.filter(column.in_(filter_cond.values))
-            elif filter_cond.operator == "like" and filter_cond.value is not None:
-                query = query.filter(column.ilike(f"%{filter_cond.value}%"))
-            elif filter_cond.operator == "between" and filter_cond.values and len(filter_cond.values) >= 2:
-                query = query.filter(column.between(filter_cond.values[0], filter_cond.values[1]))
+            expression = build_filter_expression(filter_cond)
+            if expression is not None:
+                query = query.filter(expression)
 
     if params.group_by:
         group_by_columns = []
@@ -450,6 +585,8 @@ def handle_chat_ask(
     for item in payload.history[-10:]:
         messages.append({"role": item.role, "content": item.content})
     messages.append({"role": "user", "content": payload.question})
+    print('---'*20)
+    print(f"[User Ask] Question: {payload.question} TraceID: {trace_id}")
 
     response_text, tool_params, tool_use_id = call_expertgpt_with_tools(
         messages=messages,
@@ -459,14 +596,17 @@ def handle_chat_ask(
     )
 
     if tool_params is None:
+        print(f"[Tool Call] Answer: {response_text} TraceID: {trace_id}")
         return ChatAskResponse(
             answer=response_text or "I'm unable to provide an answer at this time. Please try again.",
             has_database_query=False,
             trace_id=trace_id,
         )
+    print(f"[Tool Call] Tool Params: {json.dumps(tool_params) if tool_params else None} TraceID: {trace_id}")
 
     try:
         orm_params = ORMQueryParams(**tool_params)
+        print(f"[ORM Params] {orm_params.json()} TraceID: {trace_id}")
     except Exception as error:
         print(f"Error parsing ORM parameters: {error}")
         return ChatAskResponse(
@@ -517,8 +657,9 @@ def handle_chat_ask(
         }
     )
 
-    final_answer, _, _ = call_expertgpt_with_tools(messages=messages, temperature=0)
+    final_answer, _, _ = call_expertgpt_with_tools(messages=messages, temperature=0, max_tokens=2000)
     final_answer = strip_markdown_tables(final_answer)
+    print(f"[Final Answer] {final_answer} TraceID: {trace_id}\n")
 
     return ChatAskResponse(
         answer=final_answer or "Unable to generate answer from the retrieved data.",

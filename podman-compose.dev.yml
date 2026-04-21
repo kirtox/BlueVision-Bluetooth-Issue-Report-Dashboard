@@ -12,6 +12,8 @@ services:
       - /app/node_modules
     environment:
       - HOST=0.0.0.0
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=300
     command: npm run dev
 
   backend:

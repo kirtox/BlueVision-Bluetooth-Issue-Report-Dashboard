@@ -1,4 +1,5 @@
 import { ChangeEvent, FormEvent, KeyboardEvent, useMemo, useState, useEffect, useRef } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { Button, Form, Spinner, Table } from "react-bootstrap";
 import { chatServiceNew } from "@/services/chatService";
 import { ChatMessageNew, ChatHistoryItem, ORMQueryParams } from "@/types";
@@ -62,6 +63,32 @@ const formatQueryParamsForDisplay = (params: ORMQueryParams): string => {
     parts.push(`Aggregations: ${aggregationStrs.join(", ")}`);
   }
 
+  if (params.conditional_aggregations && params.conditional_aggregations.length > 0) {
+    const conditionalStrs = params.conditional_aggregations.map((aggregation) => {
+      const cond = aggregation.condition;
+      let conditionText = `${cond.column} ${cond.operator}`;
+      if (cond.operator === "in" && cond.values) {
+        conditionText = `${cond.column} IN [${cond.values.join(", ")}]`;
+      } else if (cond.operator === "between" && cond.values) {
+        conditionText = `${cond.column} BETWEEN ${cond.values[0]} AND ${cond.values[1]}`;
+      } else if (cond.value !== undefined) {
+        conditionText = `${cond.column} ${cond.operator} ${cond.value}`;
+      }
+
+      const distinctPrefix = aggregation.distinct ? "DISTINCT " : "";
+      const aliasSuffix = aggregation.alias ? ` AS ${aggregation.alias}` : "";
+      return `${aggregation.function.toUpperCase()}(CASE WHEN ${conditionText} THEN ${distinctPrefix}${aggregation.column} END)${aliasSuffix}`;
+    });
+    parts.push(`Conditional Aggregations: ${conditionalStrs.join(", ")}`);
+  }
+
+  if (params.derived_metrics && params.derived_metrics.length > 0) {
+    const metricStrs = params.derived_metrics.map((metric) => {
+      return `${metric.alias} = ${metric.left_operand} ${metric.operation} ${metric.right_operand}`;
+    });
+    parts.push(`Derived Metrics: ${metricStrs.join(", ")}`);
+  }
+
   if (params.group_by && params.group_by.length > 0) {
     parts.push(`Group By: ${params.group_by.join(", ")}`);
   }
@@ -78,27 +105,31 @@ const formatQueryParamsForDisplay = (params: ORMQueryParams): string => {
   return parts.join("\n");
 };
 
+const toggleExpandedState = (
+  setExpandedState: Dispatch<SetStateAction<Record<string, boolean>>>,
+  messageId: string
+) => {
+  setExpandedState((prev) => ({
+    ...prev,
+    [messageId]: !prev[messageId],
+  }));
+};
+
 const ChatAssistantNew = () => {
   const floatingButtonBottom = 30;
   const floatingButtonRight = 30;
   const floatingPanelBottom = 110;
   const floatingPanelTop = 56;
   const [isOpen, setIsOpen] = useState(false);
-  const [isButtonHovered, setIsButtonHovered] = useState(false);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessageNew[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [expandedQueryParams, setExpandedQueryParams] = useState<Record<string, boolean>>({});
+  const [expandedQueryResults, setExpandedQueryResults] = useState<Record<string, boolean>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const hasMessages = useMemo(() => messages.length > 0, [messages]);
-
-  // Auto-scroll to bottom when messages change or scroll down opens
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages, isOpen]);
 
   // Auto-scroll to bottom when messages change or scroll down opens
   useEffect(() => {
@@ -173,56 +204,6 @@ const ChatAssistantNew = () => {
 
   return (
     <>
-      <div
-        style={{
-          position: "fixed",
-          bottom: `${floatingButtonBottom + 12}px`,
-          right: `${floatingButtonRight + 74}px`,
-          zIndex: 1003,
-          padding: "6px 12px",
-          borderRadius: "999px",
-          background: "rgba(28, 37, 65, 0.88)",
-          color: "#fff",
-          fontSize: "12px",
-          fontWeight: 600,
-          letterSpacing: "0.02em",
-          whiteSpace: "nowrap",
-          pointerEvents: "none",
-          opacity: isButtonHovered ? 1 : 0,
-          transform: isButtonHovered ? "translateX(0) scale(1)" : "translateX(8px) scale(0.96)",
-          transformOrigin: "right center",
-          boxShadow: "0 10px 24px rgba(28, 37, 65, 0.24)",
-          transition: "opacity 0.18s ease, transform 0.22s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
-      >
-        {isOpen ? "Close Chatbot" : "Open Chatbot"}
-      </div>
-
-      {/* Floating Chat Button - Bottom Right (above Scroll Down button) */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: `${floatingButtonBottom + 12}px`,
-          right: `${floatingButtonRight + 74}px`,
-          zIndex: 1003,
-          padding: "6px 12px",
-          borderRadius: "999px",
-          background: "rgba(28, 37, 65, 0.88)",
-          color: "#fff",
-          fontSize: "12px",
-          fontWeight: 600,
-          letterSpacing: "0.02em",
-          whiteSpace: "nowrap",
-          pointerEvents: "none",
-          opacity: isButtonHovered ? 1 : 0,
-          transform: isButtonHovered ? "translateX(0) scale(1)" : "translateX(8px) scale(0.96)",
-          transformOrigin: "right center",
-          boxShadow: "0 10px 24px rgba(28, 37, 65, 0.24)",
-          transition: "opacity 0.18s ease, transform 0.22s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
-      >
-        {isOpen ? "Close Chatbot" : "Open Chatbot"}
-      </div>
 
       {/* Floating Chat Button - Bottom Right (above Scroll Down button) */}
       <Button
@@ -230,49 +211,14 @@ const ChatAssistantNew = () => {
         className="rounded-circle"
         onClick={() => setIsOpen(!isOpen)}
         onMouseEnter={(e) => {
-          setIsButtonHovered(true);
           e.currentTarget.style.transform = "translateY(-2px) scale(1.1)";
           e.currentTarget.style.boxShadow = "0 12px 35px rgba(250, 160, 180, 0.6)";
+          e.currentTarget.style.background = "linear-gradient(135deg, #fb7185 0%, #fda4af 100%)";
         }}
         onMouseLeave={(e) => {
-          setIsButtonHovered(false);
           e.currentTarget.style.transform = "translateY(0) scale(1)";
           e.currentTarget.style.boxShadow = "0 8px 25px rgba(250, 160, 180, 0.4)";
-        }}
-        aria-label="Toggle chat assistant"
-        aria-expanded={isOpen}
-        title={isOpen ? "Close Chatbot" : "Open Chatbot"}
-        style={{
-          position: "fixed",
-          bottom: `${floatingButtonBottom}px`,
-          right: `${floatingButtonRight}px`,
-          width: "56px",
-          height: "56px",
-          zIndex: 1002,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: "24px",
-          fontWeight: "bold",
-          padding: "0",
-          background: "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)",
-          boxShadow: "0 8px 25px rgba(250, 160, 180, 0.4)",
-          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          border: "2px solid rgba(255, 255, 255, 0.2)",
-          backdropFilter: "blur(10px)",
-        }}
-        variant="primary"
-        className="rounded-circle"
-        onClick={() => setIsOpen(!isOpen)}
-        onMouseEnter={(e) => {
-          setIsButtonHovered(true);
-          e.currentTarget.style.transform = "translateY(-2px) scale(1.1)";
-          e.currentTarget.style.boxShadow = "0 12px 35px rgba(250, 160, 180, 0.6)";
-        }}
-        onMouseLeave={(e) => {
-          setIsButtonHovered(false);
-          e.currentTarget.style.transform = "translateY(0) scale(1)";
-          e.currentTarget.style.boxShadow = "0 8px 25px rgba(250, 160, 180, 0.4)";
+          e.currentTarget.style.background = "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)";
         }}
         aria-label="Toggle chat assistant"
         aria-expanded={isOpen}
@@ -369,7 +315,7 @@ const ChatAssistantNew = () => {
             {!hasMessages && (
               <div className="text-muted small">
                 Ask me questions about the dashboard data and I'll use database queries to find the
-                answers. Try: "Which platform had the most failures?"
+                answers. Try: "Which platform had the most failures since 2026?"
               </div>
             )}
 
@@ -378,6 +324,8 @@ const ChatAssistantNew = () => {
                 message.query_results && message.query_results.length > 0
                   ? Object.keys(message.query_results[0])
                   : [];
+              const isQueryParamsOpen = Boolean(expandedQueryParams[message.id]);
+              const isQueryResultsOpen = Boolean(expandedQueryResults[message.id]);
 
               return (
                 <div
@@ -459,13 +407,36 @@ const ChatAssistantNew = () => {
                     {/* Query Parameters Display */}
                     {message.role === "assistant" && message.has_database_query && message.query_params && (
                       <div className="mt-3">
-                        <div className="small text-muted mb-1">Query Parameters</div>
-                        <pre
-                          className="small bg-light border rounded p-2 mb-0"
-                          style={{ whiteSpace: "pre-wrap", fontSize: "11px" }}
+                        <button
+                          type="button"
+                          onClick={() => toggleExpandedState(setExpandedQueryParams, message.id)}
+                          className="btn btn-link p-0 text-decoration-none d-inline-flex align-items-center gap-1"
+                          aria-expanded={isQueryParamsOpen}
+                          aria-label="Toggle query parameters"
+                          style={{ color: "inherit" }}
                         >
-                          {formatQueryParamsForDisplay(message.query_params)}
-                        </pre>
+                          <span
+                            aria-hidden="true"
+                            style={{
+                              display: "inline-block",
+                              fontSize: "10px",
+                              color: "#6c757d",
+                              transform: isQueryParamsOpen ? "rotate(90deg)" : "rotate(0deg)",
+                              transition: "transform 0.2s ease",
+                            }}
+                          >
+                            ▶
+                          </span>
+                          <span className="small text-muted">Query Parameters</span>
+                        </button>
+                        {isQueryParamsOpen && (
+                          <pre
+                            className="small bg-light border rounded p-2 mb-0 mt-1"
+                            style={{ whiteSpace: "pre-wrap", fontSize: "11px" }}
+                          >
+                            {formatQueryParamsForDisplay(message.query_params)}
+                          </pre>
+                        )}
                       </div>
                     )}
 
@@ -475,40 +446,63 @@ const ChatAssistantNew = () => {
                       message.query_results.length > 0 &&
                       rowKeys.length > 0 && (
                         <div className="mt-3">
-                          <div className="small text-muted mb-1">
-                            Results ({message.query_results.length} rows)
-                          </div>
-                          <div
-                            className="border rounded overflow-auto"
-                            style={{
-                              maxHeight: "250px",
-                              background: "rgba(255, 255, 255, 0.72)",
-                              borderColor: "rgba(99, 102, 241, 0.18)",
-                            }}
+                          <button
+                            type="button"
+                            onClick={() => toggleExpandedState(setExpandedQueryResults, message.id)}
+                            className="btn btn-link p-0 text-decoration-none d-inline-flex align-items-center gap-1"
+                            aria-expanded={isQueryResultsOpen}
+                            aria-label="Toggle query results"
+                            style={{ color: "inherit" }}
                           >
-                            <Table responsive size="sm" className="mb-0 align-middle">
-                              <thead>
-                                <tr>
-                                  {rowKeys.map((key) => (
-                                    <th key={key} style={{ fontSize: "11px" }}>
-                                      {key}
-                                    </th>
-                                  ))}
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {message.query_results.map((row, index) => (
-                                  <tr key={`${message.id}-${index}`}>
+                            <span
+                              aria-hidden="true"
+                              style={{
+                                display: "inline-block",
+                                fontSize: "10px",
+                                color: "#6c757d",
+                                transform: isQueryResultsOpen ? "rotate(90deg)" : "rotate(0deg)",
+                                transition: "transform 0.2s ease",
+                              }}
+                            >
+                              ▶
+                            </span>
+                            <span className="small text-muted">
+                              Results ({message.query_results.length} rows)
+                            </span>
+                          </button>
+                          {isQueryResultsOpen && (
+                            <div
+                              className="border rounded overflow-auto mt-1"
+                              style={{
+                                maxHeight: "250px",
+                                background: "rgba(255, 255, 255, 0.72)",
+                                borderColor: "rgba(99, 102, 241, 0.18)",
+                              }}
+                            >
+                              <Table responsive size="sm" className="mb-0 align-middle">
+                                <thead>
+                                  <tr>
                                     {rowKeys.map((key) => (
-                                      <td key={key} style={{ fontSize: "11px" }}>
-                                        {formatCellValue(row[key])}
-                                      </td>
+                                      <th key={key} style={{ fontSize: "11px" }}>
+                                        {key}
+                                      </th>
                                     ))}
                                   </tr>
-                                ))}
-                              </tbody>
-                            </Table>
-                          </div>
+                                </thead>
+                                <tbody>
+                                  {message.query_results.map((row, index) => (
+                                    <tr key={`${message.id}-${index}`}>
+                                      {rowKeys.map((key) => (
+                                        <td key={key} style={{ fontSize: "11px" }}>
+                                          {formatCellValue(row[key])}
+                                        </td>
+                                      ))}
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </Table>
+                            </div>
+                          )}
                         </div>
                       )}
                     {/* Trace ID Display */}
