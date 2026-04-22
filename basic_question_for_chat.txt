@@ -1,7 +1,6 @@
 Difficulty 1 - Easy (One-line, everyday wording)
 1) How many test records do we have in total?
 2) Since 2026, which platform has failed the most?
-3) Show me the top 5 platforms with the most failures in 2026
 
 Difficulty 2 - Still simple (One-line)
 4) In 2026, which HP platform had the most failures?

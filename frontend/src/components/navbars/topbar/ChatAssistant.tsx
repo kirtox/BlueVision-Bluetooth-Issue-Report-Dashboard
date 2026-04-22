@@ -255,7 +255,7 @@ const ChatAssistantNew = () => {
           bottom: `${floatingPanelBottom}px`,
           right: `${floatingButtonRight}px`,
           width: "min(440px, 92vw)",
-          height: `min(700px, calc(100vh - ${floatingPanelTop + floatingPanelBottom}px))`,
+          height: `min(84vh, calc(100vh - ${floatingPanelTop + floatingPanelBottom}px))`,
           zIndex: 1001,
           borderRadius: "12px",
           background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
