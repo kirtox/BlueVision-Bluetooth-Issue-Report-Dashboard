@@ -1,16 +1,67 @@
-name: Deploy
+name: Deploy (Windows Podman)
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deploy target"
+        required: true
+        default: "prod"
+        type: choice
+        options:
+          - prod
+          - dev
+      run_backup:
+        description: "Run DB backup before deploy"
+        required: true
+        default: true
+        type: boolean
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    name: Deploy on self-hosted Windows runner
+    runs-on: [self-hosted, windows]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Copy to server
-      run: |
-        scp -r . user@yourserver:/opt/app
-        ssh user@yourserver 'cd /opt/app && ./scripts/deploy.sh'
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Show tool versions
+        shell: powershell
+        run: |
+          podman --version
+          podman-compose --version
+
+      - name: Backup database (optional)
+        if: ${{ inputs.run_backup }}
+        shell: powershell
+        run: |
+          .\scripts\backup_db.bat
+
+      - name: Deploy prod stack
+        if: ${{ inputs.target == 'prod' }}
+        shell: powershell
+        run: |
+          podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d --build
+
+      - name: Deploy dev stack
+        if: ${{ inputs.target == 'dev' }}
+        shell: powershell
+        run: |
+          podman-compose -p bluevision_dev -f .\podman-compose.dev.yml up -d --build
+
+      - name: Post-deploy health check (prod)
+        if: ${{ inputs.target == 'prod' }}
+        shell: powershell
+        run: |
+          $backend = Invoke-WebRequest -Uri "http://127.0.0.1:8001/health" -UseBasicParsing -TimeoutSec 20
+          if ($backend.StatusCode -ne 200) { throw "Backend health check failed" }
+
+      - name: Print running containers
+        shell: powershell
+        run: |
+          podman ps
