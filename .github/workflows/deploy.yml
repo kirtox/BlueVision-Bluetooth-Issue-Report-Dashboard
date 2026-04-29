@@ -22,8 +22,20 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  check-branch:
+    name: Ensure deploy runs on main branch only
+    runs-on: ubuntu-latest
+    steps:
+      - name: Block non-main branch
+        if: github.ref != 'refs/heads/main'
+        run: |
+          echo "❌ Deploy is only allowed from the main branch."
+          echo "Current branch: ${{ github.ref }}"
+          exit 1
+
   deploy:
     name: Deploy on self-hosted Windows runner
+    needs: check-branch
     runs-on: [self-hosted, windows]
 
     steps:
@@ -46,13 +58,13 @@ jobs:
         if: ${{ inputs.target == 'prod' }}
         shell: powershell
         run: |
-          podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d --build
+          podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d --build --force-recreate
 
       - name: Deploy dev stack
         if: ${{ inputs.target == 'dev' }}
         shell: powershell
         run: |
-          podman-compose -p bluevision_dev -f .\podman-compose.dev.yml up -d --build
+          podman-compose -p bluevision_dev -f .\podman-compose.dev.yml up -d --build --force-recreate
 
       - name: Post-deploy health check (prod)
         if: ${{ inputs.target == 'prod' }}
