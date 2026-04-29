@@ -173,6 +173,9 @@ netsh interface portproxy show all
 
 ---
 
+## Arduino Tool Setup
+```https://hackmd.io/6NnLlVFXQ3SZPv0gEnEq4g?both```
+
 ## Development Environment Setup
 - VScode debugging mode
 - Build a container bluevision_dev_db
