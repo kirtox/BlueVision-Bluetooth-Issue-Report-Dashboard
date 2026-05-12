@@ -46,7 +46,7 @@ jobs:
         shell: powershell
         run: |
           podman --version
-          podman-compose --version
+          & "C:\Program Files\Python311\python.exe" -m podman_compose --version
 
       - name: Backup database (optional)
         if: ${{ inputs.run_backup }}
@@ -58,13 +58,13 @@ jobs:
         if: ${{ inputs.target == 'prod' }}
         shell: powershell
         run: |
-          podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d --build --force-recreate
+          & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_prod -f .\podman-compose.prod.yml up -d --build --force-recreate
 
       - name: Deploy dev stack
         if: ${{ inputs.target == 'dev' }}
         shell: powershell
         run: |
-          podman-compose -p bluevision_dev -f .\podman-compose.dev.yml up -d --build --force-recreate
+          & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_dev -f .\podman-compose.dev.yml up -d --build --force-recreate
 
       - name: Post-deploy health check (prod)
         if: ${{ inputs.target == 'prod' }}
