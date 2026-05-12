@@ -34,9 +34,7 @@ echo.
 
 REM Check if production database container is running
 echo Checking database container...
-podman ps --filter name=bluevision_prod_db_1 -q > "%TEMP%\db_check.txt" 2>&1
-set /p DB_CONTAINER=<"%TEMP%\db_check.txt"
-del "%TEMP%\db_check.txt" 2>nul
+for /f "tokens=*" %%a in ('podman ps --filter name=bluevision_prod_db_1 -q 2^>nul') do set "DB_CONTAINER=%%a"
 
 if "%DB_CONTAINER%"=="" (
     echo.
