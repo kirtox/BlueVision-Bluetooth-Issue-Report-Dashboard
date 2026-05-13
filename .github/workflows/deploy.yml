@@ -14,7 +14,7 @@ on:
       run_backup:
         description: "Run DB backup before deploy"
         required: true
-        default: true
+        default: false
         type: boolean
 
 concurrency:
@@ -47,6 +47,16 @@ jobs:
         run: |
           podman --version
           & "C:\Program Files\Python311\python.exe" -m podman_compose --version
+
+      - name: Debug environment
+        shell: powershell
+        run: |
+          whoami
+          echo "USERPROFILE: $env:USERPROFILE"
+          echo "--- All containers ---"
+          podman ps -a
+          echo "--- Podman info ---"
+          podman info --format "{{.Store.GraphRoot}}"
 
       - name: Backup database (optional)
         if: ${{ inputs.run_backup }}
