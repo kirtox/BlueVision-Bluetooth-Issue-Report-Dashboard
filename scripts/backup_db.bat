@@ -9,7 +9,7 @@ setlocal
 REM Set directories
 set "SCRIPT_DIR=%~dp0"
 set "PROJECT_ROOT=%SCRIPT_DIR%.."
-set "BACKUP_DIR=%PROJECT_ROOT%\db_backups"
+set "BACKUP_DIR=C:\BlueVision\db_backups"
 
 REM Create backup directory if it doesn't exist
 if not exist "%BACKUP_DIR%" mkdir "%BACKUP_DIR%"
@@ -34,7 +34,7 @@ echo.
 
 REM Check if production database container is running
 echo Checking database container...
-for /f "tokens=*" %%a in ('podman ps --filter name=bluevision_prod_db_1 -q 2^>nul') do set "DB_CONTAINER=%%a"
+for /f "tokens=*" %%a in ('powershell -Command "podman ps --filter name=bluevision_prod_db_1 -q"') do set "DB_CONTAINER=%%a"
 
 if "%DB_CONTAINER%"=="" (
     echo.

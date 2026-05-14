@@ -53,6 +53,10 @@ jobs:
         run: |
           whoami
           echo "USERPROFILE: $env:USERPROFILE"
+          echo "--- Working directory ---"
+          Get-Location
+          echo "--- Repo files ---"
+          Get-ChildItem -Recurse -Depth 1 | Select-Object FullName
           echo "--- All containers ---"
           podman ps -a
           echo "--- Podman info ---"
@@ -64,18 +68,21 @@ jobs:
         if: ${{ inputs.run_backup }}
         shell: powershell
         run: |
+          Set-Location $env:GITHUB_WORKSPACE
           .\scripts\backup_db.bat
 
       - name: Deploy prod stack
         if: ${{ inputs.target == 'prod' }}
         shell: powershell
         run: |
+          Set-Location $env:GITHUB_WORKSPACE
           & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_prod -f .\podman-compose.prod.yml up -d --build --force-recreate
 
       - name: Deploy dev stack
         if: ${{ inputs.target == 'dev' }}
         shell: powershell
         run: |
+          Set-Location $env:GITHUB_WORKSPACE
           & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_dev -f .\podman-compose.dev.yml up -d --build --force-recreate
 
       - name: Post-deploy health check (prod)
