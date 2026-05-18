@@ -83,7 +83,18 @@ jobs:
           echo "WSL path: $wslPath"
           wsl -d podman-BTIRD_PM -u root bash -c "$buildEnv && cd '$wslPath' && podman build --network=host --no-cache $buildArgs -t bluevision_prod_frontend:latest -f frontend/Dockerfile.prod frontend/"
           wsl -d podman-BTIRD_PM -u root bash -c "$buildEnv && cd '$wslPath' && podman build --network=host --no-cache $buildArgs -t bluevision_prod_backend:latest -f backend/Dockerfile.prod backend/"
-          wsl -d podman-BTIRD_PM -u root bash -c "export PATH=/usr/local/bin:/usr/bin:/bin && export NETAVARK_FW=none && cd '$wslPath' && podman-compose -p bluevision_prod -f podman-compose.prod.yml up -d --force-recreate"
+          Set-Location $env:GITHUB_WORKSPACE
+          & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_prod -f podman-compose.prod.yml up -d db
+          $maxRetries = 24
+          $retries = 0
+          do {
+            Start-Sleep -Seconds 5
+            podman healthcheck run bluevision_prod_db_1 2>&1 | Out-Null
+            $retries++
+            Write-Host "DB healthcheck attempt $retries/$maxRetries (exit: $LASTEXITCODE)"
+          } while ($LASTEXITCODE -ne 0 -and $retries -lt $maxRetries)
+          if ($LASTEXITCODE -ne 0) { throw "DB failed to become healthy after $maxRetries attempts" }
+          & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_prod -f podman-compose.prod.yml up -d --force-recreate
 
       - name: Deploy dev stack
         if: ${{ inputs.target == 'dev' }}
@@ -96,7 +107,18 @@ jobs:
           $buildArgs = "--build-arg http_proxy=$proxy --build-arg https_proxy=$proxy"
           wsl -d podman-BTIRD_PM -u root bash -c "$buildEnv && cd '$wslPath' && podman build --network=host --no-cache $buildArgs -t bluevision_dev_frontend:latest -f frontend/Dockerfile.dev frontend/"
           wsl -d podman-BTIRD_PM -u root bash -c "$buildEnv && cd '$wslPath' && podman build --network=host --no-cache $buildArgs -t bluevision_dev_backend:latest -f backend/Dockerfile.dev backend/"
-          wsl -d podman-BTIRD_PM -u root bash -c "export PATH=/usr/local/bin:/usr/bin:/bin && export NETAVARK_FW=none && cd '$wslPath' && podman-compose -p bluevision_dev -f podman-compose.dev.yml up -d --force-recreate"
+          Set-Location $env:GITHUB_WORKSPACE
+          & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_dev -f podman-compose.dev.yml up -d db
+          $maxRetries = 24
+          $retries = 0
+          do {
+            Start-Sleep -Seconds 5
+            podman healthcheck run bluevision_dev_db_1 2>&1 | Out-Null
+            $retries++
+            Write-Host "DB healthcheck attempt $retries/$maxRetries (exit: $LASTEXITCODE)"
+          } while ($LASTEXITCODE -ne 0 -and $retries -lt $maxRetries)
+          if ($LASTEXITCODE -ne 0) { throw "DB failed to become healthy after $maxRetries attempts" }
+          & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_dev -f podman-compose.dev.yml up -d --force-recreate
 
       - name: Post-deploy health check (prod)
         if: ${{ inputs.target == 'prod' }}
