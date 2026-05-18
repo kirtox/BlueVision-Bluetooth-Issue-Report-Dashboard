@@ -123,7 +123,6 @@ jobs:
           } while ($LASTEXITCODE -ne 0 -and $retries -lt $maxRetries)
           if ($LASTEXITCODE -ne 0) { throw "DB failed to become healthy after $maxRetries attempts" }
           & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_dev -f podman-compose.dev.yml up -d
-          & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_dev -f podman-compose.dev.yml up -d --force-recreate
 
       - name: Post-deploy health check (prod)
         if: ${{ inputs.target == 'prod' }}

@@ -31,11 +31,46 @@ BlueVision-Bluetooth-Issue-Report-Dashboard/
 ├── frontend/                # Frontend dashboard (UI)
 ├── db_backups/              # Database backup files
 ├── scripts/                 # Helper, Backup, Restore scripts
-├── .github/workflows/       # CI/CD configurations (Not yet)
+├── .github/workflows/       # CI/CD configurations
 ├── podman-compose.dev.yml   # Development environment config
 ├── podman-compose.prod.yml  # Production environment config
 └── README.md
 ```
+
+---
+
+## CI/CD
+
+### CI (`ci.yml`) — Automatic
+- **Trigger**: push / PR to `main`
+- **Runner**: `ubuntu-latest` (GitHub hosted)
+- **Jobs**: `frontend-build`, `backend-check`, `container-smoke-build`
+- **Purpose**: Verify code compiles and builds without errors
+
+### CD (`deploy.yml`) — Manual
+- **Trigger**: GitHub Actions → **Run workflow** (main branch only)
+- **Runner**: Self-hosted Windows runner (`actions-runner` service, runs as `Desktop` account)
+- **Parameters**:
+  - `target`: `prod` (default) or `dev`
+  - `run_backup`: Run DB backup before deploying
+
+**Deploy flow (prod):**
+
+| Step | Description |
+|------|-------------|
+| Build frontend image | WSL `podman build --network=host --no-cache`, proxy: `proxy-dmz.intel.com:912` |
+| Build backend image | Same as above |
+| Remove old containers | `podman rm -f` all `bluevision_prod` project containers |
+| Start db | `podman-compose up -d db` (Windows podman via Machine socket) |
+| Wait for DB healthy | Poll `podman healthcheck run` every 5s, up to 2 minutes |
+| Start all services | `podman-compose up -d` |
+| Health check | `GET http://127.0.0.1:8001/health` must return 200 |
+
+**Notes:**
+- Build uses WSL (`--network=host` required to route through corporate proxy)
+- `up` uses Windows podman (WSL direct bash has no dbus, aardvark-dns cannot start)
+- `NETAVARK_FW=none` skips nftables during build (WSL kernel does not support it)
+- DB healthcheck must be triggered manually (Podman Machine WSL type has no systemd timer)
 
 ---
 
@@ -207,7 +242,7 @@ netsh interface portproxy show all
 - **Frontend**: React + TypeScript + Recharts (for visualizations)
 - **Database**: PostgreSQL (with backup support)
 - **Deployment**: Podman Compose
-- **CI/CD**: GitHub Actions (**Not yet**)
+- **CI/CD**: GitHub Actions
 
 ---
 
