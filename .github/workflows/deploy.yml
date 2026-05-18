@@ -75,20 +75,18 @@ jobs:
         if: ${{ inputs.target == 'prod' }}
         shell: powershell
         run: |
-          Set-Location $env:GITHUB_WORKSPACE
-          $wslPath = $env:GITHUB_WORKSPACE -replace "\\", "/" -replace "^([A-Za-z]):", "/mnt/`$1"
+          $wslPath = $env:GITHUB_WORKSPACE.Replace('\', '/') -replace '^([A-Za-z]):', '/mnt/$1'
           $wslPath = $wslPath.ToLower()
           echo "WSL path: $wslPath"
-          wsl -d podman-BTIRD_PM podman-compose -p bluevision_prod -f $wslPath/podman-compose.prod.yml up -d --build --force-recreate
+          wsl -d podman-BTIRD_PM -u root bash -c "export PATH=/usr/local/bin:/usr/bin:$PATH && export NETAVARK_FW=none && export http_proxy=http://proxy-dmz.intel.com:912 && export https_proxy=http://proxy-dmz.intel.com:912 && export HTTP_PROXY=http://proxy-dmz.intel.com:912 && export HTTPS_PROXY=http://proxy-dmz.intel.com:912 && cd '$wslPath' && podman-compose -p bluevision_prod -f podman-compose.prod.yml up -d --build --force-recreate"
 
       - name: Deploy dev stack
         if: ${{ inputs.target == 'dev' }}
         shell: powershell
         run: |
-          Set-Location $env:GITHUB_WORKSPACE
-          $wslPath = $env:GITHUB_WORKSPACE -replace "\\", "/" -replace "^([A-Za-z]):", "/mnt/`$1"
+          $wslPath = $env:GITHUB_WORKSPACE.Replace('\', '/') -replace '^([A-Za-z]):', '/mnt/$1'
           $wslPath = $wslPath.ToLower()
-          wsl -d podman-BTIRD_PM podman-compose -p bluevision_dev -f $wslPath/podman-compose.dev.yml up -d --build --force-recreate
+          wsl -d podman-BTIRD_PM -u root bash -c "export PATH=/usr/local/bin:/usr/bin:$PATH && export NETAVARK_FW=none && export http_proxy=http://proxy-dmz.intel.com:912 && export https_proxy=http://proxy-dmz.intel.com:912 && export HTTP_PROXY=http://proxy-dmz.intel.com:912 && export HTTPS_PROXY=http://proxy-dmz.intel.com:912 && cd '$wslPath' && podman-compose -p bluevision_dev -f podman-compose.dev.yml up -d --build --force-recreate"
 
       - name: Post-deploy health check (prod)
         if: ${{ inputs.target == 'prod' }}
