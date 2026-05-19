@@ -33,6 +33,12 @@ export const DashboardMenu: DashboardMenuProps[] = [
   },
   {
     id: uuid(),
+    title: "Tool Tutorial",
+    icon: "book-open",
+    link: "/tool-tutorial",
+  },
+  {
+    id: uuid(),
     title: "Logs",
     icon: "file-text",
     children: [
@@ -181,13 +187,23 @@ const MENU_IDS = {
 
 // Generate menu based on user role
 export const getDashboardMenuByRole = (userRole?: string): DashboardMenuProps[] => {
-  // Base menu items (visible to all users)
+  // Base menu items (visible to all users including Guest)
   const baseMenuItems: DashboardMenuProps[] = [
     {
       id: MENU_IDS.DASHBOARD,
       title: "Dashboard",
       icon: "home",
       link: "/",
+    },
+  ];
+
+  // Non-guest menu items (visible to all roles except Guest)
+  const nonGuestMenuItems: DashboardMenuProps[] = [
+    {
+      id: uuid(),
+      title: "Tool Tutorial",
+      icon: "book-open",
+      link: "/tool-tutorial",
     },
   ];
 
@@ -210,6 +226,10 @@ export const getDashboardMenuByRole = (userRole?: string): DashboardMenuProps[] 
   ];
 
   let menuItems = [...baseMenuItems];
+
+  if (userRole !== 'Guest') {
+    menuItems = [...menuItems, ...nonGuestMenuItems];
+  }
 
   if (userRole === 'Administrator') {
     menuItems = [...menuItems, ...adminMenuItems];

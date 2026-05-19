@@ -22,6 +22,7 @@ import ApiDemo from "./pages/dashboard/pages/ApiDemo";
 
 const UserManagement = lazy(() => import("./pages/dashboard/UserManagement"));
 const APIAccessLogs = lazy(() => import("./pages/logs/APIAccessLogs"));
+const ToolTutorial = lazy(() => import("./pages/tutorial/ToolTutorial"));
 
 // import bootstrap components
 import Accordion from "bootstrap-components/Accordions";
@@ -114,6 +115,11 @@ const App = () => {
           id: "layout-vertical",
           path: "/layout-vertical",
           Component: LayoutVertical,
+        },
+        {
+          id: "tool-tutorial",
+          path: "/tool-tutorial",
+          element: <ToolTutorial />,
         },
         {
           id: "users",
