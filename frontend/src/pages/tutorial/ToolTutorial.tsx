@@ -43,7 +43,7 @@ const FAQ_ITEMS = [
   {
     id: "faq-2",
     question: "The Python script fails to connect to the backend. What should I check?",
-    answer: "Ensure the Wi-Fi is connected to 'ASUS_lab_5G' and contact the Administrator to check if the BlueVision server is running.",
+    answer: "Ensure the Wi-Fi is connected to 'ASUS_lab_2.4G', 'ASUS_lab_5G', or 'ASUS_lab_6G' (based on the requirement) and contact the Administrator to check if the BlueVision server is running.",
   },
   {
     id: "faq-3",
@@ -149,8 +149,8 @@ const ToolTutorial = () => {
               <Card.Body>
                 <h4 className="fw-semibold mb-3">Hardware Requirements</h4>
                 <ul className="mb-0">
-                  <li>Arduino board</li>
-                  <li>USB cable</li>
+                  <li>Arduino board x 1</li>
+                  <li>USB cable x 1</li>
                 </ul>
               </Card.Body>
             </Card>
@@ -166,6 +166,7 @@ const ToolTutorial = () => {
                   <li>Required Python packages (listed in <code>requirements.txt</code>)</li>
                   <li>WMIC</li>
                   <li>Tesseract OCR</li>
+                  <li>WRT (Based on Wi-Fi driver version)</li>
                   <li>Arduino IDE (for flashing Arduino firmware) (Optional)</li>
                 </ul> 
               </Card.Body>
@@ -368,12 +369,13 @@ const ToolTutorial = () => {
                   <li className="mb-2">If no matching configuration is found, freely combine the desired scenario using the "DUT Power States" and "Test Case Selection" sections.</li>
                   <li className="mb-2">More detailed test settings can be found in the "Advanced Setting" section.</li>
                   <li className="mb-2">Before starting the test, make sure all information in the "Database Setting" section is correct. Update the settings the first time and whenever the test scenario changes, to ensure the collected data is correctly recorded in BlueVision.</li>
-                  <li className="mb-2">If the DUT system language is not <strong>English</strong>, some fields in the "Database Setting" section may need to be filled in manually.</li>
+                  <li className="mb-2">If the DUT system language is not <strong>English</strong>, some fields in the "Database Setting" section may need to be filled in manually. (Especially, Samsung, LG, Panasonic, and other non-English devices)</li>
                   <li className="mb-2">Click the <strong>Start</strong> button to start the test. The script will automatically run through the test flow.</li>
                 </ol>
                 <br></br>
                 <h5 className="fw-semibold mb-2 border-start border-3 border-primary ps-2">3. Upload the test result</h5>
                 <ol className="mb-0">
+                    <li className="mb-2">Connect Wi-Fi to "ASUS_lab_2.4G", "ASUS_lab_5G", or "ASUS_lab_6G" (based on the requirement).</li>
                   <li className="mb-2">After the test is completed or stopped by the <strong>Stop</strong> button, click the <strong>Upload</strong> button to send the collected data to BlueVision.
                     <Alert variant="warning" className="py-2 px-3 small mt-2 mb-0">
                       <i className="fe fe-alert-triangle me-2" />
@@ -410,7 +412,7 @@ const ToolTutorial = () => {
               </Alert.Heading>
               <ul className="mb-0">
                 <li className="mb-2">Always verify the COM port assignment before running the script.</li>
-                <li className="mb-2">Make sure the Wi-Fi is connected to "ASUS_lab_5G".</li>
+                <li className="mb-2">Make sure the Wi-Fi is connected to "ASUS_lab_2.4G", "ASUS_lab_5G", or "ASUS_lab_6G" (based on the requirement).</li>
                 <li className="mb-2">Ensure the DUT is properly configured in the "Database Setting" before starting the test.</li>
                 <li className="mb-2">Before closing the tool, please check the <strong>"Message"</strong> section to confirm the upload was successful.</li>
               </ul>
