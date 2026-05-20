@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Container, Tab, Nav, Row, Col, Card, Badge, Accordion, Alert, Button } from "react-bootstrap";
+import { Container, Tab, Nav, Row, Col, Card, Badge, Accordion, Alert, Button, Modal } from "react-bootstrap";
 
 // Download file definitions — update filename/description/size as needed
 const DOWNLOAD_FILES = [
@@ -9,13 +9,6 @@ const DOWNLOAD_FILES = [
     description: "Main tool installer package",
     size: "—",
     path: "/downloads/tool-setup.zip",
-  },
-  {
-    id: 2,
-    filename: "config-template.zip",
-    description: "Configuration file templates",
-    size: "—",
-    path: "/downloads/config-template.zip",
   },
 ];
 
@@ -50,17 +43,31 @@ const FAQ_ITEMS = [
   {
     id: "faq-2",
     question: "The Python script fails to connect to the backend. What should I check?",
-    answer: "Verify the backend URL and API token in the config file. Ensure the BlueVision server is running and accessible from the machine running the script.",
+    answer: "Ensure the Wi-Fi is connected to 'ASUS_lab_5G' and contact the Administrator to check if the BlueVision server is running.",
   },
   {
     id: "faq-3",
     question: "How do I verify that data was uploaded successfully?",
-    answer: "Check the Dashboard page on BlueVision. New reports should appear within a few seconds after the script completes.",
+    answer: "You will see the keyword \"uploaded successfully\" in the \"Message\" section. New reports should also appear within a few seconds in the BlueVision dashboard.",
+  },
+  {
+    id: "faq-4",
+    question: "Why is my BKC information wrong in the dashboard but correct in Device Manager?",
+    answer: "The DUT system language may not be set to English. Please check the \"Database Setting\" — some fields may need to be filled in manually for non-English system languages.",
   },
 ];
 
 const ToolTutorial = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const [lightbox, setLightbox] = useState<{ src: string; alt: string } | null>(null);
+
+  const handleImgClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === "IMG") {
+      const img = target as HTMLImageElement;
+      setLightbox({ src: img.src, alt: img.alt });
+    }
+  };
 
   return (
     <Container fluid className="p-4">
@@ -71,6 +78,8 @@ const ToolTutorial = () => {
         </p>
       </div>
 
+      <style>{`.tutorial-content img.img-fluid { cursor: zoom-in; }`}</style>
+      <div className="tutorial-content" onClick={handleImgClick}>
       <Tab.Container activeKey={activeTab} onSelect={(k) => setActiveTab(k || "overview")}>
         <Nav variant="tabs" className="mb-4">
           <Nav.Item>
@@ -78,6 +87,9 @@ const ToolTutorial = () => {
           </Nav.Item>
           <Nav.Item>
             <Nav.Link eventKey="prerequisites">Prerequisites & Setup</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link eventKey="howtouse">How to Use</Nav.Link>
           </Nav.Item>
           <Nav.Item>
             <Nav.Link eventKey="notes">Notes</Nav.Link>
@@ -104,15 +116,15 @@ const ToolTutorial = () => {
                     (e.target as HTMLImageElement).style.display = "none";
                   }}
                 />
-                <div className="text-muted small mt-2">
+                {/* <div className="text-muted small mt-2">
                   Place your architecture image at:{" "}
                   <code>frontend/public/images/tutorial/architecture.png</code>
-                </div>
+                </div> */}
               </Card.Body>
             </Card>
 
             {/* Component cards */}
-            <h5 className="fw-semibold mb-3">Components</h5>
+            <h4 className="fw-semibold mb-3">Components</h4>
             <Row xs={1} md={3} className="g-3">
               {COMPONENTS.map((c) => (
                 <Col key={c.id}>
@@ -135,7 +147,7 @@ const ToolTutorial = () => {
             {/* Hardware */}
             <Card className="mb-4 border-0 shadow-sm">
               <Card.Body>
-                <h5 className="fw-semibold mb-3">Hardware Requirements</h5>
+                <h4 className="fw-semibold mb-3">Hardware Requirements</h4>
                 <ul className="mb-0">
                   <li>Arduino board</li>
                   <li>USB cable</li>
@@ -146,7 +158,7 @@ const ToolTutorial = () => {
             {/* Software */}
             <Card className="mb-4 border-0 shadow-sm">
               <Card.Body>
-                <h5 className="fw-semibold mb-3">Software Requirements</h5>
+                <h4 className="fw-semibold mb-3">Software Requirements</h4>
                 <p className="text-muted small mb-2">The installers below are available in the <strong>Downloads</strong> section.</p>
                 <ul className="mb-0">
                   <li>Python 3.13.9</li>
@@ -162,10 +174,8 @@ const ToolTutorial = () => {
             {/* Downloads */}
             <Card className="mb-4 border-0 shadow-sm">
               <Card.Body>
-                <h5 className="fw-semibold mb-3">Downloads</h5>
-                <p className="text-muted small mb-3">
-                  Place zip files at <code>frontend/public/downloads/</code>
-                </p>
+                <h4 className="fw-semibold mb-3">Downloads</h4>
+                
                 <Row xs={1} md={2} className="g-3">
                   {DOWNLOAD_FILES.map((f) => (
                     <Col key={f.id}>
@@ -198,8 +208,8 @@ const ToolTutorial = () => {
             {/* Setup steps */}
             <Card className="mb-4 border-0 shadow-sm">
               <Card.Body>
-                <h5 className="fw-semibold mb-3">Setup Steps</h5>
-                <h6 className="fw-semibold mb-2 border-start border-3 border-primary ps-2">1. Python Setup</h6>
+                <h4 className="fw-semibold mb-3">Setup Steps</h4>
+                <h5 className="fw-semibold mb-2 border-start border-3 border-primary ps-2">1. Python Setup</h5>
                 <p className="text-muted small mb-2">Please remove any other versions of Python before installing Python <strong>3.13.9</strong>.</p>
                 <p className="text-muted small mb-2">If the Downloads section is not available, please download Python <strong>3.13.9</strong> from the{" "}<a href="https://www.python.org/downloads/release/python-3139/" target="_blank" rel="noreferrer">official website</a>.</p>
                   <img src="/images/tutorial/python_download.png" alt="Python Download" className="img-fluid rounded mb-3" style={{ maxHeight: 500 }} />
@@ -216,7 +226,7 @@ const ToolTutorial = () => {
                   <li className="mb-2">After installation, open a new terminal and run <code>python --version</code> to verify Python 3.13.9 is installed correctly.</li>
                 </ol>
 
-                <h6 className="fw-semibold mt-4 mb-2 border-start border-3 border-primary ps-2">2. Git Setup</h6>
+                <h5 className="fw-semibold mt-4 mb-2 border-start border-3 border-primary ps-2">2. Git Setup</h5>
                 <p className="text-muted small mb-2">If the Downloads section is not available, please download Git from the{" "}<a href="https://git-scm.com/downloads" target="_blank" rel="noreferrer">official website</a>.</p>
                   <img src="/images/tutorial/git_download.png" alt="Git Download" className="img-fluid rounded mb-3" style={{ maxHeight: 500 }} />
                 <ol className="mb-0">
@@ -239,7 +249,7 @@ const ToolTutorial = () => {
                     <img src="/images/tutorial/git_folder.png" alt="Git Folder" className="img-fluid rounded mb-3" style={{ maxHeight: 500 }} />
                 </ol>
                 
-                <h6 className="fw-semibold mt-4 mb-2 border-start border-3 border-primary ps-2">3. Install required Python packages</h6>
+                <h5 className="fw-semibold mt-4 mb-2 border-start border-3 border-primary ps-2">3. Install required Python packages</h5>
                 <ol className="mb-0">
                   <li className="mb-2">Open Command Prompt.</li>
                   <li className="mb-2">Navigate to the cloned repository's directory and run the following command to install required Python packages.</li>
@@ -254,7 +264,7 @@ const ToolTutorial = () => {
                     <img src="/images/tutorial/pip_install.png" alt="Pip Install" className="img-fluid rounded mb-3" style={{ maxHeight: 500 }} />
                 </ol>
 
-                <h6 className="fw-semibold mt-4 mb-2 border-start border-3 border-primary ps-2">4. Install WMIC</h6>
+                <h5 className="fw-semibold mt-4 mb-2 border-start border-3 border-primary ps-2">4. Install WMIC</h5>
                 <p className="text-muted small mb-2">WMIC is used for collecting system information. It is included by default in Windows 10 and later.</p>
                 <ol className="mb-0">
                   <li className="mb-2">Open <strong>Settings</strong>{" › "}<strong>System</strong>{" › "}<strong>Optional features</strong>{" › "}<strong>View features</strong>{" › "}<strong>See available features</strong>.</li>
@@ -264,7 +274,7 @@ const ToolTutorial = () => {
                     <img src="/images/tutorial/wmic_install_2.png" alt="WMIC Install — select and add WMIC feature" className="img-fluid rounded mb-3" style={{ maxHeight: 500 }} />
                 </ol>
 
-                <h6 className="fw-semibold mt-4 mb-2 border-start border-3 border-primary ps-2">5. Install Tesseract OCR</h6>
+                <h5 className="fw-semibold mt-4 mb-2 border-start border-3 border-primary ps-2">5. Install Tesseract OCR</h5>
                 <p className="text-muted small mb-2">Tesseract OCR is used for extracting text from images. If the Downloads section is not available, please download Tesseract OCR from the{" "}<a href="https://tesseract-ocr.github.io/tessdoc/Downloads.html" target="_blank" rel="noreferrer">official Tesseract OCR GitHub</a>.</p>
                 <ol className="mb-0">
                   <li className="mb-2">Install <code>tesseract-ocr-w64-setup-*.exe</code> included in tool-setup.zip.</li>
@@ -274,7 +284,7 @@ const ToolTutorial = () => {
                     <img src="/images/tutorial/tesseract_install_2.png" alt="Tesseract Install Step 2" className="img-fluid rounded mb-3" style={{ maxHeight: 500 }} />
                 </ol>
 
-                <h6 className="fw-semibold mt-4 mb-2 border-start border-3 border-primary ps-2">6. Install Arduino IDE</h6>
+                <h5 className="fw-semibold mt-4 mb-2 border-start border-3 border-primary ps-2">6. Install Arduino IDE</h5>
                 <p className="text-muted small mb-2">Arduino IDE is used for flashing firmware to the Arduino board. This step is optional if the Arduino board is already flashed with the required firmware.</p>
                 <p className="text-muted small mb-2">If the Downloads section is not available, please download Arduino IDE from the{" "}<a href="https://www.arduino.cc/en/software" target="_blank" rel="noreferrer">official website</a>.</p>
                   <img src="/images/tutorial/arduino_download.png" alt="Arduino Download" className="img-fluid rounded mb-3" style={{ maxHeight: 500 }} />
@@ -289,12 +299,12 @@ const ToolTutorial = () => {
             {/* Arduino firmware flash */}
             <Card className="mb-4 border-0 shadow-sm">
               <Card.Body>
-                <h5 className="fw-semibold mb-3">Flash Arduino firmware</h5>
+                <h4 className="fw-semibold mb-3">Flash Arduino firmware</h4>
                 <p className="text-muted small">If your Arduino board is not pre-flashed with the required firmware, please follow the steps below to flash it using the Arduino IDE.</p>
                 <ol className="mb-0">
                   <li className="mb-2">Open Arduino IDE.</li>
                     <img src="/images/tutorial/arduino_open_ide.png" alt="Arduino Open IDE" className="img-fluid rounded mb-3" style={{ maxHeight: 500 }} />
-                  <li className="mb-2">Go to <strong>File</strong>{" › "}<strong>Open</strong> and navigate to the firmware file (e.g., <code>arduino_firmware.ino</code>) provided in the tool-setup.zip. Open the .ino file.</li>
+                  <li className="mb-2">Go to <strong>File</strong>{" › "}<strong>Open</strong> and navigate to the firmware file (<code>user_exp_auto_test.ino</code>) provided in the repository folder (<code>\Desktop\auto_workspace\auto_test\user_exp_auto_test_ui\arduino\user_exp_auto_test</code>). Open the .ino file.</li>
                     <img src="/images/tutorial/arduino_open_path.png" alt="Arduino Open Firmware" className="img-fluid rounded mb-3" style={{ maxHeight: 500 }} />
                   <li className="mb-2">Connect your Arduino board to the computer using the USB cable.</li>
                   <li className="mb-2">In Arduino IDE, select the <strong>Arduino Uno</strong>.</li>
@@ -303,11 +313,11 @@ const ToolTutorial = () => {
                     <img src="/images/tutorial/arduino_upload.png" alt="Arduino Upload Firmware" className="img-fluid rounded mb-3" style={{ maxHeight: 500 }} />
                   <li className="mb-2">Wait for the upload to complete. You should see a "Done uploading" message in the status bar.</li>
                 </ol>
-
-                <h5 className="fw-semibold mb-3">Verify the Arduino Board is Ready</h5>
+                <br></br>
+                <h4 className="fw-semibold mb-3">Verify the Arduino Board is Ready</h4>
                 <p className="text-muted small mb-2">Click the <strong>Serial Monitor</strong> button in the top-right corner of Arduino IDE. The Serial Monitor panel will appear at the bottom as shown below. Set the baud rate to <strong>115200</strong>.</p>
                   <img src="/images/tutorial/arduino_serial_monitor.png" alt="Arduino Serial Monitor" className="img-fluid rounded mb-3" style={{ maxHeight: 500 }} />
-                <p className="text-muted small mb-2">Input the following command in the Serial Monitor and press <strong>Enter</strong>:</p>
+                <h5 className="fw-semibold mt-4 mb-2 border-start border-3 border-primary ps-2">Input the following command in the Serial Monitor and press <strong>Enter</strong>:</h5>
                 <ol className="mb-0">
                   <li className="mb-2">Command <code>1</code>: test sound detector module — returns <code>0</code> if no sound is detected, or <code>1</code> if sound is detected.</li>
                     <img src="/images/tutorial/arduino_cmd_1.png" alt="Serial Monitor output for Command 1 — sound detector test result" className="img-fluid rounded mb-3" />
@@ -324,19 +334,74 @@ const ToolTutorial = () => {
             
           </Tab.Pane>
 
-          {/* ── Tab 3: Notes ── */}
+          {/* ── Tab 3: How to Use ── */}
+          <Tab.Pane eventKey="howtouse">
+            {/* Running the tool */}
+            <Card className="mb-4 border-0 shadow-sm">
+              <Card.Body>
+                <h4 className="fw-semibold mb-3">Running the Tool</h4>
+                <p className="text-muted small mb-3">Make sure all setup steps are completed before running the tool.</p>
+                <h5 className="fw-semibold mb-2 border-start border-3 border-primary ps-2">1. Launch the Script</h5>
+                <ol className="mb-0">
+                  <li className="mb-2">Open Command Prompt.</li>
+                  <li className="mb-2">Navigate to the repository directory (<code>\Desktop\auto_workspace\auto_test\user_exp_auto_test_ui</code>).</li>
+                  <ul className="mb-2">
+                    <li>
+                      <code>cd C:\Users\<strong>{`<YourUsername>`}</strong>\Desktop\auto_workspace\auto_test\user_exp_auto_test_ui</code>
+                    </li>
+                  </ul>
+                  <li className="mb-2">Run the script.</li>
+                  <ul className="mb-0">
+                    <li>
+                      <code>execute.bat</code> (or <code>python ui_main.py</code>)
+                    </li>
+                  </ul>
+                </ol>
+                <br></br>
+                <h5 className="fw-semibold mb-2 border-start border-3 border-primary ps-2">2. Configure the Test Session</h5>
+                <p className="text-muted small mb-2">Follow the steps below to set up the UX test session.</p>
+                  <img src="/images/tutorial/tool_gui.png" alt="Tool GUI" className="img-fluid rounded mb-3" style={{ maxHeight: 500 }} />
+                <ol className="mb-0">
+                  <li className="mb-2">Verify that the serial port is detected correctly. A port name such as <code>COM3</code> should appear in the "Message" section.</li>
+                  <li className="mb-2">Check the connected devices in the "Device" section.</li>
+                  <li className="mb-2">If a matching configuration exists in the "Pattern Selection" section, it can be applied directly.</li>
+                  <li className="mb-2">If no matching configuration is found, freely combine the desired scenario using the "DUT Power States" and "Test Case Selection" sections.</li>
+                  <li className="mb-2">More detailed test settings can be found in the "Advanced Setting" section.</li>
+                  <li className="mb-2">Before starting the test, make sure all information in the "Database Setting" section is correct. Update the settings the first time and whenever the test scenario changes, to ensure the collected data is correctly recorded in BlueVision.</li>
+                  <li className="mb-2">If the DUT system language is not <strong>English</strong>, some fields in the "Database Setting" section may need to be filled in manually.</li>
+                  <li className="mb-2">Click the <strong>Start</strong> button to start the test. The script will automatically run through the test flow.</li>
+                </ol>
+                <br></br>
+                <h5 className="fw-semibold mb-2 border-start border-3 border-primary ps-2">3. Upload the test result</h5>
+                <ol className="mb-0">
+                  <li className="mb-2">After the test is completed or stopped by the <strong>Stop</strong> button, click the <strong>Upload</strong> button to send the collected data to BlueVision.
+                    <Alert variant="warning" className="py-2 px-3 small mt-2 mb-0">
+                      <i className="fe fe-alert-triangle me-2" />
+                      Before closing the tool, please check the <strong>"Message"</strong> section to confirm the upload was successful.
+                    </Alert>
+                  </li>
+                  <li className="mb-2">You can check the uploaded report in the Dashboard page.</li>
+                  <li className="mb-2">The fail rate shows in the <strong>"Task Schedule"</strong> section.</li>
+                  <li className="mb-2">If the test failed, the failure reason can be found in the <strong>"Summary"</strong> section.</li>
+                  <li className="mb-2">If you encounter any issues during the test or upload process, please refer to the <strong>Notes</strong> and <strong>FAQ</strong> sections for troubleshooting tips or contact the Administrator.</li>
+                </ol>
+              </Card.Body>
+            </Card>
+
+            {/* Additional usage sections can be added here */}
+          </Tab.Pane>
+
+          {/* ── Tab 4: Notes ── */}
           <Tab.Pane eventKey="notes">
-            <Alert variant="warning">
+            {/* <Alert variant="warning">
               <Alert.Heading>
                 <i className="fe fe-alert-triangle me-2" />
                 Important Notes
               </Alert.Heading>
               <ul className="mb-0">
-                <li className="mb-2">Always verify the COM port assignment before running the script.</li>
-                <li className="mb-2">Do not disconnect the Arduino while data collection is in progress.</li>
-                <li>Ensure the BlueVision backend is running before starting the script.</li>
+                <li className="mb-2">Temp.</li>
               </ul>
-            </Alert>
+            </Alert> */}
 
             <Alert variant="info">
               <Alert.Heading>
@@ -344,8 +409,10 @@ const ToolTutorial = () => {
                 Tips
               </Alert.Heading>
               <ul className="mb-0">
-                <li className="mb-2">Run the script in a terminal to see real-time log output.</li>
-                <li>Use the Dashboard to verify data was received correctly after each session.</li>
+                <li className="mb-2">Always verify the COM port assignment before running the script.</li>
+                <li className="mb-2">Make sure the Wi-Fi is connected to "ASUS_lab_5G".</li>
+                <li className="mb-2">Ensure the DUT is properly configured in the "Database Setting" before starting the test.</li>
+                <li className="mb-2">Before closing the tool, please check the <strong>"Message"</strong> section to confirm the upload was successful.</li>
               </ul>
             </Alert>
           </Tab.Pane>
@@ -363,6 +430,16 @@ const ToolTutorial = () => {
           </Tab.Pane>
         </Tab.Content>
       </Tab.Container>
+      </div>
+
+      <Modal show={!!lightbox} onHide={() => setLightbox(null)} size="xl" centered>
+        <Modal.Header closeButton />
+        <Modal.Body className="text-center p-2">
+          {lightbox && (
+            <img src={lightbox.src} alt={lightbox.alt} className="img-fluid" style={{ maxHeight: "85vh" }} />
+          )}
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 };
