@@ -79,9 +79,9 @@ jobs:
           $src = "C:\BlueVision_static\tool-setup.zip"
           if (Test-Path $src) {
             Copy-Item -Path $src -Destination "$dest\tool-setup.zip" -Force
-            Write-Host "Copied tool-setup.zip to workspace"
+            Write-Host "✅ Copied tool-setup.zip to workspace"
           } else {
-            Write-Warning "tool-setup.zip not found at $src - Download button will not work. Place the file at $src on the server."
+            Write-Warning "⚠ $src not found — Download button will not work. Place the file at $src on the server."
           }
 
       - name: Deploy prod stack
