@@ -12,6 +12,7 @@ build/
 develop-eggs/
 dist/
 downloads/
+frontend/public/tool_tutorial/
 eggs/
 .eggs/
 lib/

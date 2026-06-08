@@ -8,7 +8,7 @@ const DOWNLOAD_FILES = [
     filename: "tool-setup.zip",
     description: "Main tool installer package",
     size: "—",
-    path: "/downloads/tool-setup.zip",
+    path: "/tool_tutorial/tool-setup.zip",
   },
 ];
 

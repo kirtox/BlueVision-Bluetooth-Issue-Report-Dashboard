@@ -71,6 +71,19 @@ jobs:
           Set-Location $env:GITHUB_WORKSPACE
           .\scripts\backup_db.bat
 
+      - name: Copy large static files (not tracked by Git)
+        shell: powershell
+        run: |
+          $dest = Join-Path $env:GITHUB_WORKSPACE "frontend\public\tool_tutorial"
+          if (-not (Test-Path $dest)) { New-Item -ItemType Directory -Path $dest | Out-Null }
+          $src = "C:\BlueVision_static\tool-setup.zip"
+          if (Test-Path $src) {
+            Copy-Item -Path $src -Destination "$dest\tool-setup.zip" -Force
+            Write-Host "Copied tool-setup.zip to workspace"
+          } else {
+            Write-Warning "tool-setup.zip not found at $src - Download button will not work. Place the file at $src on the server."
+          }
+
       - name: Deploy prod stack
         if: ${{ inputs.target == 'prod' }}
         shell: powershell
