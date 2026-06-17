@@ -81,7 +81,7 @@ jobs:
             Copy-Item -Path $src -Destination "$dest\tool-setup.zip" -Force
             Write-Host "✅ Copied tool-setup.zip to workspace"
           } else {
-            Write-Warning "⚠ $src not found — Download button will not work. Place the file at $src on the server."
+            Write-Warning "⚠ $src not found - Download button will not work. Place the file at $src on the server."
           }
 
       - name: Deploy prod stack
