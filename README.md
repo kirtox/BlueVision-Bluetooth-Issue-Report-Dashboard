@@ -111,8 +111,12 @@ cd BlueVision-Bluetooth-Issue-Report-Dashboard
 podman-compose -p bluevision_prod -f .\podman-compose.prod.yml down
 
 # Build the services that need to be built
+## Without proxy
 podman build -t bluevision_prod_backend -f backend/Dockerfile.prod backend/
 podman build -t bluevision_prod_frontend -f frontend/Dockerfile.prod frontend/
+## With proxy
+podman build --build-arg http_proxy=http://proxy-dmz.intel.com:912 --build-arg https_proxy=http://proxy-dmz.intel.com:912 -t bluevision_prod_backend -f backend/Dockerfile.prod backend/
+podman build --build-arg http_proxy=http://proxy-dmz.intel.com:912 --build-arg https_proxy=http://proxy-dmz.intel.com:912 -t bluevision_prod_frontend -f frontend/Dockerfile.prod frontend/
 
 # Restart all services (included db)
 podman-compose -p bluevision_prod -f .\podman-compose.prod.yml up -d
