@@ -33,6 +33,8 @@ MAPPINGS = [
     ("PF5WL21J", "21V7SIT057", "Avon"),
     ("PF5XFNBA", "21V9SIT046", "Avon"),
     ("TANTKD000051448", "Zenbook S14 UX5406AA_000051448", "UX5406"),
+    ("N8JYKWW002606016A03400", "Aspire A14-I51M", "Bubbletea"),
+    ("5CD6052407", "HP ProBook 4 G2i 16 inch Notebook AI PC", "Cheddar"),
 ]
 
 
