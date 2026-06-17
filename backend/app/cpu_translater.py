@@ -13,7 +13,9 @@ def identify_intel_cpu(cpu_name):
             series = match.group(1) if match.group(1) else match.group(2)[0]
             model_number = match.group(2)
             
-            if series == '3' or model_number.startswith('3'):
+            if series == '4' or model_number.startswith('4'):
+                return "Nova Lake"
+            elif series == '3' or model_number.startswith('3'):
                 return "Panther Lake"
             elif series == '2' or model_number.startswith('2'):
                 # Series 2 has two branches, simple distinction: V for Lunar Lake, others/S for Arrow Lake
@@ -40,6 +42,15 @@ def identify_intel_cpu(cpu_name):
                 return "Tiger Lake"
             return "Rocket Lake"
 
+    # 3. Identify Core series without "Ultra" and without "i" (e.g., Core 5 320U, Core 3 3XXU)
+    # Handles mainstream/entry-level branding (no Ultra, no i-prefix)
+    if "CORE" in cpu_name and "ULTRA" not in cpu_name:
+        match_core = re.search(r'CORE(?:\(TM\))?\s+\d\s+(\d{3})', cpu_name)
+        if match_core:
+            series = match_core.group(1)[0]  # First digit of model number
+            if series == '3':
+                return "Wildcat Lake"
+
     return "Unknown"
 
 # --- Test cases ---
@@ -51,7 +62,9 @@ test_cpus = [
     # "Intel Core i9-14900K"
     # "Intel(R) Core(TM) Ultra 5 338H",
     # "Intel(R) Core(TM) Ultra X7 358H",
-    "Intel(R) Core(TM) Ultra 5 238V"
+    # "Intel(R) Core(TM) Ultra 5 238V"
+    "Intel(R) Core(TM) 7 360",
+    "Intel(R) Core(TM) 7 350"
 ]
 
 for cpu in test_cpus:
