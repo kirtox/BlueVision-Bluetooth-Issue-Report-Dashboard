@@ -323,7 +323,7 @@ const ToolTutorial = () => {
                   <li className="mb-2">Command <code>1</code>: test sound detector module — returns <code>0</code> if no sound is detected, or <code>1</code> if sound is detected.</li>
                     <img src="/images/tutorial/arduino_cmd_1.png" alt="Serial Monitor output for Command 1 — sound detector test result" className="img-fluid rounded mb-3" />
                   <li className="mb-2">Command <code>2</code>: test buzzer sound module — you should hear the buzzer sound after sending the command.</li>
-                    <img src="/images/tutorial/arduino_cmd_2.png" alt="Serial Monitor output for Command 2 — buzzer test result" className="img-fluid rounded mb-3" />
+                    <img src="/images/tutorial/arduino_cmd_2.png" alt="Serial M onitor output for Command 2 — buzzer test result" className="img-fluid rounded mb-3" />
                   <li className="mb-2">Command <code>3</code>: test mouse servo motor module — the mouse servo motor should start spinning after sending the command.</li>
                     <img src="/images/tutorial/arduino_cmd_3.png" alt="Serial Monitor output for Command 3 — mouse servo motor test result" className="img-fluid rounded mb-3" />
                   <li className="mb-2">Command <code>6</code>: test keyboard servo motor module — the keyboard servo motor should start spinning after sending the command.</li>
@@ -332,6 +332,82 @@ const ToolTutorial = () => {
               </Card.Body>
             </Card>
 
+            {/* Arduino Components */}
+            <Card className="mb-4 border-0 shadow-sm">
+              <Card.Body>
+                <h4 className="fw-semibold mb-3">Arduino Peripheral Wiring</h4>
+                <p className="text-muted small mb-4">Connect the peripheral modules to your Arduino board according to the wiring diagrams below. Ensure all connections are secure before powering on the system.</p>
+
+                {/* 1. Buzzer Module */}
+                <h5 className="fw-semibold mt-4 mb-3 border-start border-3 border-warning ps-2">
+                  1. Buzzer Module
+                </h5>
+                <pre className="bg-light p-3 rounded" style={{ fontFamily: 'Consolas, monospace' }}>
+                  {`Buzzer Module          Arduino Board
+                  ┌─────────┐           ┌──────────┐
+                  │    S  --│ ────────→ │-- Pin 2  │
+                  │   VCC --│ ────────→ │-- 5V     │
+                  │   GND --│ ────────→ │-- GND    │
+                  └─────────┘           └──────────┘`}
+                </pre>
+
+                {/* 2. Sound Detector Module */}
+                <h5 className="fw-semibold mt-4 mb-3 border-start border-3 border-info ps-2">
+                  2. Sound Detector Module
+                </h5>
+                <pre className="bg-light p-3 rounded" style={{ fontFamily: 'Consolas, monospace' }}>
+                  {`Sound Detector         Arduino Board
+                  ┌─────────┐           ┌──────────┐
+                  │   A0    │           │   N/A    │ (not connected)
+                  │    G  --│ ────────→ │-- GND    │
+                  │    +  --│ ────────→ │-- 5V     │
+                  │   D0  --│ ────────→ │-- Pin 4  │
+                  └─────────┘           └──────────┘
+
+                  Note: Adjust the potentiometer until the signal LED turns off,
+                        but flashes when tapped lightly.`}
+                </pre>
+
+                {/* 3. Mouse Servo Motor */}
+                <h5 className="fw-semibold mt-4 mb-3 border-start border-3 border-success ps-2">
+                  3. 15kg Servo Motor (Mouse)
+                </h5>
+                <pre className="bg-light p-3 rounded" style={{ fontFamily: 'Consolas, monospace' }}>
+                  {`15kg Servo (Mouse)     Arduino Board
+                  ┌─────────┐           ┌──────────┐
+                  │ Yellow--│ ────────→ │-- Pin 5  │ (Signal)
+                  │   Red --│ ────────→ │-- 5V     │ (Power)
+                  │  Brown--│ ────────→ │-- GND    │ (Ground)
+                  └─────────┘           └──────────┘`}
+                </pre>
+
+                {/* 4. Keyboard Servo Motor */}
+                <h5 className="fw-semibold mt-4 mb-3 border-start border-3 border-success ps-2">
+                  4. 15kg Servo Motor (Keyboard)
+                </h5>
+                <pre className="bg-light p-3 rounded" style={{ fontFamily: 'Consolas, monospace' }}>
+                  {`15kg Servo (Keyboard)  Arduino Board
+                  ┌─────────┐           ┌──────────┐
+                  │ Yellow--│ ────────→ │-- Pin 6  │ (Signal)
+                  │   Red --│ ────────→ │-- 5V     │ (Power)
+                  │  Brown--│ ────────→ │-- GND    │ (Ground)
+                  └─────────┘           └──────────┘`}
+                </pre>
+
+                {/* 5. Headset Power Servo Motor */}
+                <h5 className="fw-semibold mt-4 mb-3 border-start border-3 border-danger ps-2">
+                  5. 20kg Servo Motor (Headset Power)
+                </h5>
+                <pre className="bg-light p-3 rounded" style={{ fontFamily: 'Consolas, monospace' }}>
+                  {`20kg Servo (Headset)   Arduino Board
+                  ┌─────────┐           ┌──────────┐
+                  │ Yellow--│ ────────→ │-- Pin 3  │ (Signal)
+                  │   Red --│ ────────→ │-- 5V     │ (Power)
+                  │  Brown--│ ────────→ │-- GND    │ (Ground)
+                  └─────────┘           └──────────┘`}
+                </pre>
+              </Card.Body>
+            </Card>
             
           </Tab.Pane>
 
