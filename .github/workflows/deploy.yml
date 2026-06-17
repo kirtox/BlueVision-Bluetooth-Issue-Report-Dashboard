@@ -97,8 +97,20 @@ jobs:
           wsl -d podman-BTIRD_PM -u root bash -c "$buildEnv && cd '$wslPath' && podman build --network=host --no-cache $buildArgs -t bluevision_prod_frontend:latest -f frontend/Dockerfile.prod frontend/"
           wsl -d podman-BTIRD_PM -u root bash -c "$buildEnv && cd '$wslPath' && podman build --network=host --no-cache $buildArgs -t bluevision_prod_backend:latest -f backend/Dockerfile.prod backend/"
           Set-Location $env:GITHUB_WORKSPACE
-          $ids = podman ps -aq --filter "label=io.podman.compose.project=bluevision_prod"
-          if ($ids) { podman rm -f $ids }
+          Write-Host "Stopping existing containers..."
+          $ErrorActionPreference = 'Continue'
+          & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_prod -f podman-compose.prod.yml down *>&1 | Out-String | Write-Verbose
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "⚠ Graceful stop had issues (likely netavark cleanup), forcing removal..."
+            Start-Sleep -Seconds 2
+            $ids = podman ps -aq --filter "label=io.podman.compose.project=bluevision_prod"
+            if ($ids) { 
+              podman rm -f $ids *>&1 | Out-Null
+              Write-Host "✅ Force removal completed"
+            }
+          } else {
+            Write-Host "✅ Containers stopped gracefully"
+          }
           & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_prod -f podman-compose.prod.yml up -d db
           $maxRetries = 24
           $retries = 0
@@ -123,8 +135,20 @@ jobs:
           wsl -d podman-BTIRD_PM -u root bash -c "$buildEnv && cd '$wslPath' && podman build --network=host --no-cache $buildArgs -t bluevision_dev_frontend:latest -f frontend/Dockerfile.dev frontend/"
           wsl -d podman-BTIRD_PM -u root bash -c "$buildEnv && cd '$wslPath' && podman build --network=host --no-cache $buildArgs -t bluevision_dev_backend:latest -f backend/Dockerfile.dev backend/"
           Set-Location $env:GITHUB_WORKSPACE
-          $ids = podman ps -aq --filter "label=io.podman.compose.project=bluevision_dev"
-          if ($ids) { podman rm -f $ids }
+          Write-Host "Stopping existing containers..."
+          $ErrorActionPreference = 'Continue'
+          & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_dev -f podman-compose.dev.yml down *>&1 | Out-String | Write-Verbose
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "⚠ Graceful stop had issues (likely netavark cleanup), forcing removal..."
+            Start-Sleep -Seconds 2
+            $ids = podman ps -aq --filter "label=io.podman.compose.project=bluevision_dev"
+            if ($ids) { 
+              podman rm -f $ids *>&1 | Out-Null
+              Write-Host "✅ Force removal completed"
+            }
+          } else {
+            Write-Host "✅ Containers stopped gracefully"
+          }
           & "C:\Program Files\Python311\python.exe" -m podman_compose -p bluevision_dev -f podman-compose.dev.yml up -d db
           $maxRetries = 24
           $retries = 0
