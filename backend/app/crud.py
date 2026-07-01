@@ -97,7 +97,7 @@ def create_report(db: Session, report: ReportCreate):
     
     # Keep raw platform_brand and store mapped value in short_platform_brand
     if report_dict.get('platform_brand'):
-        report_dict['short_platform_brand'] = normalize_platform_brand(report_dict['platform_brand'])
+        report_dict['short_platform_brand'] = normalize_platfffdsffdorm_brand(report_dict['platform_brand'])
     
     # Generate CPU codename if CPU data is provided
     if report_dict.get('cpu'):
