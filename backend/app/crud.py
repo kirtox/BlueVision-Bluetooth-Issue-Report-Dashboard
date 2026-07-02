@@ -4,7 +4,7 @@ from .schema_platform import PlatformCreate, PlatformUpdate
 from .schema_platform_latest_report import PlatformWithLatestReportInDB
 from .schema_user import UserCreate, UserUpdate
 from sqlalchemy.orm import Session, aliased
-from .utils import get_password_hash, verify_password, normalize_platform_brand
+from .utils import get_password_hash, verify_password, normalize_platform_brand, normalize_platform
 from sqlalchemy import func, or_, String
 from datetime import datetime
 from datetime import datetime, timezone, timedelta
@@ -97,7 +97,13 @@ def create_report(db: Session, report: ReportCreate):
     
     # Keep raw platform_brand and store mapped value in short_platform_brand
     if report_dict.get('platform_brand'):
-        report_dict['short_platform_brand'] = normalize_platfffdsffdorm_brand(report_dict['platform_brand'])
+        report_dict['short_platform_brand'] = normalize_platform_brand(report_dict['platform_brand'])
+
+    # Calculate short_platform from (serial_num, platform) mapping
+    if report_dict.get('serial_num') and report_dict.get('platform'):
+        short_platform = normalize_platform(report_dict['serial_num'], report_dict['platform'])
+        if short_platform:
+            report_dict['short_platform'] = short_platform
     
     # Generate CPU codename if CPU data is provided
     if report_dict.get('cpu'):
@@ -127,7 +133,15 @@ def update_report(db: Session, report_id: int, report: ReportUpdate):
     # Keep raw platform_brand and refresh short_platform_brand when platform_brand changes
     if 'platform_brand' in update_dict and update_dict['platform_brand']:
         update_dict['short_platform_brand'] = normalize_platform_brand(update_dict['platform_brand'])
-    
+
+    # Recalculate short_platform if serial_num or platform changed
+    if 'serial_num' in update_dict or 'platform' in update_dict:
+        serial_num = update_dict.get('serial_num', db_report.serial_num)
+        platform = update_dict.get('platform', db_report.platform)
+        short_platform = normalize_platform(serial_num, platform)
+        if short_platform:
+            update_dict['short_platform'] = short_platform
+
     for key, value in update_dict.items():
         setattr(db_report, key, value)
     

@@ -1,9 +1,8 @@
 """
-Update historical report records with short_platform values.
+Update existing report records to populate short_platform values.
 
-Match condition (exact match):
-- serial_num
-- platform
+Match condition: uses normalize_platform(serial_num, platform) from utils.
+Mapping is maintained centrally in app/utils.py.
 
 Then update:
 - short_platform
@@ -17,76 +16,54 @@ sys.path.append(str(Path(__file__).resolve().parent))
 
 from app.db import SessionLocal
 from app.models import Report
-
-# serial_num : platform -> short_platform
-MAPPINGS = [
-    ("0005770SP1", "HP EliteBook 8 G2i 13 inch Notebook Next Gen AI PC", "Merino"),
-    ("000577136B", "HP EliteBook X G2i 14 inch Notebook Next Gen AI PC", "Cashmere"),
-    ("0005771CT2", "HP ZBook 8 G2i 14 inch Mobile Workstation PC", "Merino"),
-    ("123456789", "16Z90U-NDV21KB", "Gram16"),
-    ("123490EN400015", "Galaxy Book6 Pro - PRHK", "Venus 14"),
-    ("5KKSA00058", "CFSC-2", "BM241mk2"),
-    ("BK34HPQ25453PY", "900_MAA Product", "N74030-012"),
-    ("C1L54400F9", "HP OmniBook Ultra Laptop 14-kd0xxxC1L54400F9", "Graham"),
-    ("GOU64C11AX", "HP", "Gouda14"),
-    ("PF51H6WD", "21NSSIT019", "Thames - 2"),
-    ("PF5WL21J", "21V7SIT057", "Avon"),
-    ("PF5XFNBA", "21V9SIT046", "Avon"),
-    ("TANTKD000051448", "Zenbook S14 UX5406AA_000051448", "UX5406"),
-    ("N8JYKWW002606016A03400", "Aspire A14-I51M", "Bubbletea"),
-    ("5CD6052407", "HP ProBook 4 G2i 16 inch Notebook AI PC", "Cheddar"),
-]
+from app.utils import normalize_platform
 
 
 def update_short_platforms() -> None:
+    """Fill short_platform from (serial_num, platform) mapping for existing reports."""
     db = SessionLocal()
 
     updated_rows = 0
     unchanged_rows = 0
-    not_found_pairs = 0
+    skipped_rows = 0
 
     try:
-        print(f"Total mappings: {len(MAPPINGS)}")
+        reports = db.query(Report).all()
+        total = len(reports)
 
-        for serial_num, platform, short_platform in MAPPINGS:
-            matched_reports = (
-                db.query(Report)
-                .filter(
-                    Report.serial_num == serial_num,
-                    Report.platform == platform,
-                )
-                .all()
-            )
+        print(f"Found {total} reports to check")
+        print("")
 
-            if not matched_reports:
-                not_found_pairs += 1
-                print(f"[NOT FOUND] serial_num={serial_num}, platform={platform}")
+        for report in reports:
+            if not report.serial_num or not report.platform:
+                skipped_rows += 1
                 continue
 
-            for report in matched_reports:
-                old_value = report.short_platform
+            normalized_value = normalize_platform(report.serial_num, report.platform)
 
-                if old_value == short_platform:
-                    unchanged_rows += 1
-                    print(
-                        f"[UNCHANGED] id={report.id}, serial_num={serial_num}, "
-                        f"short_platform={short_platform}"
-                    )
-                    continue
+            if normalized_value is None:
+                skipped_rows += 1
+                continue
 
-                report.short_platform = short_platform
-                updated_rows += 1
-                print(
-                    f"[UPDATED] id={report.id}, serial_num={serial_num}, "
-                    f"platform={platform}, short_platform: {old_value} -> {short_platform}"
-                )
+            old_value = report.short_platform
+
+            if old_value == normalized_value:
+                unchanged_rows += 1
+                continue
+
+            report.short_platform = normalized_value
+            updated_rows += 1
+            print(
+                f"[UPDATED] id={report.id}, serial_num={report.serial_num}, "
+                f"short_platform: '{old_value}' -> '{normalized_value}'"
+            )
 
         db.commit()
 
         print("\n=== Update Summary ===")
-        print(f"Updated rows   : {updated_rows}")
-        print(f"Unchanged rows : {unchanged_rows}")
-        print(f"Not found pairs: {not_found_pairs}")
+        print(f"Updated rows  : {updated_rows}")
+        print(f"Unchanged rows: {unchanged_rows}")
+        print(f"Skipped rows  : {skipped_rows} (no serial_num/platform or no mapping)")
         print("Done.")
 
     except Exception as exc:
@@ -98,5 +75,5 @@ def update_short_platforms() -> None:
 
 
 if __name__ == "__main__":
-    print("=== Updating short_platform in report table ===")
+    print("=== Populating short_platform in report table ===\n")
     update_short_platforms()
