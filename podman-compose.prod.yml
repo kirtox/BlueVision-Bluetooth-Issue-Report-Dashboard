@@ -26,8 +26,9 @@ services:
       dockerfile: Dockerfile.prod
     # network_mode: "host"
     environment:
-      - DATABASE_URL=postgresql://admin:password@db:5432/btird
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
       - TZ=Asia/Taipei
+      - SECRET_KEY=${SECRET_KEY}
     depends_on:
       - db
     # restart: always
@@ -50,9 +51,9 @@ services:
     ports:
       - "5433:5432"
     environment:
-      POSTGRES_DB: btird
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - pgdata_prod:/var/lib/postgresql/data
     networks:
@@ -73,7 +74,7 @@ services:
     volumes:
       - ./db_backups:/backups
     environment:
-      - PGPASSWORD=password
+      - PGPASSWORD=${DB_PASSWORD}
       - TZ=Asia/Taipei
     networks:
       - app-network
