@@ -306,30 +306,6 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
     );
   };
 
-  // ─── Toggle switch (Y/N) ───────────────────────────────────────────────────
-  const renderToggle = (label: string, field: keyof Report) => {
-    const isOn = report[field] === "Y";
-    return (
-      <div className="d-flex align-items-center gap-2 mb-1">
-        <span className="fw-semibold text-secondary" style={{ fontSize: "0.82rem", minWidth: 140 }}>{label}</span>
-        <Form.Check
-          type="switch"
-          id={`switch-${field as string}`}
-          checked={isOn}
-          onChange={(e) => handleFieldChange(field, e.target.checked ? "Y" : "N")}
-          disabled={readonly}
-          className="mb-0"
-        />
-        <span
-          className={`badge ${isOn ? "bg-success" : "bg-secondary"}`}
-          style={{ fontSize: "0.72rem", minWidth: 24, opacity: 0.85 }}
-        >
-          {isOn ? "Y" : "N"}
-        </span>
-      </div>
-    );
-  };
-
   // ─── Result selector (colored buttons) ────────────────────────────────────
   const resultConfig: Record<string, { color: string; icon: string }> = {
     Pass:    { color: "#198754", icon: "fas fa-check-circle" },
