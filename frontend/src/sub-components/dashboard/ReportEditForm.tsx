@@ -3,6 +3,124 @@ import { Form, Card, Row, Col, Tab, Tabs, Alert, OverlayTrigger, Tooltip } from 
 import { Report } from "types";
 import { useAuth } from "../../contexts/AuthContext";
 
+// ─── Collapsible accessory group ──────────────────────────────────────────
+const AccessoryGroup = ({
+  groupKey,
+  title,
+  fields,
+  report,
+  expandedAccessories,
+  setExpandedAccessories,
+  children,
+}: {
+  groupKey: string;
+  title: string;
+  fields: (keyof Report)[];
+  report: Report;
+  expandedAccessories: Record<string, boolean>;
+  setExpandedAccessories: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  children: React.ReactNode;
+}) => {
+  const hasData = fields.some((f) => report[f] && report[f] !== "None");
+  const isExpanded = expandedAccessories[groupKey] ?? hasData;
+  return (
+    <div className="border rounded mb-2" style={{ overflow: "hidden" }}>
+      <button
+        type="button"
+        className="w-100 d-flex align-items-center justify-content-between px-3 py-2 border-0"
+        style={{ background: hasData ? "#eef3ff" : "#f8f9fa", cursor: "pointer" }}
+        onClick={() => setExpandedAccessories((prev) => ({ ...prev, [groupKey]: !isExpanded }))}
+      >
+        <span style={{ fontSize: "0.8rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: hasData ? "var(--bs-primary)" : "#6c757d" }}>
+          {hasData && <i className="fas fa-circle me-2" style={{ fontSize: "0.5rem", verticalAlign: "middle" }} />}
+          {title}
+        </span>
+        <i className={`fas fa-chevron-${isExpanded ? "up" : "down"} text-muted`} style={{ fontSize: "0.72rem" }} />
+      </button>
+      {isExpanded && (
+        <div className="px-3 pt-3 pb-1">
+          <Row>{children}</Row>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Power cycle row ──────────────────────────────────────────────────────
+const PowerCycleRow = ({
+  label,
+  enableField,
+  periodField,
+  waitField,
+  report,
+  readonly,
+  handleFieldChange,
+}: {
+  label: string;
+  enableField: keyof Report;
+  periodField: keyof Report;
+  waitField: keyof Report;
+  report: Report;
+  readonly: boolean;
+  handleFieldChange: (field: keyof Report, value: any) => void;
+}) => {
+  const isEnabled = report[enableField] === "Y";
+  const isOn = isEnabled;
+  return (
+    <Row className="align-items-center py-2 border-bottom mx-0 gx-2">
+      <Col md={4} className="d-flex align-items-center">
+        <div className="d-flex align-items-center gap-2 mb-1">
+          <span className="fw-semibold text-secondary" style={{ fontSize: "0.82rem", minWidth: 140 }}>{label}</span>
+          <Form.Check
+            type="switch"
+            id={`switch-${enableField as string}`}
+            checked={isOn}
+            onChange={(e) => handleFieldChange(enableField, e.target.checked ? "Y" : "N")}
+            disabled={readonly}
+            className="mb-0"
+          />
+          <span
+            className={`badge ${isOn ? "bg-success" : "bg-secondary"}`}
+            style={{ fontSize: "0.72rem", minWidth: 24, opacity: 0.85 }}
+          >
+            {isOn ? "Y" : "N"}
+          </span>
+        </div>
+      </Col>
+      <Col md={4}>
+        <Form.Control
+          size="sm"
+          type="text"
+          value={report[periodField] || ""}
+          onChange={(e) => handleFieldChange(periodField, e.target.value)}
+          readOnly={readonly || !isEnabled}
+          placeholder={isEnabled ? "" : "—"}
+          style={{
+            fontSize: "0.88rem",
+            backgroundColor: !isEnabled ? "#f3f4f6" : undefined,
+            color: !isEnabled ? "#adb5bd" : undefined,
+          }}
+        />
+      </Col>
+      <Col md={4}>
+        <Form.Control
+          size="sm"
+          type="text"
+          value={report[waitField] || ""}
+          onChange={(e) => handleFieldChange(waitField, e.target.value)}
+          readOnly={readonly || !isEnabled}
+          placeholder={isEnabled ? "" : "—"}
+          style={{
+            fontSize: "0.88rem",
+            backgroundColor: !isEnabled ? "#f3f4f6" : undefined,
+            color: !isEnabled ? "#adb5bd" : undefined,
+          }}
+        />
+      </Col>
+    </Row>
+  );
+};
+
 interface ReportEditFormProps {
   report: Report | null;
   onChange: (report: Report) => void;
@@ -47,9 +165,24 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
     field: keyof Report,
     type: string = "text",
     colSize: number = 6,
-    customReadOnly?: boolean
+    customReadOnly?: boolean,
+    showTooltip?: boolean
   ) => {
     const isAutoFilled = customReadOnly === true && customReadOnly !== readonly;
+    const value = (report[field] as string) || "";
+    const control = (
+      <Form.Control
+        type={type}
+        value={value}
+        onChange={(e) => handleFieldChange(field, e.target.value)}
+        readOnly={customReadOnly !== undefined ? customReadOnly : readonly}
+        style={{
+          fontSize: "0.9rem",
+          backgroundColor: isAutoFilled ? "#f3f4f6" : undefined,
+          color: isAutoFilled ? "#6c757d" : undefined,
+        }}
+      />
+    );
     return (
       <Form.Group as={Col} md={colSize} className="mb-3">
         <Form.Label className="fw-semibold text-secondary d-flex align-items-center gap-1" style={{ fontSize: "0.82rem" }}>
@@ -60,17 +193,11 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
             </OverlayTrigger>
           )}
         </Form.Label>
-        <Form.Control
-          type={type}
-          value={report[field] || ""}
-          onChange={(e) => handleFieldChange(field, e.target.value)}
-          readOnly={customReadOnly !== undefined ? customReadOnly : readonly}
-          style={{
-            fontSize: "0.9rem",
-            backgroundColor: isAutoFilled ? "#f3f4f6" : undefined,
-            color: isAutoFilled ? "#6c757d" : undefined,
-          }}
-        />
+        {showTooltip && value ? (
+          <OverlayTrigger placement="top" overlay={<Tooltip>{value}</Tooltip>}>
+            <div>{control}</div>
+          </OverlayTrigger>
+        ) : control}
       </Form.Group>
     );
   };
@@ -97,6 +224,87 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
       </Form.Select>
     </Form.Group>
   );
+
+  // ─── Accessory option lists ───────────────────────────────────────────────
+  const BT_TYPE_OPTIONS = ["Classic", "LE"];
+  const BT_BRAND_OPTIONS = ["Microsoft", "Dell", "HP", "Apple", "Logitech", "Jabra", "Sony", "Other"];
+
+  // Map: model field key → dependent brand / bt fields
+  const accessoryModelMap: Record<string, { brandField: keyof Report; btField?: keyof Report }> = {
+    mouse:    { brandField: "mouse_brand",    btField: "mouse_bt" },
+    keyboard: { brandField: "keyboard_brand", btField: "keyboard_bt" },
+    headset:  { brandField: "headset_brand",  btField: "headset_bt" },
+    speaker:  { brandField: "speaker_brand",  btField: "speaker_bt" },
+  };
+
+  // When model is cleared, reset brand & BT to "None"
+  const handleModelChange = (modelKey: string, field: keyof Report, value: string) => {
+    let updated: Report = { ...report, [field]: value };
+    if (!value) {
+      const map = accessoryModelMap[modelKey];
+      if (map) {
+        updated = { ...updated, [map.brandField]: "None" };
+        if (map.btField) updated = { ...updated, [map.btField]: "None" };
+      }
+    }
+    onChange(updated);
+  };
+
+  // Dropdown for brand / BT type — disabled with "None" when model is empty
+  const renderAccessorySelect = (
+    label: string,
+    field: keyof Report,
+    modelField: keyof Report,
+    options: string[],
+    colSize: number = 3
+  ) => {
+    const modelEmpty = !report[modelField];
+    return (
+      <Form.Group as={Col} md={colSize} className="mb-3">
+        <Form.Label className="fw-semibold text-secondary" style={{ fontSize: "0.82rem" }}>{label}</Form.Label>
+        <Form.Select
+          value={modelEmpty ? "None" : (report[field] || "")}
+          onChange={(e) => handleFieldChange(field, e.target.value)}
+          disabled={readonly || modelEmpty}
+          style={{ fontSize: "0.9rem", backgroundColor: modelEmpty ? "#f3f4f6" : undefined, color: modelEmpty ? "#adb5bd" : undefined }}
+        >
+          <option value="None">None</option>
+          {options.map((opt, i) => (
+            <option key={i} value={opt}>{opt}</option>
+          ))}
+        </Form.Select>
+      </Form.Group>
+    );
+  };
+
+  // Text field for accessory model — triggers auto-reset of brand/BT on clear
+  const renderModelField = (
+    label: string,
+    field: keyof Report,
+    modelKey: string,
+    colSize: number = 3
+  ) => {
+    const value = (report[field] as string) || "";
+    const input = (
+      <Form.Control
+        type="text"
+        value={value}
+        onChange={(e) => handleModelChange(modelKey, field, e.target.value)}
+        readOnly={readonly}
+        style={{ fontSize: "0.9rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+      />
+    );
+    return (
+      <Form.Group as={Col} md={colSize} className="mb-3">
+        <Form.Label className="fw-semibold text-secondary" style={{ fontSize: "0.82rem" }}>{label}</Form.Label>
+        {value ? (
+          <OverlayTrigger placement="top" overlay={<Tooltip>{value}</Tooltip>}>
+            <div>{input}</div>
+          </OverlayTrigger>
+        ) : input}
+      </Form.Group>
+    );
+  };
 
   // ─── Toggle switch (Y/N) ───────────────────────────────────────────────────
   const renderToggle = (label: string, field: keyof Report) => {
@@ -203,95 +411,6 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
     </Form.Group>
   );
 
-  // ─── Collapsible accessory group ──────────────────────────────────────────
-  const AccessoryGroup = ({
-    groupKey,
-    title,
-    fields,
-    children,
-  }: {
-    groupKey: string;
-    title: string;
-    fields: (keyof Report)[];
-    children: React.ReactNode;
-  }) => {
-    const hasData = fields.some((f) => report[f]);
-    const isExpanded = expandedAccessories[groupKey] ?? hasData;
-    return (
-      <div className="border rounded mb-2" style={{ overflow: "hidden" }}>
-        <button
-          type="button"
-          className="w-100 d-flex align-items-center justify-content-between px-3 py-2 border-0"
-          style={{ background: hasData ? "#eef3ff" : "#f8f9fa", cursor: "pointer" }}
-          onClick={() => setExpandedAccessories((prev) => ({ ...prev, [groupKey]: !isExpanded }))}
-        >
-          <span style={{ fontSize: "0.8rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", color: hasData ? "var(--bs-primary)" : "#6c757d" }}>
-            {hasData && <i className="fas fa-circle me-2" style={{ fontSize: "0.5rem", verticalAlign: "middle" }} />}
-            {title}
-          </span>
-          <i className={`fas fa-chevron-${isExpanded ? "up" : "down"} text-muted`} style={{ fontSize: "0.72rem" }} />
-        </button>
-        {isExpanded && (
-          <div className="px-3 pt-3 pb-1">
-            <Row>{children}</Row>
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  // ─── Power cycle row ──────────────────────────────────────────────────────
-  const PowerCycleRow = ({
-    label,
-    enableField,
-    periodField,
-    waitField,
-  }: {
-    label: string;
-    enableField: keyof Report;
-    periodField: keyof Report;
-    waitField: keyof Report;
-  }) => {
-    const isEnabled = report[enableField] === "Y";
-    return (
-      <Row className="align-items-center py-2 border-bottom mx-0 gx-2">
-        <Col md={4} className="d-flex align-items-center">
-          {renderToggle(label, enableField)}
-        </Col>
-        <Col md={4}>
-          <Form.Control
-            size="sm"
-            type="text"
-            value={report[periodField] || ""}
-            onChange={(e) => handleFieldChange(periodField, e.target.value)}
-            readOnly={readonly || !isEnabled}
-            placeholder={isEnabled ? "" : "—"}
-            style={{
-              fontSize: "0.88rem",
-              backgroundColor: !isEnabled ? "#f3f4f6" : undefined,
-              color: !isEnabled ? "#adb5bd" : undefined,
-            }}
-          />
-        </Col>
-        <Col md={4}>
-          <Form.Control
-            size="sm"
-            type="text"
-            value={report[waitField] || ""}
-            onChange={(e) => handleFieldChange(waitField, e.target.value)}
-            readOnly={readonly || !isEnabled}
-            placeholder={isEnabled ? "" : "—"}
-            style={{
-              fontSize: "0.88rem",
-              backgroundColor: !isEnabled ? "#f3f4f6" : undefined,
-              color: !isEnabled ? "#adb5bd" : undefined,
-            }}
-          />
-        </Col>
-      </Row>
-    );
-  };
-
 
   return (
     <Form>
@@ -376,41 +495,45 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
               <SectionHeader icon="fas fa-vial" title="Test Scenario" />
               <Row>
                 {renderField("Scenario", "short_scenario", "text", 6)}
-                {renderField("Detailed Scenario", "scenario", "text", 6)}
+                {renderField("Detailed Scenario", "scenario", "text", 6, undefined, true)}
               </Row>
 
-              <SectionHeader icon="fas fa-toolbox" title="Test Accessories" />
-              <p className="text-muted mb-2" style={{ fontSize: "0.78rem" }}>
-                <i className="fas fa-info-circle me-1" />
-                Groups with filled data are highlighted. Click to expand / collapse.
-              </p>
-              <AccessoryGroup groupKey="mouse" title="Mouse" fields={["mouse_brand", "mouse_bt", "mouse", "mouse_click_period"]}>
-                {renderField("Brand", "mouse_brand", "text", 3)}
-                {renderField("BT Version", "mouse_bt", "text", 3)}
-                {renderField("Model", "mouse", "text", 3)}
+              <div className="d-flex align-items-center mb-3 mt-2">
+                <div className="d-flex align-items-center justify-content-center rounded me-2 text-white" style={{ width: 28, height: 28, backgroundColor: "var(--bs-primary)", fontSize: 13, flexShrink: 0 }}>
+                  <i className="fas fa-toolbox" />
+                </div>
+                <span className="fw-semibold text-dark me-2" style={{ fontSize: "0.95rem", letterSpacing: "0.01em" }}>Test Accessories</span>
+                <OverlayTrigger placement="right" overlay={<Tooltip>Groups with filled data are highlighted. Click to expand / collapse.</Tooltip>}>
+                  <i className="fas fa-info-circle text-muted" style={{ fontSize: "0.85rem", cursor: "help" }} />
+                </OverlayTrigger>
+              </div>
+              <AccessoryGroup groupKey="mouse" title="Mouse" fields={["mouse_brand", "mouse_bt", "mouse", "mouse_click_period"]} report={report} expandedAccessories={expandedAccessories} setExpandedAccessories={setExpandedAccessories}>
+                {renderAccessorySelect("Brand", "mouse_brand", "mouse", BT_BRAND_OPTIONS, 3)}
+                {renderAccessorySelect("BT Type", "mouse_bt", "mouse", BT_TYPE_OPTIONS, 3)}
+                {renderModelField("Model", "mouse", "mouse", 3)}
                 {renderField("Click Period", "mouse_click_period", "text", 3)}
               </AccessoryGroup>
-              <AccessoryGroup groupKey="keyboard" title="Keyboard" fields={["keyboard_brand", "keyboard_bt", "keyboard", "keyboard_click_period"]}>
-                {renderField("Brand", "keyboard_brand", "text", 3)}
-                {renderField("BT Version", "keyboard_bt", "text", 3)}
-                {renderField("Model", "keyboard", "text", 3)}
+              <AccessoryGroup groupKey="keyboard" title="Keyboard" fields={["keyboard_brand", "keyboard_bt", "keyboard", "keyboard_click_period"]} report={report} expandedAccessories={expandedAccessories} setExpandedAccessories={setExpandedAccessories}>
+                {renderAccessorySelect("Brand", "keyboard_brand", "keyboard", BT_BRAND_OPTIONS, 3)}
+                {renderAccessorySelect("BT Type", "keyboard_bt", "keyboard", BT_TYPE_OPTIONS, 3)}
+                {renderModelField("Model", "keyboard", "keyboard", 3)}
                 {renderField("Click Period", "keyboard_click_period", "text", 3)}
               </AccessoryGroup>
-              <AccessoryGroup groupKey="headset" title="Headset" fields={["headset_brand", "headset_bt", "headset"]}>
-                {renderField("Brand", "headset_brand", "text", 4)}
-                {renderField("BT Version", "headset_bt", "text", 4)}
-                {renderField("Model", "headset", "text", 4)}
+              <AccessoryGroup groupKey="headset" title="Headset" fields={["headset_brand", "headset_bt", "headset"]} report={report} expandedAccessories={expandedAccessories} setExpandedAccessories={setExpandedAccessories}>
+                {renderAccessorySelect("Brand", "headset_brand", "headset", BT_BRAND_OPTIONS, 4)}
+                {renderAccessorySelect("BT Type", "headset_bt", "headset", BT_TYPE_OPTIONS, 4)}
+                {renderModelField("Model", "headset", "headset", 4)}
               </AccessoryGroup>
-              <AccessoryGroup groupKey="speaker" title="Speaker" fields={["speaker_brand", "speaker_bt", "speaker"]}>
-                {renderField("Brand", "speaker_brand", "text", 4)}
-                {renderField("BT Version", "speaker_bt", "text", 4)}
-                {renderField("Model", "speaker", "text", 4)}
+              <AccessoryGroup groupKey="speaker" title="Speaker" fields={["speaker_brand", "speaker_bt", "speaker"]} report={report} expandedAccessories={expandedAccessories} setExpandedAccessories={setExpandedAccessories}>
+                {renderAccessorySelect("Brand", "speaker_brand", "speaker", BT_BRAND_OPTIONS, 4)}
+                {renderAccessorySelect("BT Type", "speaker_bt", "speaker", BT_TYPE_OPTIONS, 4)}
+                {renderModelField("Model", "speaker", "speaker", 4)}
               </AccessoryGroup>
-              <AccessoryGroup groupKey="phone" title="Phone" fields={["phone_brand", "phone"]}>
+              <AccessoryGroup groupKey="phone" title="Phone" fields={["phone_brand", "phone"]} report={report} expandedAccessories={expandedAccessories} setExpandedAccessories={setExpandedAccessories}>
                 {renderField("Brand", "phone_brand", "text", 6)}
                 {renderField("Model", "phone", "text", 6)}
               </AccessoryGroup>
-              <AccessoryGroup groupKey="device1" title="Other Device" fields={["device1_brand", "device1"]}>
+              <AccessoryGroup groupKey="device1" title="Other Device" fields={["device1_brand", "device1"]} report={report} expandedAccessories={expandedAccessories} setExpandedAccessories={setExpandedAccessories}>
                 {renderField("Brand", "device1_brand", "text", 6)}
                 {renderField("Model", "device1", "text", 6)}
               </AccessoryGroup>
@@ -429,77 +552,91 @@ const ReportEditForm: React.FC<ReportEditFormProps> = ({ report, onChange, reado
                 <Col md={4}><span className="text-muted" style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>Waiting Time</span></Col>
               </Row>
               <div className="border rounded overflow-hidden mb-4">
-                <PowerCycleRow label="Modern Standby" enableField="modern_standby" periodField="ms_period" waitField="ms_os_waiting_time" />
-                <PowerCycleRow label="Hibernation (S4)" enableField="s4" periodField="s4_period" waitField="s4_os_waiting_time" />
-                <PowerCycleRow label="Warm Boot" enableField="warm_boot" periodField="wb_period" waitField="wb_os_waiting_time" />
-                <PowerCycleRow label="Cold Boot" enableField="cold_boot" periodField="cb_period" waitField="cb_os_waiting_time" />
+                <PowerCycleRow label="Modern Standby" enableField="modern_standby" periodField="ms_period" waitField="ms_os_waiting_time" report={report} readonly={readonly} handleFieldChange={handleFieldChange} />
+                <PowerCycleRow label="Hibernation (S4)" enableField="s4" periodField="s4_period" waitField="s4_os_waiting_time" report={report} readonly={readonly} handleFieldChange={handleFieldChange} />
+                <PowerCycleRow label="Warm Boot" enableField="warm_boot" periodField="wb_period" waitField="wb_os_waiting_time" report={report} readonly={readonly} handleFieldChange={handleFieldChange} />
+                <PowerCycleRow label="Cold Boot" enableField="cold_boot" periodField="cb_period" waitField="cb_os_waiting_time" report={report} readonly={readonly} handleFieldChange={handleFieldChange} />
               </div>
 
               <SectionHeader icon="fas fa-cogs" title="Other Functions" />
-              <Row className="mb-2">
-                <Col md={2} className="mb-3">
-                  <Form.Label className="fw-semibold text-secondary d-block" style={{ fontSize: "0.82rem" }}>APM</Form.Label>
-                  <div className="d-flex align-items-center gap-2 mt-1">
-                    <Form.Check
-                      type="switch"
-                      id="switch-apm"
-                      checked={report.apm === "Y"}
-                      onChange={(e) => handleFieldChange("apm", e.target.checked ? "Y" : "N")}
-                      disabled={readonly}
-                      className="mb-0"
-                    />
-                    <span className={`badge ${report.apm === "Y" ? "bg-success" : "bg-secondary"}`} style={{ fontSize: "0.72rem" }}>
-                      {report.apm === "Y" ? "Y" : "N"}
-                    </span>
-                  </div>
-                </Col>
-                <Col md={3} className="mb-3">
-                  <Form.Label className="fw-semibold text-secondary d-block" style={{ fontSize: "0.82rem" }}>APM Period</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={report.apm_period || ""}
-                    onChange={(e) => handleFieldChange("apm_period", e.target.value)}
-                    readOnly={readonly || report.apm !== "Y"}
-                    style={{
-                      fontSize: "0.9rem",
-                      backgroundColor: report.apm !== "Y" ? "#f3f4f6" : undefined,
-                      color: report.apm !== "Y" ? "#adb5bd" : undefined,
-                    }}
-                  />
-                </Col>
-                <Col md={2} className="mb-3">
-                  <Form.Label className="fw-semibold text-secondary d-block" style={{ fontSize: "0.82rem" }}>OPP</Form.Label>
-                  <div className="d-flex align-items-center gap-2 mt-1">
-                    <Form.Check
-                      type="switch"
-                      id="switch-opp"
-                      checked={report.opp === "Y"}
-                      onChange={(e) => handleFieldChange("opp", e.target.checked ? "Y" : "N")}
-                      disabled={readonly}
-                      className="mb-0"
-                    />
-                    <span className={`badge ${report.opp === "Y" ? "bg-success" : "bg-secondary"}`} style={{ fontSize: "0.72rem" }}>
-                      {report.opp === "Y" ? "Y" : "N"}
-                    </span>
-                  </div>
-                </Col>
-                <Col md={2} className="mb-3">
-                  <Form.Label className="fw-semibold text-secondary d-block" style={{ fontSize: "0.82rem" }}>Swift Pair</Form.Label>
-                  <div className="d-flex align-items-center gap-2 mt-1">
-                    <Form.Check
-                      type="switch"
-                      id="switch-swift_pair"
-                      checked={report.swift_pair === "Y"}
-                      onChange={(e) => handleFieldChange("swift_pair", e.target.checked ? "Y" : "N")}
-                      disabled={readonly}
-                      className="mb-0"
-                    />
-                    <span className={`badge ${report.swift_pair === "Y" ? "bg-success" : "bg-secondary"}`} style={{ fontSize: "0.72rem" }}>
-                      {report.swift_pair === "Y" ? "Y" : "N"}
-                    </span>
-                  </div>
-                </Col>
+              <Row className="mx-0 mb-1 gx-2">
+                <Col md={3}><span className="text-muted" style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>Function</span></Col>
+                <Col md={3}><span className="text-muted" style={{ fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>Period</span></Col>
               </Row>
+              <div className="border rounded overflow-hidden mb-4">
+                {/* APM row */}
+                <Row className="align-items-center py-2 border-bottom mx-0 gx-2">
+                  <Col md={3} className="d-flex align-items-center">
+                    <div className="d-flex align-items-center gap-2 mb-1">
+                      <span className="fw-semibold text-secondary" style={{ fontSize: "0.82rem", minWidth: 100 }}>APM</span>
+                      <Form.Check
+                        type="switch"
+                        id="switch-apm"
+                        checked={report.apm === "Y"}
+                        onChange={(e) => handleFieldChange("apm", e.target.checked ? "Y" : "N")}
+                        disabled={readonly}
+                        className="mb-0"
+                      />
+                      <span className={`badge ${report.apm === "Y" ? "bg-success" : "bg-secondary"}`} style={{ fontSize: "0.72rem", minWidth: 24, opacity: 0.85 }}>
+                        {report.apm === "Y" ? "Y" : "N"}
+                      </span>
+                    </div>
+                  </Col>
+                  <Col md={3}>
+                    <Form.Control
+                      size="sm"
+                      type="text"
+                      value={report.apm_period || ""}
+                      onChange={(e) => handleFieldChange("apm_period", e.target.value)}
+                      readOnly={readonly || report.apm !== "Y"}
+                      placeholder={report.apm === "Y" ? "" : "—"}
+                      style={{
+                        fontSize: "0.88rem",
+                        backgroundColor: report.apm !== "Y" ? "#f3f4f6" : undefined,
+                        color: report.apm !== "Y" ? "#adb5bd" : undefined,
+                      }}
+                    />
+                  </Col>
+                </Row>
+                {/* OPP row */}
+                <Row className="align-items-center py-2 border-bottom mx-0 gx-2">
+                  <Col md={3} className="d-flex align-items-center">
+                    <div className="d-flex align-items-center gap-2 mb-1">
+                      <span className="fw-semibold text-secondary" style={{ fontSize: "0.82rem", minWidth: 100 }}>OPP</span>
+                      <Form.Check
+                        type="switch"
+                        id="switch-opp"
+                        checked={report.opp === "Y"}
+                        onChange={(e) => handleFieldChange("opp", e.target.checked ? "Y" : "N")}
+                        disabled={readonly}
+                        className="mb-0"
+                      />
+                      <span className={`badge ${report.opp === "Y" ? "bg-success" : "bg-secondary"}`} style={{ fontSize: "0.72rem", minWidth: 24, opacity: 0.85 }}>
+                        {report.opp === "Y" ? "Y" : "N"}
+                      </span>
+                    </div>
+                  </Col>
+                </Row>
+                {/* Swift Pair row */}
+                <Row className="align-items-center py-2 mx-0 gx-2">
+                  <Col md={3} className="d-flex align-items-center">
+                    <div className="d-flex align-items-center gap-2 mb-1">
+                      <span className="fw-semibold text-secondary" style={{ fontSize: "0.82rem", minWidth: 100 }}>Swift Pair</span>
+                      <Form.Check
+                        type="switch"
+                        id="switch-swift_pair"
+                        checked={report.swift_pair === "Y"}
+                        onChange={(e) => handleFieldChange("swift_pair", e.target.checked ? "Y" : "N")}
+                        disabled={readonly}
+                        className="mb-0"
+                      />
+                      <span className={`badge ${report.swift_pair === "Y" ? "bg-success" : "bg-secondary"}`} style={{ fontSize: "0.72rem", minWidth: 24, opacity: 0.85 }}>
+                        {report.swift_pair === "Y" ? "Y" : "N"}
+                      </span>
+                    </div>
+                  </Col>
+                </Row>
+              </div>
               <Row>
                 {renderSelectField("Music Type", "music_type", ["None", "WAV", "MP3"], 4)}
               </Row>

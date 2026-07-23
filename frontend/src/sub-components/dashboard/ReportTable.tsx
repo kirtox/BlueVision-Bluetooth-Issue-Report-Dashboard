@@ -256,9 +256,6 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
               <th onClick={() => handleSort('jira_id')} style={{ cursor: 'pointer' }}>
                 Jira ID {sortField === 'jira_id' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
               </th>
-              <th onClick={() => handleSort('hsd_id')} style={{ cursor: 'pointer' }}>
-                HSD ID {sortField === 'hsd_id' ? (sortOrder === 'asc' ? '▲' : '▼') : ''}
-              </th>
               <th></th>
             </tr>
           </thead>
@@ -389,7 +386,6 @@ function ReportTable({ reports, onReload }: ReportTableProps) {
                     )}
                   </td>
                   <td className="align-middle">{item.jira_id || ''}</td>
-                  <td className="align-middle">{item.hsd_id || ''}</td>
                   <td className="align-middle">
                     {/* <ActionMenu /> */}
                     <ReportActions
